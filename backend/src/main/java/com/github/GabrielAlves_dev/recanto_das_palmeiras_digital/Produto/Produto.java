@@ -17,24 +17,21 @@ public class Produto {
     @Column(name = "id_produto")
     private Integer id;
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     @Column(name = "descricao")
     private String descricao;
 
-    @Column(name = "preco")
+    @Column(name = "preco", nullable = false)
     private BigDecimal preco;
 
-    @Column(name = "preco_revenda")
-    private BigDecimal precoRevenda;
-
-    @Column(name = "quantidade")
+    @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
     @Column(name = "imagem")
     private String imagem;
 
-    @Column(name = "ativo")
-    private Boolean ativo;
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 }

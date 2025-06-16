@@ -1,48 +1,58 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ProdutoService {
 
-    @Value("${produto.imagem.diretorio:uploads}")
-    private String diretorioUpload;
-
     @Autowired
-    private ProdutoRepository produtoRepository;
+    private ProdutoRepository repo;
 
-    public Produto salvarProduto(String nome, String descricao, BigDecimal preco,
-                                 BigDecimal precoRevenda, Integer quantidade,
-                                 Boolean ativo, MultipartFile imagem) throws IOException {
+    public Produto salvarProduto(Produto produto) {
+        return repo.save(produto);
+    }
 
-        String nomeImagem = UUID.randomUUID() + "_" + imagem.getOriginalFilename();
-        Path path = Paths.get(diretorioUpload).resolve(nomeImagem);
-        Files.createDirectories(path.getParent());
-        Files.copy(imagem.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+    public Produto atualizarProduto(Integer id, Produto dados) {
+        Produto existente = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
+        existente.setNome(dados.getNome());
+        existente.setDescricao(dados.getDescricao());
+        existente.setPreco(dados.getPreco());
+        existente.setQuantidade(dados.getQuantidade());
+        existente.setImagem(dados.getImagem());
+        return repo.save(existente);
+    }
 
-        Produto produto = new Produto();
-        System.out.println("antes");
-        produto.setNome(nome);
-        System.out.println("depois");
-        produto.setDescricao(descricao);
-        produto.setPreco(preco);
-        produto.setPrecoRevenda(precoRevenda);
-        produto.setQuantidade(quantidade);
-        produto.setAtivo(ativo);
-        produto.setImagem(path.toString());
+    public void setAtivo(Integer id, boolean ativo) {
+        Produto existente = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
+        existente.setAtivo(ativo);
+        repo.save(existente);
+    }
 
-        return produtoRepository.save(produto);
+    public Page<Produto> listar(String nome, BigDecimal minPreco, BigDecimal maxPreco,
+                                Pageable pageable) {
+        List<Specification<Produto>> filtros = new ArrayList<>();
+
+        if (nome != null && !nome.isBlank()) {
+            filtros.add(ProdutoSpecification.porNome(nome));
+        }
+        if (minPreco != null || maxPreco != null) {
+            filtros.add(ProdutoSpecification.porPrecoEntre(minPreco, maxPreco));
+        }
+
+        Specification<Produto> spec = filtros.stream()
+                .reduce(Specification::and)
+                .orElse(null);
+
+        return repo.findAll(spec, pageable);
     }
 }
-

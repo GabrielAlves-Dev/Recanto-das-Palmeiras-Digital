@@ -1,8 +1,8 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.mappers.ProdutoMapper;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.request.ProdutoRequestDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.response.ProdutoResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoMapper;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoRequestDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

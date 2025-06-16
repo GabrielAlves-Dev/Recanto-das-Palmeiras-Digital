@@ -1,4 +1,4 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.response;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos;
 
 import lombok.Getter;
 import lombok.Setter;

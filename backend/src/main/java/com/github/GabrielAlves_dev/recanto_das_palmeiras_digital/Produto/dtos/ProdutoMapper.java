@@ -1,8 +1,6 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.mappers;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.Produto;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.request.ProdutoRequestDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.response.ProdutoResponseDTO;
 import org.springframework.stereotype.Component;
 
 @Component

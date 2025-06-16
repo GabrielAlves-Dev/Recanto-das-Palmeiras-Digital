@@ -1,7 +1,6 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

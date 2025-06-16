@@ -8,6 +8,6 @@ public class RecantoDasPalmeirasDigitalApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecantoDasPalmeirasDigitalApplication.class, args);
+		System.out.println("Recanto-das-Palmeiras application started");
 	}
-
 }

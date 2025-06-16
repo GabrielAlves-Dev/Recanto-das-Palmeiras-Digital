@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
 @Getter
 @Setter
 @Entity
@@ -22,10 +21,21 @@ public class Produto {
     @Column(name = "nome")
     private String nome;
 
+    @Column(name = "descricao")
     private String descricao;
+
+    @Column(name = "preco")
     private BigDecimal preco;
+
+    @Column(name = "preco_revenda")
     private BigDecimal precoRevenda;
+
+    @Column(name = "quantidade")
     private Integer quantidade;
+
+    @Column(name = "imagem")
     private String imagem;
+
+    @Column(name = "ativo")
     private Boolean ativo;
 }

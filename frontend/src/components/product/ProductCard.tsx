@@ -15,7 +15,7 @@ interface Product {
 }
 
 export interface ProductCardProps {
-  product: Product;
+  product: {
     id: string;
     name: string;
     price: string;

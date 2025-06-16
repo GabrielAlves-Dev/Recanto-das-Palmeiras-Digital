@@ -1,6 +1,7 @@
-import React from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import React, { type ReactNode } from 'react';
+
 interface LayoutProps {
   children: ReactNode;
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;

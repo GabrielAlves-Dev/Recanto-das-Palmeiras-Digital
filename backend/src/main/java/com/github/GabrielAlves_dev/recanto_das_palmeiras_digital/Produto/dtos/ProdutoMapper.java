@@ -1,10 +1,16 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.Produto;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ProdutoMapper {
+
+    @Autowired
+    StorageService storageService;
 
     public Produto toEntity(ProdutoRequestDTO dto) {
         Produto entity = new Produto();
@@ -16,12 +22,14 @@ public class ProdutoMapper {
         entity.setQuantidade(dto.getQuantidade());
         entity.setAtivo(true);
 
-        if(dto.getImagem() != null) {
-            entity.setImagem(dto.getImagem());
+        if (dto.getImagem() != null && !dto.getImagem().isEmpty()) {
+            String caminhoImagem = storageService.salvarImagem(dto.getImagem()); // Salva a imagem em si
+            entity.setImagem(caminhoImagem); // Salva o caminho no banco
         }
 
         return entity;
     }
+
 
     public ProdutoResponseDTO toProdutoResponseDTO(Produto produto) {
         ProdutoResponseDTO dto = new ProdutoResponseDTO();

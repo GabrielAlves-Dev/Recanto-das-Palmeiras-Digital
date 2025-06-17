@@ -1,10 +1,13 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoRequestDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,20 +19,35 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository repo;
 
+    @Autowired
+    private StorageService storageService;
+
     public Produto salvarProduto(Produto produto) {
         return repo.save(produto);
     }
 
-    public Produto atualizarProduto(Integer id, Produto dados) {
+    public Produto atualizarProduto(Integer id, ProdutoRequestDTO dto) {
         Produto existente = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
-        existente.setNome(dados.getNome());
-        existente.setDescricao(dados.getDescricao());
-        existente.setPreco(dados.getPreco());
-        existente.setQuantidade(dados.getQuantidade());
-        existente.setImagem(dados.getImagem());
+
+        existente.setNome(dto.getNome());
+        existente.setDescricao(dto.getDescricao());
+        existente.setPreco(dto.getPreco());
+        existente.setQuantidade(dto.getQuantidade());
+
+        MultipartFile novaImagem = dto.getImagem();
+        if (novaImagem != null && !novaImagem.isEmpty()) {
+            if (existente.getImagem() != null) {
+                storageService.deletarImagem(existente.getImagem());
+            }
+
+            String caminhoImagem = storageService.salvarImagem(novaImagem);
+            existente.setImagem(caminhoImagem);
+        }
+
         return repo.save(existente);
     }
+
 
     public void setAtivo(Integer id, boolean ativo) {
         Produto existente = repo.findById(id)

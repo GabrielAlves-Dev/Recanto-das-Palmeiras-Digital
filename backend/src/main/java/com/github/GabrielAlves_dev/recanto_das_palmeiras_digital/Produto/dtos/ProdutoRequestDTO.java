@@ -1,10 +1,9 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -27,5 +26,5 @@ public class ProdutoRequestDTO {
     @NotNull(message = "A quantidade não pode estar em branco!")
     private Integer quantidade;
 
-    private String imagem;
+    private MultipartFile imagem;
 }

@@ -43,9 +43,18 @@ const CustomerProductActions: React.FC<CustomerProductActionsProps> = ({ product
     disabled={!product.active || product.stock === 0}
     onClick={onClickAddToCart}
   >
-    <ShoppingCartIcon size={14} className="mr-1" />
-    Adicionar
-  </Button>
+    {product.active && product.stock > 0 ? (
+      <>
+        <ShoppingCartIcon size={18} className="mr-1" />
+        Comprar
+      </>
+    ) : (
+      <>
+        <ShoppingCartIcon size={18} className="mr-1" />
+        Sem Estoque
+      </>
+    )}
+</Button>
 );
 
 interface SellerProductActionsProps {

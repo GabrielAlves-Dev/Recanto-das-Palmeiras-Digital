@@ -20,7 +20,7 @@ const ProductEdit: React.FC = () => {
     stock: isEditing ? '15' : '',
     category: isEditing ? 'arrangements' : '',
     active: isEditing ? true : true,
-    image: isEditing ? 'https://images.unsplash.com/photo-1587556930799-8dca6fad6d71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80' : ''
+    image: isEditing ? '' : ''
   });
   const categories = [{
     id: 'bouquets',

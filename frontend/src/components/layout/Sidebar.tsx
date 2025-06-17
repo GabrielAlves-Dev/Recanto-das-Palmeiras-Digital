@@ -19,14 +19,10 @@ const Sidebar: React.FC<SidebarProps> = ({
     } else if (userRole === 'vendedor') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
-          <NavItem to="/create-order" icon={<PlusCircleIcon size={20} />} label="Novo Pedido" active={isActive('/create-order')} />
-          <NavItem to="/orders" icon={<ClipboardListIcon size={20} />} label="Pedidos" active={isActive('/orders')} />
         </>;
     } else if (userRole === 'cliente') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
-          <NavItem to="/orders" icon={<ClipboardListIcon size={20} />} label="Meus Pedidos" active={isActive('/orders')} />
-          <NavItem to="/cart" icon={<ShoppingCartIcon size={20} />} label="Meu Carrinho" active={isActive('/cart')} />
         </>;
     }
     return null;

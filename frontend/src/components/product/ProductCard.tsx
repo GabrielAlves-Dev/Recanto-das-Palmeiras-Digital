@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../ui/Button'; // Assuming Button is in src/components/ui/Button
+import Button from '../ui/Button'; 
 import { ShoppingCartIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 interface Product {
@@ -8,7 +8,6 @@ interface Product {
   name: string;
   price: string;
   resellerPrice: string;
-  category: string;
   stock: number;
   active: boolean;
   image: string;
@@ -20,7 +19,6 @@ export interface ProductCardProps {
     name: string;
     price: string;
     resellerPrice: string;
-    category: string;
     stock: number;
     active: boolean;
     image: string;
@@ -28,7 +26,7 @@ export interface ProductCardProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
 }
 
-// Event handler types (adjust as needed based on actual implementation)
+// Event handler types ajustar depois
 type OnClickCartHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 type OnClickEditHandler = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
 type OnClickToggleActiveHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -93,23 +91,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole }) =
   const isSeller = userRole === 'vendedor';
   const isCustomer = userRole === 'cliente';
 
-  // Placeholder event handlers - these would be passed in or defined with actual logic
+  // Placeholder event handlers
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     console.log(`Add to cart: ${product.name}`);
-    // Actual add to cart logic here
+    // logica de adcionar ao carrinho
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    // e.stopPropagation(); // Already in Link component, but if needed elsewhere
     console.log(`Edit: ${product.name}`);
-    // Actual edit navigation / logic can be handled by Link, or further logic here
+    // logica
   };
 
   const handleToggleActive = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     console.log(`Toggle active: ${product.name}`);
-    // Actual toggle active logic here
+    // toggle ativos
   };
 
   return (

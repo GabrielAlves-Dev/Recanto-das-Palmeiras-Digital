@@ -17,12 +17,12 @@ const Header: React.FC<HeaderProps> = ({
         </h1>
       </div>
       <div className="flex items-center space-x-4">
-        {userRole === 'cliente' && <Link to="/cart" className="relative text-gray-600 hover:text-emerald-700">
+        {/* {userRole === 'cliente' && <Link to="/cart" className="relative text-gray-600 hover:text-emerald-700"> //implementar carrinho dps
             <ShoppingCartIcon size={20} />
             <span className="absolute -top-1 -right-1 bg-emerald-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
               2
             </span>
-          </Link>}
+          </Link>} */}
         <button className="text-gray-600 hover:text-emerald-700">
           <BellIcon size={20} />
         </button>

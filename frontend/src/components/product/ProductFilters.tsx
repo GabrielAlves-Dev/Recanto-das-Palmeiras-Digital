@@ -3,11 +3,6 @@ import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { SearchIcon, FilterIcon } from 'lucide-react';
 
-interface Category {
-  id: string;
-  name: string;
-}
-
 interface PriceRange {
   min: string;
   max: string;
@@ -16,9 +11,6 @@ interface PriceRange {
 interface ProductFiltersProps {
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
-  selectedCategory: string;
-  onSelectedCategoryChange: (value: string) => void;
-  categories: Category[];
   priceRange: PriceRange;
   onPriceRangeChange: (newPriceRange: PriceRange) => void;
   showFilters: boolean;
@@ -28,9 +20,6 @@ interface ProductFiltersProps {
 export const ProductFilters: React.FC<ProductFiltersProps> = ({
   searchQuery,
   onSearchQueryChange,
-  selectedCategory,
-  onSelectedCategoryChange,
-  categories,
   priceRange,
   onPriceRangeChange,
   showFilters,
@@ -50,17 +39,6 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           />
         </div>
         <div className="flex gap-2">
-          <select
-            value={selectedCategory}
-            onChange={(e) => onSelectedCategoryChange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
-          >
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
           <Button variant="secondary" onClick={onToggleShowFilters}>
             <FilterIcon size={18} className="mr-1" />
             Filtros

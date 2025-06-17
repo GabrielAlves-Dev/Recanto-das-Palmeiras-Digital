@@ -30,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({
     lg: 'px-5 py-2.5 text-base'
   };
   const widthClass = fullWidth ? 'w-full' : '';
-  const disabledClass = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
+  const disabledClass = disabled ? 'bg-red-500 cursor-not-allowed hover:bg-red-600' : 'cursor-pointer';
   return <button type={type} onClick={onClick} disabled={disabled} className={`
         ${baseClasses}
         ${variantClasses[variant]}

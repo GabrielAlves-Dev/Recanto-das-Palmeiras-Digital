@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, ShoppingCartIcon, HeartIcon, ShareIcon, MinusIcon, PlusIcon, TagIcon, PackageIcon, TruckIcon } from 'lucide-react';
+import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, TagIcon, PackageIcon, TruckIcon } from 'lucide-react';
 const ProductDetails: React.FC = () => {
   const {
     id
@@ -10,34 +10,17 @@ const ProductDetails: React.FC = () => {
     id: string;
   }>();
   const [quantity, setQuantity] = useState(1);
-  // Mock product data - in a real app, this would come from an API
+  // Mock produtos
   const product = {
     id,
     name: 'Arranjo de Rosas',
     price: 70.0,
-    description: 'Lindo arranjo com uma dúzia de rosas vermelhas, perfeito para presentear em ocasiões especiais. As rosas são cuidadosamente selecionadas e arranjadas com folhagens decorativas.',
-    category: 'arrangements',
+    description: 'Composto por rosas frescas e cuidadosamente selecionadas, este arranjo é a personificação da elegância e do sentimento. Cada flor é disposta de forma harmoniosa para criar um impacto visual deslumbrante, tornando-o o presente ideal para celebrar aniversários, expressar amor e gratidão, ou simplesmente para levar um toque de sofisticação e beleza natural a qualquer ambiente. Permita que a beleza atemporal das rosas transmita sua mensagem mais sincera.',
     stock: 15,
-    image: 'https://images.unsplash.com/photo-1587556930799-8dca6fad6d71?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    image: '',
     details: ['Contém 12 rosas vermelhas', 'Folhagens decorativas', 'Vaso de vidro incluso', 'Altura aproximada: 40cm', 'Cartão para mensagem incluso']
   };
-  // Mock related products
-  const relatedProducts = [{
-    id: '2',
-    name: 'Buquê Primavera',
-    price: 75.0,
-    image: 'https://images.unsplash.com/photo-1561181286-d5c88c3490c9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }, {
-    id: '3',
-    name: 'Orquídea Phalaenopsis',
-    price: 80.0,
-    image: 'https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }, {
-    id: '4',
-    name: 'Cesta de Flores do Campo',
-    price: 70.0,
-    image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }];
+  
   const updateQuantity = (newQuantity: number) => {
     if (newQuantity >= 1 && newQuantity <= product.stock) {
       setQuantity(newQuantity);
@@ -70,30 +53,11 @@ const ProductDetails: React.FC = () => {
                     R$ {product.price.toFixed(2)}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <button className="p-2 text-gray-400 hover:text-emerald-600 rounded-full hover:bg-gray-100">
-                    <HeartIcon size={20} />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-emerald-600 rounded-full hover:bg-gray-100">
-                    <ShareIcon size={20} />
-                  </button>
-                </div>
               </div>
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-5 border-t border-gray-100">
                 <p className="text-gray-600">{product.description}</p>
               </div>
-              <div className="pt-4 border-t border-gray-100">
-                <h3 className="font-medium text-gray-800 mb-2">
-                  Detalhes do Produto
-                </h3>
-                <ul className="space-y-2">
-                  {product.details.map((detail, index) => <li key={index} className="flex items-center text-gray-600">
-                      <TagIcon size={16} className="mr-2 text-emerald-600" />
-                      {detail}
-                    </li>)}
-                </ul>
-              </div>
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-5 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
                     <PackageIcon size={20} className="text-emerald-600 mr-2" />
@@ -124,24 +88,6 @@ const ProductDetails: React.FC = () => {
               </div>
             </div>
           </Card>
-        </div>
-      </div>
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-gray-800">
-          Produtos Relacionados
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {relatedProducts.map(product => <Link key={product.id} to={`/products/${product.id}`}>
-              <Card className="h-full transition-transform hover:-translate-y-1">
-                <div className="aspect-square rounded-lg overflow-hidden mb-4">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                </div>
-                <h3 className="font-medium text-gray-800">{product.name}</h3>
-                <p className="text-emerald-600 font-medium mt-1">
-                  R$ {product.price.toFixed(2)}
-                </p>
-              </Card>
-            </Link>)}
         </div>
       </div>
     </div>;

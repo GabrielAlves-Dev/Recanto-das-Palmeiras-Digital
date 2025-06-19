@@ -3,7 +3,6 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoMapper;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoResponseDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,9 +24,6 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoService service;
-
-    @Autowired
-    private StorageService storageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProdutoResponseDTO> cadastrar(@ModelAttribute @Valid ProdutoRequestDTO dto) {

@@ -4,7 +4,6 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.Produto
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ProdutoMapper {

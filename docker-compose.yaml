@@ -4,16 +4,32 @@ services:
     container_name: recanto-postgres
     restart: always
     environment:
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
     ports:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init_data.sql:/docker-entrypoint-initdb.d/init_data.sql
     networks:
-      - postgres-network
+      - recanto-das-palmeiras-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: recanto-das-palmeiras-backend
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - recanto-das-palmeiras-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -22,7 +38,6 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-      PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
     ports:
       - "${PGADMIN_PORT}:${PGADMIN_LISTEN_PORT}"
     depends_on:
@@ -30,10 +45,10 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
-      - postgres-network
+      - recanto-das-palmeiras-network
 
 networks:
-  postgres-network:
+  recanto-das-palmeiras-network:
     driver: bridge
 
 volumes:

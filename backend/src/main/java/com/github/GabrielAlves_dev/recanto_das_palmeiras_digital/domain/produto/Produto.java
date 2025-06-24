@@ -1,0 +1,31 @@
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Table(name = "produto")
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Produto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private UUID id;
+
+    private String nome;
+    private String descricao;
+    private BigDecimal preco;
+    private Integer quantidade;
+    private String imagem_url;
+    private Boolean ativo;
+}

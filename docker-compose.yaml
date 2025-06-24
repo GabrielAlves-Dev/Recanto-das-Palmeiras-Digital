@@ -1,10 +1,12 @@
 services:
   postgres:
     image: postgres:15
-    container_name: recanto-postgres
+    container_name: recanto-postgres-segredo
     restart: always
     environment:
-      - .env
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT}:5432"
     volumes:
@@ -17,9 +19,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: recanto-das-palmeiras-backend
-    env_file:
-      - .env
+    container_name: recanto-das-palmeiras-backend-segredo
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8080:8080"
     depends_on:
@@ -29,10 +33,11 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: recanto-pgadmin
+    container_name: recanto-pgadmin-segredo
     restart: always
     environment:
-      - .env
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
       - "${PGADMIN_PORT}:${PGADMIN_LISTEN_PORT}"
     depends_on:

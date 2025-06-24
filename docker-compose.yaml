@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15
-    container_name: recanto-postgres-segredo
+    container_name: recanto-postgres
     restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
@@ -19,7 +19,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: recanto-das-palmeiras-backend-segredo
+    container_name: recanto-das-palmeiras-backend
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
@@ -33,7 +33,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: recanto-pgadmin-segredo
+    container_name: recanto-pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}

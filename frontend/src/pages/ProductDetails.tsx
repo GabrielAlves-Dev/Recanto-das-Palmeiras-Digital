@@ -1,8 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, TagIcon, PackageIcon, TruckIcon } from 'lucide-react';
+import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon } from 'lucide-react';
+import axios from 'axios';
+
+// Interface do ProdutoResponseDTO
+interface BackendProduct {
+  id: number; // Backend ID is number
+  nome: string;
+  descricao: string;
+  preco: number;
+  quantidade: number;
+  imagem: string | null;
+  ativo: boolean;
+}
+
+interface Product {
+  id: string; // useParams devolve uma string
+  name: string;
+  price: number;
+  description: string;
+  stock: number;
+  image: string;
+  active: boolean;
+}
+
 const ProductDetails: React.FC = () => {
   const {
     id
@@ -10,36 +33,87 @@ const ProductDetails: React.FC = () => {
     id: string;
   }>();
   const [quantity, setQuantity] = useState(1);
-  // Mock produtos
-  const product = {
-    id,
-    name: 'Arranjo de Rosas',
-    price: 70.0,
-    description: 'Composto por rosas frescas e cuidadosamente selecionadas, este arranjo é a personificação da elegância e do sentimento. Cada flor é disposta de forma harmoniosa para criar um impacto visual deslumbrante, tornando-o o presente ideal para celebrar aniversários, expressar amor e gratidão, ou simplesmente para levar um toque de sofisticação e beleza natural a qualquer ambiente. Permita que a beleza atemporal das rosas transmita sua mensagem mais sincera.',
-    stock: 15,
-    image: '',
-    details: ['Contém 12 rosas vermelhas', 'Folhagens decorativas', 'Vaso de vidro incluso', 'Altura aproximada: 40cm', 'Cartão para mensagem incluso']
-  };
+  const [productData, setProductData] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return; 
+
+    const fetchProductDetails = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get<BackendProduct>(`/api/produtos/${id}`);
+        const backendData = response.data;
+
+        setProductData({
+          id: String(backendData.id), // Or keep as number if ProductCard can handle it
+          name: backendData.nome,
+          price: backendData.preco,
+          description: backendData.descricao,
+          stock: backendData.quantidade,
+          image: backendData.imagem || '/placeholder-image.jpg', // Fallback image
+          active: backendData.ativo,
+        });
+      } catch (err) {
+        console.error(`Error erro ao carregar detalhes do produto de ID ${id}:`, err);
+        setError('Produto não encontrado ou falha ao carregar.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProductDetails();
+  }, [id]);
   
   const updateQuantity = (newQuantity: number) => {
-    if (newQuantity >= 1 && newQuantity <= product.stock) {
+    if (productData && newQuantity >= 1 && newQuantity <= productData.stock) { // Uses productData
       setQuantity(newQuantity);
     }
   };
+
+  if (isLoading) {
+    return <div className="text-center py-10">Carregando detalhes do produto...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-10 text-red-600">{error}</div>;
+  }
+
+  if (!productData) {
+    return <div className="text-center py-10 text-gray-500">Produto não encontrado.</div>;
+  }
+
   return <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/products" className="text-emerald-600 hover:text-emerald-700">
           <ArrowLeftIcon size={20} />
         </Link>
-        <h1 className="text-2xl font-bold text-gray-800">{product.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{productData.name}</h1>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <Card>
             <div className="aspect-square rounded-lg overflow-hidden">
-              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+              <img src={productData.image} alt={productData.name} className="w-full h-full object-cover" />
             </div>
           </Card>
+          {/* Details section removed as it's not in productData from backend
+          <Card>
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <TagIcon size={20} className="text-emerald-600 mr-2" />
+                Detalhes do Produto
+              </h3>
+              <ul className="list-disc list-inside text-gray-600 space-y-1">
+                {productData.details.map((detail, index) => (
+                  <li key={index}>{detail}</li>
+                ))}
+              </ul>
+            </div>
+          </Card>
+          */}
         </div>
         <div className="space-y-6">
           <Card>
@@ -47,22 +121,22 @@ const ProductDetails: React.FC = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-800">
-                    {product.name}
+                    {productData.name}
                   </h2>
                   <p className="text-lg font-medium text-emerald-600 mt-1">
-                    R$ {product.price.toFixed(2)}
+                    R$ {productData.price.toFixed(2)}
                   </p>
                 </div>
               </div>
               <div className="pt-5 border-t border-gray-100">
-                <p className="text-gray-600">{product.description}</p>
+                <p className="text-gray-600">{productData.description}</p>
               </div>
               <div className="pt-5 border-t border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
                     <PackageIcon size={20} className="text-emerald-600 mr-2" />
                     <span className="text-gray-600">
-                      Estoque disponível: {product.stock} unidades
+                      Estoque disponível: {productData.stock} unidades
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -72,19 +146,36 @@ const ProductDetails: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center border border-gray-200 rounded-lg">
-                    <button onClick={() => updateQuantity(quantity - 1)} className="p-2 hover:bg-gray-50" disabled={quantity <= 1}>
+                    <button
+                      onClick={() => updateQuantity(quantity - 1)}
+                      className="p-2 hover:bg-gray-50"
+                      disabled={quantity <= 1 || !productData.active || productData.stock === 0}
+                    >
                       <MinusIcon size={16} />
                     </button>
                     <span className="px-4 py-2 text-gray-800">{quantity}</span>
-                    <button onClick={() => updateQuantity(quantity + 1)} className="p-2 hover:bg-gray-50" disabled={quantity >= product.stock}>
+                    <button
+                      onClick={() => updateQuantity(quantity + 1)}
+                      className="p-2 hover:bg-gray-50"
+                      disabled={quantity >= productData.stock || !productData.active || productData.stock === 0}
+                    >
                       <PlusIcon size={16} />
                     </button>
                   </div>
-                  <Button className="flex-1">
+                  <Button
+                    className="flex-1"
+                    disabled={!productData.active || productData.stock === 0}
+                  >
                     <ShoppingCartIcon size={18} className="mr-2" />
-                    Adicionar ao Carrinho
+                    {productData.active && productData.stock > 0 ? 'Adicionar ao Carrinho' : 'Indisponível'}
                   </Button>
                 </div>
+                {!productData.active && (
+                  <p className="text-red-500 text-sm mt-2 text-center">Este produto não está disponível no momento.</p>
+                )}
+                 {productData.active && productData.stock === 0 && (
+                  <p className="text-yellow-500 text-sm mt-2 text-center">Produto sem estoque.</p>
+                )}
               </div>
             </div>
           </Card>

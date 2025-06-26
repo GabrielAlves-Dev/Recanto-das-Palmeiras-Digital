@@ -73,4 +73,9 @@ public class ProdutoService {
 
         return repo.findAll(spec, pageable);
     }
+
+    public Produto findById(Integer id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
+    }
 }

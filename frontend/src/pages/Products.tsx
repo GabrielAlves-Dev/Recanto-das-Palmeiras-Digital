@@ -11,7 +11,7 @@ interface BackendProduct {
   id: number;
   nome: string;
   descricao: string;
-  preco: number; 
+  preco: number;
   quantidade: number;
   imagem: string | null;
   ativo: boolean;
@@ -20,8 +20,8 @@ interface BackendProduct {
 interface Product {
   id: string;
   name: string;
-  originalPrice: number; // Remover depois pois vamos usar filtros do back
-  displayPrice: string; // preço formatado: 'R$ XX,XX'
+  originalPrice: number;
+  displayPrice: string;
   stock: number;
   active: boolean;
   image: string;
@@ -34,14 +34,10 @@ const formatPrice = (price: number): string => {
 interface ProductsProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
 }
-const Products: React.FC<ProductsProps> = ({
-  userRole
-}) => {
+
+const Products: React.FC<ProductsProps> = ({ userRole }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [priceRange, setPriceRange] = useState({
-    min: '',
-    max: ''
-  });
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [showFilters, setShowFilters] = useState(false);
   const [productsData, setProductsData] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +58,7 @@ const Products: React.FC<ProductsProps> = ({
             displayPrice: formatPrice(p.preco),
             stock: p.quantidade,
             active: p.ativo,
-            image: p.imagem || '/placeholder-image.jpg', 
+            image: p.imagem || '/placeholder-image.jpg',
           })
         );
         setProductsData(transformedProducts);
@@ -75,7 +71,7 @@ const Products: React.FC<ProductsProps> = ({
     };
 
     fetchProducts();
-  }, []); 
+  }, []);
 
   const filteredProducts = productsData.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -83,20 +79,12 @@ const Products: React.FC<ProductsProps> = ({
     const matchesMaxPrice = priceRange.max === '' || product.originalPrice <= parseFloat(priceRange.max);
     return matchesSearch && matchesMinPrice && matchesMaxPrice;
   });
+
   const isManager = userRole === 'gerente';
-  const isSeller = userRole === 'vendedor';
   const isCustomer = userRole === 'cliente';
 
-  if (isLoading) {
-    return <div className="text-center py-10">Carregando produtos...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center py-10 text-red-600">{error}</div>;
-  }
-
   const handleToggleActive = async (productId: string, currentStatus: boolean) => {
-    setActivationError(null); 
+    setActivationError(null);
     try {
       await axios.patch(`/api/produtos/${productId}/ativo?ativo=${!currentStatus}`);
       setProductsData(prevProducts =>
@@ -110,17 +98,28 @@ const Products: React.FC<ProductsProps> = ({
     }
   };
 
-  return <div className="space-y-6">
+  if (isLoading) {
+    return <div className="text-center py-10">Carregando produtos...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-10 text-red-600">{error}</div>;
+  }
+
+  return (
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">
           {isCustomer ? 'Catálogo de Produtos' : 'Gerenciar Produtos'}
         </h1>
-        {isManager && <Link to="/products/new">
+        {isManager && (
+          <Link to="/products/new">
             <Button>
               <PlusCircleIcon size={18} className="mr-1" />
               Novo Produto
             </Button>
-          </Link>}
+          </Link>
+        )}
       </div>
 
       {activationError && (
@@ -153,16 +152,18 @@ const Products: React.FC<ProductsProps> = ({
             product={{
               id: product.id,
               name: product.name,
-              price: product.displayPrice, 
+              price: product.displayPrice,
               stock: product.stock,
               active: product.active,
               image: product.image,
             }}
             userRole={userRole}
-            onToggleActive={isManager ? handleToggleActive : undefined} 
+            onToggleActive={isManager ? handleToggleActive : undefined}
           />
         ))}
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Products;

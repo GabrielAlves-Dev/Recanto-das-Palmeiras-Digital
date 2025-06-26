@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../ui/Button'; 
+import Button from '../ui/Button';
 import { ShoppingCartIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 interface Product {
@@ -13,55 +13,25 @@ interface Product {
 }
 
 export interface ProductCardProps {
-  product: {
-    id: string;
-    name: string;
-    price: string;
-    stock: number;
-    active: boolean;
-    image: string;
-  };
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-  onToggleActive?: (productId: string, currentStatus: boolean) => Promise<void>;
-}
-
-// Event handler ajustar depois
-type OnClickCartHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-type OnClickEditHandler = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
-
-interface CustomerProductActionsProps {
   product: Product;
-  onClickAddToCart: OnClickCartHandler;
+  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
+  onToggleActive?: (productId: string, currentStatus: boolean) => void;
 }
 
-const CustomerProductActions: React.FC<CustomerProductActionsProps> = ({ product, onClickAddToCart }) => (
+const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e: React.MouseEvent) => void }> = ({ product, onClickAddToCart }) => (
   <Button
     fullWidth
     size="sm"
     disabled={!product.active || product.stock === 0}
     onClick={onClickAddToCart}
   >
-    {product.active && product.stock > 0 ? (
-      <>
-        <ShoppingCartIcon size={18} className="mr-1" />
-        Comprar
-      </>
-    ) : (
-      <>
-        <ShoppingCartIcon size={18} className="mr-1" />
-        Sem Estoque
-      </>
-    )}
-</Button>
+    <ShoppingCartIcon size={18} className="mr-1" />
+    {product.active && product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
+  </Button>
 );
 
-interface SellerProductActionsProps {
-  product: Product;
-  onClickEdit: OnClickEditHandler;
-}
-
-const SellerProductActions: React.FC<SellerProductActionsProps> = ({ product, onClickEdit }) => (
-  <Link to={`/products/edit/${product.id}`} className="flex-1" onClick={onClickEdit}>
+const SellerProductActions: React.FC<{ product: Product }> = ({ product }) => (
+  <Link to={`/products/edit/${product.id}`} className="flex-1">
     <Button variant="secondary" size="sm" fullWidth>
       <EditIcon size={14} className="mr-1" />
       Editar
@@ -69,27 +39,21 @@ const SellerProductActions: React.FC<SellerProductActionsProps> = ({ product, on
   </Link>
 );
 
-interface ManagerProductActionsProps {
-  product: Product;
-  onClickEdit: OnClickEditHandler; // funcionalidade editar é separada?
-  onToggleActive?: (productId: string, currentStatus: boolean) => Promise<void>; 
-}
-
-const ManagerProductActions: React.FC<ManagerProductActionsProps> = ({ product, onClickEdit, onToggleActive }) => (
+const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (productId: string, currentStatus: boolean) => void }> = ({ product, onToggleActive }) => (
   <>
-    <Link to={`/products/edit/${product.id}`} className="flex-1" onClick={onClickEdit}>
+    <Link to={`/products/edit/${product.id}`} className="flex-1">
       <Button variant="secondary" size="sm" fullWidth>
         <EditIcon size={14} className="mr-1" />
         Editar
       </Button>
     </Link>
-    {onToggleActive && ( 
+    {onToggleActive && (
       <Button
         variant={product.active ? 'outline' : 'primary'}
         size="sm"
         onClick={(e) => {
-          e.preventDefault(); 
-          e.stopPropagation(); 
+          e.preventDefault();
+          e.stopPropagation();
           onToggleActive(product.id, product.active);
         }}
         title={product.active ? "Desativar Produto" : "Ativar Produto"}
@@ -105,15 +69,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
   const isSeller = userRole === 'vendedor';
   const isCustomer = userRole === 'cliente';
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log(`Add to cart: ${product.name}`);
-    // logica de adcionar ao carrinho
-  };
-
-  const handleEdit = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-    console.log(`Edit: ${product.name}`);
-    // logica
   };
 
   return (
@@ -146,13 +105,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
         )}
         <div className="mt-3">
           {isCustomer && <CustomerProductActions product={product} onClickAddToCart={handleAddToCart} />}
-          {isSeller && !isManager && <SellerProductActions product={product} onClickEdit={handleEdit} />}
+          {isSeller && !isManager && <SellerProductActions product={product} />}
           {isManager && (
             <div className="flex gap-2">
               <ManagerProductActions
                 product={product}
-                onClickEdit={handleEdit}
-                onToggleActive={onToggleActive} // Pass the actual prop
+                onToggleActive={onToggleActive}
               />
             </div>
           )}

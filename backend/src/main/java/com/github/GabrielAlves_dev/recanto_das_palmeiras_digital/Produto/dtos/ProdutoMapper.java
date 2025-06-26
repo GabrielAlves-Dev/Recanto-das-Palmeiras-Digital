@@ -5,6 +5,8 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageSer
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Paths;
+
 @Component
 public class ProdutoMapper {
 
@@ -22,8 +24,8 @@ public class ProdutoMapper {
         entity.setAtivo(true);
 
         if (dto.getImagem() != null && !dto.getImagem().isEmpty()) {
-            String caminhoImagem = storageService.salvarImagem(dto.getImagem()); // Salva a imagem em si
-            entity.setImagem(caminhoImagem); // Salva o caminho no banco
+            String caminhoImagem = storageService.salvarImagem(dto.getImagem());
+            entity.setImagem(caminhoImagem);
         }
 
         return entity;
@@ -41,7 +43,10 @@ public class ProdutoMapper {
         dto.setAtivo(produto.getAtivo());
 
         if (produto.getImagem() != null) {
-            dto.setImagem(produto.getImagem());
+            // transforma o caminho em url
+            String imageName = Paths.get(produto.getImagem()).getFileName().toString();
+            String imageUrl = "/uploads/" + imageName;
+            dto.setImagem(imageUrl);
         }
 
         return dto;

@@ -44,8 +44,7 @@ public class ProdutoMapper {
 
         if (produto.getImagem() != null) {
             // transforma o caminho em url
-            String imageName = Paths.get(produto.getImagem()).getFileName().toString();
-            String imageUrl = "/uploads/" + imageName;
+            String imageUrl = "/uploads/" + produto.getImagem();
             dto.setImagem(imageUrl);
         }
 

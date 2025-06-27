@@ -84,20 +84,26 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
   const isManager = userRole === 'gerente';
   const isCustomer = userRole === 'cliente';
 
-  const handleToggleActive = async (productId: string, currentStatus: boolean) => {
+const handleToggleActive = async (productId: string, currentStatus: boolean) => {
     setActivationError(null);
     try {
-      await axios.patch(`/api/produtos/${productId}?ativo=${!currentStatus}`);
-      setProductsData(prevProducts =>
-        prevProducts.map(p =>
-          p.id === productId ? { ...p, active: !currentStatus } : p
-        )
-      );
+        await axios.patch(`/api/produtos/${productId}?ativo=${!currentStatus}`);
+        setProductsData(prevProducts =>
+            prevProducts.map(p =>
+                p.id === productId ? { ...p, active: !currentStatus } : p
+            )
+        );
     } catch (err) {
-      console.error("Error toggling product status:", err);
-      setActivationError(`Falha ao alterar status do produto ID ${productId}. Tente novamente.`);
+        console.error("Erro ao alterar status do produto:", err);
+        if (axios.isAxiosError(err) && err.response) {
+            const errorData = err.response.data;
+            const message = errorData.messages?.join(' ') || `Falha ao alterar status do produto.`;
+            setActivationError(message);
+        } else {
+            setActivationError(`Falha ao alterar status do produto ID ${productId}. Tente novamente.`);
+        }
     }
-  };
+};
 
   if (isLoading) {
     return <div className="text-center py-10">Carregando produtos...</div>;

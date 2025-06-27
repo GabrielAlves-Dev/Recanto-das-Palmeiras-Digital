@@ -86,36 +86,37 @@ const ProductEdit: React.FC = () => {
     }
   };
   
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = 'O nome do produto é obrigatório.';
-    }
-    if (!formData.description.trim()) {
-      newErrors.description = 'A descrição é obrigatória.';
-    }
-    if (!formData.price) {
-      newErrors.price = 'O preço é obrigatório.';
-    } else if (parseFloat(formData.price) <= 0) {
-      newErrors.price = 'O preço deve ser maior que zero.';
-    }
-    if (!formData.stock) {
-      newErrors.stock = 'A quantidade em estoque é obrigatória.';
-    } else if (parseInt(formData.stock, 10) < 0) {
-      newErrors.stock = 'A quantidade não pode ser negativa.';
-    }
+  // const validateForm = (): boolean => { temos que ver se não vamos precisar disso dps
+  //   const newErrors: FormErrors = {};
+  //   if (!formData.name.trim()) {
+  //     newErrors.name = 'O nome do produto é obrigatório.';
+  //   }
+  //   if (!formData.description.trim()) {
+  //     newErrors.description = 'A descrição é obrigatória.';
+  //   }
+  //   if (!formData.price) {
+  //     newErrors.price = 'O preço é obrigatório.';
+  //   } else if (parseFloat(formData.price) <= 0) {
+  //     newErrors.price = 'O preço deve ser maior que zero.';
+  //   }
+  //   if (!formData.stock) {
+  //     newErrors.stock = 'A quantidade em estoque é obrigatória.';
+  //   } else if (parseInt(formData.stock, 10) < 0) {
+  //     newErrors.stock = 'A quantidade não pode ser negativa.';
+  //   }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
 
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPageError(null);
 
-    if (!validateForm()) {
-      return;
-    }
+    // if (!validateForm()) {
+    //     // return;
+    // }
 
     setIsLoading(true);
 
@@ -126,35 +127,37 @@ const ProductEdit: React.FC = () => {
     formDataPayload.append('quantidade', formData.stock);
 
     if (imageFile) {
-      formDataPayload.append('imagem', imageFile);
+        formDataPayload.append('imagem', imageFile);
     }
 
     try {
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      };
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        };
 
-      if (isEditing && id) {
-        await axios.put(`/api/produtos/${id}`, formDataPayload, config);
-      } else {
-        await axios.post('/api/produtos', formDataPayload, config);
-      }
-      navigate('/products');
+        if (isEditing && id) {
+            await axios.put(`/api/produtos/${id}`, formDataPayload, config);
+        } else {
+            await axios.post('/api/produtos', formDataPayload, config);
+        }
+        navigate('/products');
     } catch (err) {
-      console.error("Error saving product:", err);
-      if (axios.isAxiosError(err) && err.response) {
-        const errorData = err.response.data;
-        const messages = errorData.messages || ['Verifique os campos e tente novamente.'];
-        setPageError(`Erro ao salvar produto: ${messages.join(', ')}`);
-      } else {
-        setPageError('Erro ao salvar produto. Verifique os campos e tente novamente.');
-      }
+        console.error("Erro ao salvar produto:", err);
+        if (axios.isAxiosError(err) && err.response) {
+            const errorData = err.response.data;
+            // A mensagem de erro agora é extraída diretamente da resposta do backend
+            const messages = errorData.messages || ['Ocorreu um erro. Verifique os dados e tente novamente.'];
+            setPageError(messages.join(' '));
+        } else {
+            setPageError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+        }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
+
 
   if (isEditing && isLoading && !formData.name) {
     return <div className="text-center py-10">Carregando dados do produto...</div>;

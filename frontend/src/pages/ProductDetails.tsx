@@ -38,37 +38,43 @@ const ProductDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) return; 
+    if (!id) return;
 
     const fetchProductDetails = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await axios.get<BackendProduct>(`/api/produtos/${id}`);
-        const backendData = response.data;
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await axios.get<BackendProduct>(`/api/produtos/${id}`);
+            const backendData = response.data;
 
-        setProductData({
-          id: String(backendData.id), // Or keep as number if ProductCard can handle it
-          name: backendData.nome,
-          price: backendData.preco,
-          description: backendData.descricao,
-          stock: backendData.quantidade,
-          image: backendData.imagem || '/placeholder-image.jpg', // Fallback image
-          active: backendData.ativo,
-        });
-      } catch (err) {
-        console.error(`Error erro ao carregar detalhes do produto de ID ${id}:`, err);
-        setError('Produto não encontrado ou falha ao carregar.');
-      } finally {
-        setIsLoading(false);
-      }
+            setProductData({
+                id: String(backendData.id),
+                name: backendData.nome,
+                price: backendData.preco,
+                description: backendData.descricao,
+                stock: backendData.quantidade,
+                image: backendData.imagem || '/placeholder-image.jpg',
+                active: backendData.ativo,
+            });
+        } catch (err) {
+            console.error(`Erro ao carregar detalhes do produto de ID ${id}:`, err);
+            if (axios.isAxiosError(err) && err.response) {
+                const errorData = err.response.data;
+                const message = errorData.messages?.join(' ') || 'Produto não encontrado ou falha ao carregar.';
+                setError(message);
+            } else {
+                setError('Produto não encontrado ou falha ao carregar.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     fetchProductDetails();
   }, [id]);
-  
+
   const updateQuantity = (newQuantity: number) => {
-    if (productData && newQuantity >= 1 && newQuantity <= productData.stock) { // Uses productData
+    if (productData && newQuantity >= 1 && newQuantity <= productData.stock) { 
       setQuantity(newQuantity);
     }
   };

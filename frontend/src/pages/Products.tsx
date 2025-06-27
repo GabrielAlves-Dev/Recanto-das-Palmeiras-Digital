@@ -77,7 +77,8 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMinPrice = priceRange.min === '' || product.originalPrice >= parseFloat(priceRange.min);
     const matchesMaxPrice = priceRange.max === '' || product.originalPrice <= parseFloat(priceRange.max);
-    return matchesSearch && matchesMinPrice && matchesMaxPrice;
+    const matchesActivity = userRole !== 'cliente' || product.active;
+    return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesActivity;
   });
 
   const isManager = userRole === 'gerente';
@@ -86,7 +87,7 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
   const handleToggleActive = async (productId: string, currentStatus: boolean) => {
     setActivationError(null);
     try {
-      await axios.patch(`/api/produtos/${productId}/ativo?ativo=${!currentStatus}`);
+      await axios.patch(`/api/produtos/${productId}?ativo=${!currentStatus}`);
       setProductsData(prevProducts =>
         prevProducts.map(p =>
           p.id === productId ? { ...p, active: !currentStatus } : p

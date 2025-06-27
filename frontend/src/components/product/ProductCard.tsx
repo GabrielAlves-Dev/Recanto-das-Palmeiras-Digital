@@ -22,11 +22,11 @@ const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e:
   <Button
     fullWidth
     size="sm"
-    disabled={!product.active || product.stock === 0}
+    disabled={product.stock === 0}
     onClick={onClickAddToCart}
   >
     <ShoppingCartIcon size={18} className="mr-1" />
-    {product.active && product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
+    {product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
   </Button>
 );
 

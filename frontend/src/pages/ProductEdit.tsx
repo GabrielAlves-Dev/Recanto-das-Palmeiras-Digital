@@ -16,6 +16,13 @@ interface BackendProduct {
   ativo: boolean;
 }
 
+interface FormErrors {
+  name?: string;
+  description?: string;
+  price?: string;
+  stock?: string;
+}
+
 const ProductEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -33,6 +40,7 @@ const ProductEdit: React.FC = () => {
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (isEditing && id) {
@@ -49,7 +57,6 @@ const ProductEdit: React.FC = () => {
             active: product.ativo,
           });
           if (product.imagem) {
-            // Assuming the backend returns a URL or a path that can be resolved to a URL
             setImagePreview(product.imagem);
           }
         })
@@ -78,10 +85,38 @@ const ProductEdit: React.FC = () => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
+  
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = 'O nome do produto é obrigatório.';
+    }
+    if (!formData.description.trim()) {
+      newErrors.description = 'A descrição é obrigatória.';
+    }
+    if (!formData.price) {
+      newErrors.price = 'O preço é obrigatório.';
+    } else if (parseFloat(formData.price) <= 0) {
+      newErrors.price = 'O preço deve ser maior que zero.';
+    }
+    if (!formData.stock) {
+      newErrors.stock = 'A quantidade em estoque é obrigatória.';
+    } else if (parseInt(formData.stock, 10) < 0) {
+      newErrors.stock = 'A quantidade não pode ser negativa.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPageError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     const formDataPayload = new FormData();
@@ -136,7 +171,7 @@ const ProductEdit: React.FC = () => {
         </h1>
       </div>
       <Card>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           {pageError && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
               {pageError}
@@ -144,16 +179,17 @@ const ProductEdit: React.FC = () => {
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <Input label="Nome do Produto" id="name" name="name" value={formData.name} onChange={handleChange} required disabled={isLoading} />
+              <Input label="Nome do Produto" id="name" name="name" value={formData.name} onChange={handleChange} disabled={isLoading} error={errors.name} />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Descrição
               </label>
-              <textarea id="description" name="description" rows={4} value={formData.description} onChange={handleChange} className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm" disabled={isLoading} />
+              <textarea id="description" name="description" rows={4} value={formData.description} onChange={handleChange} className={`px-3 py-2 bg-white border ${errors.description ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm`} disabled={isLoading} />
+              {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
             </div>
-            <Input label="Preço (R$)" id="price" name="price" type="number" value={formData.price} onChange={handleChange} required disabled={isLoading} />
-            <Input label="Quantidade em Estoque" id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} required disabled={isLoading} />
+            <Input label="Preço (R$)" id="price" name="price" type="number" value={formData.price} onChange={handleChange} disabled={isLoading} error={errors.price} />
+            <Input label="Quantidade em Estoque" id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} disabled={isLoading} error={errors.stock} />
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Imagem do Produto

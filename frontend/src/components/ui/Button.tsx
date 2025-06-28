@@ -25,9 +25,9 @@ const Button: React.FC<ButtonProps> = ({
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
   };
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-base'
+    sm: 'px-3 py-2 text-sm',
+    md: 'px-4 py-3 text-sm',
+    lg: 'px-5 py-4 text-base'
   };
   const widthClass = fullWidth ? 'w-full' : '';
   const disabledClass = disabled ? 'bg-red-500 cursor-not-allowed hover:bg-red-600' : 'cursor-pointer';

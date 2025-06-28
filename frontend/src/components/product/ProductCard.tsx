@@ -21,7 +21,7 @@ export interface ProductCardProps {
 const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e: React.MouseEvent) => void }> = ({ product, onClickAddToCart }) => (
   <Button
     fullWidth
-    size="sm"
+    size="md"
     disabled={product.stock === 0}
     onClick={onClickAddToCart}
   >
@@ -44,9 +44,11 @@ const SellerProductActions: React.FC<{ product: Product }> = ({ product }) => (
 const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (productId: string, currentStatus: boolean) => void }> = ({ product, onToggleActive }) => (
   <>
     <Link to={`/products/edit/${product.id}`} className="flex-1">
-      <Button variant="secondary" size="sm" fullWidth>
-        <EditIcon size={14} className="mr-1" />
-        Editar
+      <Button variant="secondary" size="md" fullWidth>
+        <span className="flex items-center justify-center">
+          <EditIcon size={15} className="mr-1" />
+          Editar
+        </span>
       </Button>
     </Link>
     {onToggleActive && (

@@ -25,8 +25,10 @@ const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e:
     disabled={product.stock === 0}
     onClick={onClickAddToCart}
   >
-    <ShoppingCartIcon size={18} className="mr-1" />
-    {product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
+    <span className="flex items-center justify-center">
+      <ShoppingCartIcon size={18} className="mr-2" />
+      {product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
+    </span>
   </Button>
 );
 

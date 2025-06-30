@@ -13,13 +13,13 @@ const Register: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: '',
-    state: '',
-    zipCode: ''
+    // street: '',
+    // number: '',
+    // complement: '',
+    // neighborhood: '',
+    // city: '',
+    // state: '',
+    // zipCode: ''
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -33,7 +33,6 @@ const Register: React.FC = () => {
   };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, just navigate to login
     navigate('/');
   };
   return <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -70,7 +69,7 @@ const Register: React.FC = () => {
                 <Input label="Confirmar Senha" type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />
               </div>
             </div>
-            <div className="mb-8">
+            {/* <div className="mb-8"> passar para o checkout depois
               <h3 className="text-lg font-medium text-gray-800 mb-4">
                 Endereço
               </h3>
@@ -83,7 +82,7 @@ const Register: React.FC = () => {
                 <Input label="Cidade" id="city" name="city" value={formData.city} onChange={handleChange} required />
                 <Input label="Estado" id="state" name="state" value={formData.state} onChange={handleChange} required />
               </div>
-            </div>
+            </div> */}
             <div className="flex items-center justify-between mt-8">
               <Button type="button" variant="secondary" onClick={() => navigate('/')}>
                 Cancelar

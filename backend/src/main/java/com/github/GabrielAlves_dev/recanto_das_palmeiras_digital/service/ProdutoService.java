@@ -1,8 +1,8 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto.ProdutoMapper;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto.ProdutoRequestDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoMapper;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ProdutoRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.specifications.ProdutoSpecification;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service

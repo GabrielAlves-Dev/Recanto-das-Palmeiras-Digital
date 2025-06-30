@@ -1,4 +1,4 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

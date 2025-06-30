@@ -1,6 +1,5 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import org.springframework.stereotype.Component;
 
 @Component

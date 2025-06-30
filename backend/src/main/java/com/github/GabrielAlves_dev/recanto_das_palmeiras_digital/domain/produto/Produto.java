@@ -1,4 +1,4 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,5 +1,6 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

@@ -1,11 +1,8 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.Produto;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageService;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.nio.file.Paths;
 
 @Component
 public class ProdutoMapper {

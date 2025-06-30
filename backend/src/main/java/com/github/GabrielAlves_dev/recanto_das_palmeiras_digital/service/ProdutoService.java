@@ -1,7 +1,9 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoRequestDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Util.StorageService;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ProdutoRepository;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoSpecification;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoRequestDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

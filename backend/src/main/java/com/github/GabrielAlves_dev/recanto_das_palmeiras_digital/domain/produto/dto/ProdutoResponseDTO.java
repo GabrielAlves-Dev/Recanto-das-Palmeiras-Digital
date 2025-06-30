@@ -1,14 +1,20 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
-@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProdutoResponseDTO {
-    private Integer id;
+
+    private UUID id;
     private String nome;
     private String descricao;
     private BigDecimal preco;

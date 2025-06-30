@@ -1,51 +1,33 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.StorageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProdutoMapper {
 
-    @Autowired
-    StorageService storageService;
+    public ProdutoResponseDTO toProdutoResponseDTO(Produto produto) {
+        if (produto == null) return null;
 
-    public Produto toEntity(ProdutoRequestDTO dto) {
-        Produto entity = new Produto();
-
-        entity.setId(dto.getId());
-        entity.setNome(dto.getNome());
-        entity.setDescricao(dto.getDescricao());
-        entity.setPreco(dto.getPreco());
-        entity.setQuantidade(dto.getQuantidade());
-        entity.setAtivo(true);
-
-        if (dto.getImagem() != null && !dto.getImagem().isEmpty()) {
-            String caminhoImagem = storageService.salvarImagem(dto.getImagem());
-            entity.setImagem(caminhoImagem);
-        }
-
-        return entity;
+        return ProdutoResponseDTO.builder()
+                .id(produto.getId())
+                .nome(produto.getNome())
+                .descricao(produto.getDescricao())
+                .preco(produto.getPreco())
+                .quantidade(produto.getQuantidade())
+                .imagem(produto.getImagem())
+                .ativo(produto.getAtivo())
+                .build();
     }
 
+    public Produto toProduto(ProdutoRequestDTO dto) {
+        if (dto == null) return null;
 
-    public ProdutoResponseDTO toProdutoResponseDTO(Produto produto) {
-        ProdutoResponseDTO dto = new ProdutoResponseDTO();
-
-        dto.setNome(produto.getNome());
-        dto.setId(produto.getId());
-        dto.setDescricao(produto.getDescricao());
-        dto.setPreco(produto.getPreco());
-        dto.setQuantidade(produto.getQuantidade());
-        dto.setAtivo(produto.getAtivo());
-
-        if (produto.getImagem() != null) {
-            // transforma o caminho em url
-            String imageUrl = "/uploads/" + produto.getImagem();
-            dto.setImagem(imageUrl);
-        }
-
-        return dto;
+        Produto produto = new Produto();
+        produto.setNome(dto.getNome());
+        produto.setDescricao(dto.getDescricao());
+        produto.setPreco(dto.getPreco());
+        produto.setQuantidade(dto.getQuantidade());
+        return produto;
     }
 }

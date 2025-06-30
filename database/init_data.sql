@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS public.usuario
     id uuid NOT NULL DEFAULT gen_random_uuid(),
     nome character varying(255) COLLATE pg_catalog."default" NOT NULL,
     email character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    telefone character varying(20) COLLATE pg_catalog."default",
     cargo character varying(20) COLLATE pg_catalog."default" NOT NULL,
     senha character varying(255) COLLATE pg_catalog."default" NOT NULL,
     ativo boolean NOT NULL DEFAULT true,

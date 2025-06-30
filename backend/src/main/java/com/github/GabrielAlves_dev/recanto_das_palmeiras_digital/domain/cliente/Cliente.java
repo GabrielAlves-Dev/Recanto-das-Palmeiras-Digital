@@ -25,5 +25,5 @@ public class Cliente {
     private String telefone;
     private String cpfCnpj;
     private String senha;
-    private Boolean ativo;
+    private Boolean ativo = true;
 }

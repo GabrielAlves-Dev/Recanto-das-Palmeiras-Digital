@@ -49,10 +49,4 @@ public class UsuarioController {
         service.alterarStatus(id, ativo);
         return ResponseEntity.noContent().build();
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable UUID id) {
-        service.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -1,4 +1,4 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;

@@ -90,11 +90,4 @@ public class UsuarioService {
         usuario.setAtivo(ativo);
         repository.save(usuario);
     }
-
-    public void excluir(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Usuário não encontrado");
-        }
-        repository.deleteById(id);
-    }
 }

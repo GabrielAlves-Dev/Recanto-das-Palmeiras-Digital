@@ -82,23 +82,30 @@ public class ProdutoService {
     public void setAtivo(Integer id, boolean ativo) {
         Produto existente = produtoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
+
+        if (!ativo && existente.getQuantidade() > 0) {
+            throw new ValidationException("Não é possível desativar um produto com quantidade em estoque.");
+        }
+
         existente.setAtivo(ativo);
         produtoRepository.save(existente);
     }
 
-    public Page<Produto> listar(String nome, BigDecimal minPreco, BigDecimal maxPreco, Pageable pageable) {
-        List<Specification<Produto>> filtros = new ArrayList<>();
+    public Page<Produto> listar(String nome, BigDecimal minPreco, BigDecimal maxPreco, Boolean ativo, Boolean comEstoque, Pageable pageable) {
+        Specification<Produto> spec = Specification.where(null);
 
         if (nome != null && !nome.isBlank()) {
-            filtros.add(ProdutoSpecification.porNome(nome));
+            spec = spec.and(ProdutoSpecification.porNome(nome));
         }
         if (minPreco != null || maxPreco != null) {
-            filtros.add(ProdutoSpecification.porPrecoEntre(minPreco, maxPreco));
+            spec = spec.and(ProdutoSpecification.porPrecoEntre(minPreco, maxPreco));
         }
-
-        Specification<Produto> spec = filtros.stream()
-                .reduce(Specification::and)
-                .orElse(null);
+        if (ativo != null) {
+            spec = spec.and(ProdutoSpecification.porAtivo(ativo));
+        }
+        if (comEstoque != null) {
+            spec = spec.and(ProdutoSpecification.comEstoque(comEstoque));
+        }
 
         return produtoRepository.findAll(spec, pageable);
     }

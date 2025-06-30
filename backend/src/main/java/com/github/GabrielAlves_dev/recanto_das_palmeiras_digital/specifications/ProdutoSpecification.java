@@ -20,4 +20,18 @@ public class ProdutoSpecification {
             return cb.between(root.get("preco"), min, max);
         };
     }
+
+    public static Specification<Produto> porAtivo(boolean ativo) {
+        return (root, query, cb) -> cb.equal(root.get("ativo"), ativo);
+    }
+
+    public static Specification<Produto> comEstoque(boolean comEstoque) {
+        return (root, query, cb) -> {
+            if (comEstoque) {
+                return cb.greaterThan(root.get("quantidade"), 0);
+            } else {
+                return cb.equal(root.get("quantidade"), 0);
+            }
+        };
+    }
 }

@@ -15,10 +15,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (userRole === 'gerente') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Produtos" active={isActive('/products')} />
+          <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
+          <NavItem to="/users" icon={<UserCogIcon size={20} />} label="Usuários" active={isActive('/users')} />
         </>;
     } else if (userRole === 'vendedor') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
+          <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
         </>;
     } else if (userRole === 'cliente') {
       return <>

@@ -10,10 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "usuario")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Usuario {
 
     @Id
@@ -23,6 +20,8 @@ public class Usuario {
 
     private String nome;
     private String email;
+    private String telefone;
+    private String cpfCnpj;
     private String cargo;
     private String senha;
     private Boolean ativo;

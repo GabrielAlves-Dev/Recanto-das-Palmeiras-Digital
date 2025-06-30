@@ -58,9 +58,11 @@ public class ProdutoController {
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) BigDecimal minPreco,
             @RequestParam(required = false) BigDecimal maxPreco,
+            @RequestParam(required = false) Boolean ativo,
+            @RequestParam(required = false) Boolean comEstoque,
             @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<Produto> pagina = produtoService.listar(nome, minPreco, maxPreco, pageable);
+        Page<Produto> pagina = produtoService.listar(nome, minPreco, maxPreco, ativo, comEstoque, pageable);
         Page<ProdutoResponseDTO> resposta = pagina.map(produtoMapper::toProdutoResponseDTO);
         return ResponseEntity.ok(resposta);
     }

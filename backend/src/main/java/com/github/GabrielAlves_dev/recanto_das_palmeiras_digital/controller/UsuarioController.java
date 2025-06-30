@@ -2,6 +2,7 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioUpdateDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,12 @@ public class UsuarioController {
     @GetMapping
     public ResponseEntity<Page<UsuarioResponseDTO>> listar(@PageableDefault Pageable pageable) {
         return ResponseEntity.ok(service.listar(pageable));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> editar(@PathVariable UUID id, @RequestBody @Valid UsuarioUpdateDTO dto) {
+        service.editar(id, dto);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")

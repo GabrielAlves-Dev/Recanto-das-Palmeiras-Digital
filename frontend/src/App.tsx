@@ -10,7 +10,12 @@ import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
 import CreateOrder from './pages/CreateOrder';
+import Customers from './pages/Customers';
+import CustomerDetails from './pages/CustomerDetails';
+import Users from './pages/Users';
+import UserEdit from './pages/UserEdit';
 import Layout from './components/layout/Layout';
+
 
 interface ProtectedRoutesLayoutProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
@@ -21,19 +26,41 @@ const ProtectedRoutesLayout: React.FC<ProtectedRoutesLayoutProps> = ({ userRole,
   return (
     <Layout userRole={userRole} onLogout={onLogout}>
       <Routes>
+        {/* rotas de produtos */}
         <Route path="/products" element={<Products userRole={userRole} />} />
-        <Route path="/products/edit/:id" element={<ProductEdit userRole={userRole} />} />
-        <Route path="/products/new" element={<ProductEdit userRole={userRole} />} />
+        <Route path="/products/edit/:id" element={<ProductEdit />} />
+        <Route path="/products/new" element={<ProductEdit />} />
         <Route path="/products/:id" element={<ProductDetails />} />
+        
+        {/* carrinho e checkout */}
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
-        {(userRole === 'cliente' || userRole === 'vendedor') && (
+
+        {/* rotas de pedidos */}
+        {(userRole === 'cliente' || userRole === 'vendedor' || userRole === 'gerente') && (
           <>
             <Route path="/orders" element={<Orders userRole={userRole} />} />
             <Route path="/orders/:id" element={<OrderDetails userRole={userRole} />} />
           </>
         )}
-        {userRole === 'vendedor' && <Route path="/create-order" element={<CreateOrder />} />}
+        {(userRole === 'vendedor' || userRole === 'gerente') && <Route path="/create-order" element={<CreateOrder />} />}
+        
+        {/* rotas de cliente (gerente e vendedor) */}
+        {(userRole === 'gerente' || userRole === 'vendedor') && (
+            <>
+              <Route path="/customers" element={<Customers userRole={userRole} />} />
+              <Route path="/customers/:id" element={<CustomerDetails userRole={userRole} />} />
+            </>
+        )}
+
+        {/* Rotas de usuario (somente gerente) */}
+        {userRole === 'gerente' && (
+            <>
+              <Route path="/users" element={<Users />} />
+              <Route path="/users/new" element={<UserEdit />} />
+              <Route path="/users/edit/:id" element={<UserEdit />} />
+            </>
+        )}
       </Routes>
     </Layout>
   );

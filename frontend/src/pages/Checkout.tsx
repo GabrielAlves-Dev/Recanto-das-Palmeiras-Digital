@@ -6,7 +6,6 @@ import { ArrowLeftIcon, MapPinIcon, CreditCardIcon, CheckIcon } from 'lucide-rea
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('credit');
-  // Mock data for cart items
   const cartItems = [{
     id: '1',
     name: 'Arranjo de Rosas',
@@ -26,7 +25,6 @@ const Checkout: React.FC = () => {
     quantity: 1,
     image: 'https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
   }];
-  // Mock data for customer address
   const address = {
     street: 'Rua das Flores',
     number: '123',
@@ -39,7 +37,6 @@ const Checkout: React.FC = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, just show a success message and navigate to orders
     alert('Pedido realizado com sucesso!');
     navigate('/orders');
   };

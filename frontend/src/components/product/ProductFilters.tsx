@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { SearchIcon, FilterIcon } from 'lucide-react';
@@ -8,23 +8,24 @@ interface PriceRange {
   max: string;
 }
 
-interface ProductFiltersProps {
+interface FilterValues {
   searchQuery: string;
-  onSearchQueryChange: (value: string) => void;
   priceRange: PriceRange;
-  onPriceRangeChange: (newPriceRange: PriceRange) => void;
-  showFilters: boolean;
-  onToggleShowFilters: () => void;
 }
 
-export const ProductFilters: React.FC<ProductFiltersProps> = ({
-  searchQuery,
-  onSearchQueryChange,
-  priceRange,
-  onPriceRangeChange,
-  showFilters,
-  onToggleShowFilters,
-}) => {
+interface ProductFiltersProps {
+  onFilter: (filters: FilterValues) => void;
+}
+
+export const ProductFilters: React.FC<ProductFiltersProps> = ({ onFilter }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleApplyFilters = () => {
+    onFilter({ searchQuery, priceRange });
+  };
+
   return (
     <>
       <div className="flex flex-col md:flex-row gap-4">
@@ -34,15 +35,16 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             type="text"
             placeholder="Buscar produtos..."
             value={searchQuery}
-            onChange={(e) => onSearchQueryChange(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
           />
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={onToggleShowFilters}>
+          <Button variant="secondary" onClick={() => setShowFilters(!showFilters)}>
             <FilterIcon size={18} className="mr-1" />
             Filtros
           </Button>
+          <Button onClick={handleApplyFilters}>Buscar</Button>
         </div>
       </div>
       {showFilters && (
@@ -52,14 +54,14 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             <Input
               placeholder="Min"
               value={priceRange.min}
-              onChange={(e) => onPriceRangeChange({ ...priceRange, min: e.target.value })}
+              onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
               fullWidth={false}
             />
             <span>-</span>
             <Input
               placeholder="Max"
               value={priceRange.max}
-              onChange={(e) => onPriceRangeChange({ ...priceRange, max: e.target.value })}
+              onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
               fullWidth={false}
             />
           </div>

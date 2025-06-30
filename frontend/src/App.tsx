@@ -22,8 +22,8 @@ const ProtectedRoutesLayout: React.FC<ProtectedRoutesLayoutProps> = ({ userRole,
     <Layout userRole={userRole} onLogout={onLogout}>
       <Routes>
         <Route path="/products" element={<Products userRole={userRole} />} />
-        <Route path="/products/edit/:id" element={<ProductEdit />} />
-        <Route path="/products/new" element={<ProductEdit />} />
+        <Route path="/products/edit/:id" element={<ProductEdit userRole={userRole} />} />
+        <Route path="/products/new" element={<ProductEdit userRole={userRole} />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

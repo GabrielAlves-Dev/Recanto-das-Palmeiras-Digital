@@ -56,4 +56,10 @@ public class ProdutoController {
         Page<ProdutoResponseDTO> dtoPage = page.map(mapper::toProdutoResponseDTO);
         return ResponseEntity.ok(dtoPage);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProdutoResponseDTO> buscarPorId(@PathVariable Integer id) {
+        Produto produto = service.findById(id);
+        return ResponseEntity.ok(mapper.toProdutoResponseDTO(produto));
+    }
 }

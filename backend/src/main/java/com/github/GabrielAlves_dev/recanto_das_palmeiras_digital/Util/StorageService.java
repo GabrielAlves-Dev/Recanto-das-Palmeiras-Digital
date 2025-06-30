@@ -25,19 +25,18 @@ public class StorageService {
             Path destino = root.resolve(nomeArquivo);
             Files.copy(file.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
-            return destino.toString();
+            return nomeArquivo; 
         } catch (IOException e) {
             throw new RuntimeException("Erro ao salvar imagem: " + e.getMessage());
         }
     }
 
-    public void deletarImagem(String caminhoRelativo) {
-        Path caminhoCompleto = Paths.get("uploads").resolve(caminhoRelativo);
+    public void deletarImagem(String nomeArquivo) {
+        Path caminhoCompleto = root.resolve(nomeArquivo); 
         try {
             Files.deleteIfExists(caminhoCompleto);
         } catch (IOException e) {
-            throw new RuntimeException("Erro ao excluir imagem antiga: " + caminhoRelativo, e);
+            throw new RuntimeException("Erro ao excluir imagem antiga: " + nomeArquivo, e);
         }
     }
-
 }

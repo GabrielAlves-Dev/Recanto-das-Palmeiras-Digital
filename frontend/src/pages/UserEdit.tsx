@@ -15,7 +15,6 @@ const UserEdit: React.FC = () => {
   const [formData, setFormData] = useState({
     name: isEditing ? 'Maria Santos' : '',
     email: isEditing ? 'maria.santos@recanto.com' : '',
-    phone: isEditing ? '(11) 97654-3210' : '',
     role: isEditing ? 'vendedor' : '',
     password: '',
     confirmPassword: '',
@@ -63,7 +62,6 @@ const UserEdit: React.FC = () => {
             </div>
             <Input label="Nome Completo" id="name" name="name" value={formData.name} onChange={handleChange} required />
             <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-            <Input label="Telefone" id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Cargo

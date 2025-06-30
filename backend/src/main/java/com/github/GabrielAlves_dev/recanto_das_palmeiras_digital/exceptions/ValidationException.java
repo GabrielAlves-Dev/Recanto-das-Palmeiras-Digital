@@ -1,4 +1,4 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Exceptions;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions;
 
 import lombok.Getter;
 import org.springframework.validation.BindingResult;

@@ -1,8 +1,10 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoMapper;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoRequestDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.Produto.dtos.ProdutoResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoMapper;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoRequestDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

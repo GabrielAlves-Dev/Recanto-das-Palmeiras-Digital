@@ -1,5 +1,6 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

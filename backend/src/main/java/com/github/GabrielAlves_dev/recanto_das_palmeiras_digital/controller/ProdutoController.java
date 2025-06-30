@@ -1,8 +1,8 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoMapper;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoRequestDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.ProdutoResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto.ProdutoMapper;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto.ProdutoRequestDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.dto.ProdutoResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.ProdutoService;
 import jakarta.validation.Valid;

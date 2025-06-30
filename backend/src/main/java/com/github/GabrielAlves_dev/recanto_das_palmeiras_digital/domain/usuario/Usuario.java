@@ -1,4 +1,4 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,15 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Entity
-@Table(name = "produto")
+@Table(name = "usuario")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Produto {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +20,9 @@ public class Produto {
     private Integer id;
 
     private String nome;
-    private String descricao;
-    private BigDecimal preco;
-    private Integer quantidade;
-    private String imagem;
-    private Boolean ativo = true;
+    private String email;
+    private String telefone;
+    private String cpfCnpj;
+    private String senha;
+    private Boolean ativo;
 }

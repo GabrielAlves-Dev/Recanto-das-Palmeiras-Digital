@@ -1,5 +1,6 @@
-package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto;
+package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.specifications;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;

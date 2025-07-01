@@ -21,6 +21,7 @@ const UserEdit: React.FC = () => {
     active: true,
   });
   const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEditing) {
@@ -63,9 +64,10 @@ const UserEdit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
 
     if (formData.password && formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
+      setFormError("As senhas não coincidem!");
       return;
     }
 
@@ -78,22 +80,19 @@ const UserEdit: React.FC = () => {
     };
 
     try {
+      const successMessage = isEditing ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!';
       if (isEditing) {
         await axios.put(`/api/usuarios/${id}`, userData);
-        alert('Usuário atualizado com sucesso!');
       } else {
-        const response = await axios.post('/api/usuarios', { ...userData, senha: formData.password });
-        if (response.status === 201) {
-          alert('Usuário cadastrado com sucesso!');
-        }
+        await axios.post('/api/usuarios', { ...userData, senha: formData.password });
       }
-      navigate('/users');
+      navigate('/users', { state: { successMessage } });
     } catch (axiosError) {
         if (axios.isAxiosError(axiosError) && axiosError.response) {
             const messages = axiosError.response.data.messages || ['Ocorreu um erro.'];
-            alert(`Erro: ${messages.join(', ')}`);
+            setFormError(`Erro: ${messages.join(', ')}`);
         } else {
-            alert('Ocorreu um erro inesperado. Tente novamente.');
+            setFormError('Ocorreu um erro inesperado. Tente novamente.');
         }
     }
   };
@@ -108,9 +107,10 @@ const UserEdit: React.FC = () => {
                 {isEditing ? 'Editar Usuário' : 'Novo Usuário'}
             </h1>
         </div>
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">{error}</div>}
         <Card>
             <form onSubmit={handleSubmit}>
+                 {formError && <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">{formError}</div>}
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
                       <h3 className="text-lg font-medium text-gray-800 mb-4">

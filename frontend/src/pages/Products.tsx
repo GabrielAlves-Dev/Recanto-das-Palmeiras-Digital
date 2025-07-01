@@ -95,7 +95,13 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
 
     } catch (err) {
       console.error("Error fetching products:", err);
-      setError('Falha ao carregar produtos. Tente novamente mais tarde.');
+      if (axios.isAxiosError(err) && err.response) {
+          const errorData = err.response.data;
+          const message = errorData.messages?.join(' ') || 'Falha ao carregar produtos.';
+          setError(message);
+      } else {
+          setError('Falha ao carregar produtos. Tente novamente mais tarde.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -134,10 +140,6 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
     return <div className="text-center py-10">Carregando produtos...</div>;
   }
 
-  if (error) {
-    return <div className="text-center py-10 text-red-600">{error}</div>;
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -163,6 +165,12 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
       <Card>
         <ProductFilters onFilter={handleFilter} />
       </Card>
+
+      {error && (
+        <div className="my-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
+          {error}
+        </div>
+      )}
 
       {isLoading && <div className="text-center py-5">Atualizando...</div>}
 

@@ -4,7 +4,7 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, ArrowLeftIcon } from 'lucide-react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const Register: React.FC = () => {
     password: '',
     confirmPassword: '',
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,8 +25,9 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
+      setError("As senhas não coincidem!");
       return;
     }
     try {
@@ -37,14 +39,14 @@ const Register: React.FC = () => {
         senha: formData.password,
       });
       if (response.status === 201) {
-        alert('Cadastro realizado com sucesso!');
-        navigate('/');
+        navigate('/', { state: { successMessage: 'Cadastro realizado com sucesso! Faça seu login.' } });
       }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        alert(`Erro no cadastro: ${error.response.data.messages.join(', ')}`);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        const messages = err.response.data.messages || ['Ocorreu um erro.'];
+        setError(`Erro no cadastro: ${messages.join(', ')}`);
       } else {
-        alert('Ocorreu um erro inesperado. Tente novamente.');
+        setError('Ocorreu um erro inesperado. Tente novamente.');
       }
     }
   };
@@ -71,6 +73,7 @@ const Register: React.FC = () => {
         </div>
         <Card>
           <form onSubmit={handleSubmit}>
+            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">{error}</div>}
             <div className="mb-8">
               <h3 className="text-lg font-medium text-gray-800 mb-4">
                 Dados Pessoais

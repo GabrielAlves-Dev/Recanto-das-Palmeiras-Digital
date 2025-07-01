@@ -25,12 +25,13 @@ interface CustomersProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
 }
 
-const API_BASE_URL = '/api'; 
+const API_BASE_URL = '/api';
 
 const Customers: React.FC<CustomersProps> = ({ userRole }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -74,13 +75,19 @@ const Customers: React.FC<CustomersProps> = ({ userRole }) => {
 
   const handleToggleActive = async (customer: Customer) => {
     const action = customer.ativo ? 'desativar' : 'ativar';
-    
+    setActionError(null);
     try {
       await axios.patch(`${API_BASE_URL}/clientes/${customer.id}/${action}`);
       fetchCustomers();
     } catch (err) {
       console.error(`Erro ao ${action} cliente:`, err);
-      alert(`Falha ao ${action} o cliente. Tente novamente.`);
+      if (axios.isAxiosError(err) && err.response) {
+          const errorData = err.response.data;
+          const message = errorData.messages?.join(' ') || `Falha ao ${action} o cliente.`;
+          setActionError(message);
+      } else {
+          setActionError(`Falha ao ${action} o cliente. Tente novamente.`);
+      }
     }
   };
 
@@ -105,6 +112,12 @@ const Customers: React.FC<CustomersProps> = ({ userRole }) => {
           </Button>
         </Link>
       </div>
+
+      {actionError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
+          {actionError}
+        </div>
+      )}
       
       {isLoading && <div className="text-center py-4">Atualizando...</div>}
       
@@ -166,9 +179,10 @@ const Customers: React.FC<CustomersProps> = ({ userRole }) => {
         <div className="flex justify-center items-center space-x-4 mt-8">
             <Button 
                 variant="outline"
-                size="icon"
+                size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)} 
                 disabled={currentPage === 0 || isLoading}
+                className="!p-2"
                 title="Página Anterior"
             >
                 <ArrowLeft size={16} />
@@ -178,9 +192,10 @@ const Customers: React.FC<CustomersProps> = ({ userRole }) => {
             </span>
             <Button 
                 variant="outline"
-                size="icon"
+                size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)} 
                 disabled={currentPage >= totalPages - 1 || isLoading}
+                className="!p-2"
                 title="Próxima Página"
             >
                 <ArrowRight size={16} />

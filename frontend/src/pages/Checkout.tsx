@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { ArrowLeftIcon, MapPinIcon, CreditCardIcon, CheckIcon } from 'lucide-react';
+
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('credit');
@@ -35,11 +36,12 @@ const Checkout: React.FC = () => {
     zipCode: '01234-567'
   };
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Pedido realizado com sucesso!');
-    navigate('/orders');
+    navigate('/orders', { state: { successMessage: 'Pedido realizado com sucesso!' } });
   };
+
   return <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/cart" className="text-emerald-600 hover:text-emerald-700">
@@ -154,4 +156,5 @@ const Checkout: React.FC = () => {
       </div>
     </div>;
 };
+
 export default Checkout;

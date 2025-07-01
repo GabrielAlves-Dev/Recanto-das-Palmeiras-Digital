@@ -4,6 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { ArrowLeftIcon, SearchIcon, UserPlusIcon, PlusIcon, MinusIcon, TrashIcon, SaveIcon } from 'lucide-react';
+
 const CreateOrder: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
@@ -95,8 +96,7 @@ const CreateOrder: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // For demo purposes, just navigate to orders
-    alert('Pedido criado com sucesso!');
-    navigate('/orders');
+    navigate('/orders', { state: { successMessage: 'Pedido criado com sucesso!' } });
   };
   const getSelectedCustomer = () => {
     return customers.find(customer => customer.id === selectedCustomer);
@@ -287,4 +287,5 @@ const CreateOrder: React.FC = () => {
       </div>
     </div>;
 };
+
 export default CreateOrder;

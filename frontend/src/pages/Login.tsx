@@ -1,17 +1,29 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { LeafIcon } from 'lucide-react';
+import { LeafIcon, CheckCircleIcon } from 'lucide-react';
+
 interface LoginProps {
   onLogin: (role: 'gerente' | 'vendedor' | 'cliente') => void;
 }
-const Login: React.FC<LoginProps> = ({
-  onLogin
-}) => {
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(location.state?.successMessage || null);
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000); 
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // For demo purposes, different emails login as different roles
@@ -23,6 +35,7 @@ const Login: React.FC<LoginProps> = ({
       onLogin('cliente');
     }
   };
+
   return <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
@@ -38,6 +51,12 @@ const Login: React.FC<LoginProps> = ({
             Faça login para acessar sua conta
           </p>
         </div>
+        {successMessage && (
+            <div className="p-3 bg-green-100 text-green-700 border border-green-300 rounded-md flex items-center">
+                <CheckCircleIcon className="mr-2" size={20} />
+                {successMessage}
+            </div>
+        )}
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <Input label="E-mail" type="email" id="email" name="email" placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
@@ -72,4 +91,5 @@ const Login: React.FC<LoginProps> = ({
       </div>
     </div>;
 };
+
 export default Login;

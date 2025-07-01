@@ -4,6 +4,8 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, ArrowLeftIcon } from 'lucide-react';
+import axios from 'axios'; // Import axios
+
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -13,29 +15,42 @@ const Register: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    // street: '',
-    // number: '',
-    // complement: '',
-    // neighborhood: '',
-    // city: '',
-    // state: '',
-    // zipCode: ''
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      name,
-      value
-    } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/');
+    if (formData.password !== formData.confirmPassword) {
+      alert("As senhas não coincidem!");
+      return;
+    }
+    try {
+      const response = await axios.post('/api/clientes/auto-cadastro', {
+        nome: formData.fullName,
+        cpfCnpj: formData.document,
+        telefone: formData.phone,
+        email: formData.email,
+        senha: formData.password,
+      });
+      if (response.status === 201) {
+        alert('Cadastro realizado com sucesso!');
+        navigate('/');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        alert(`Erro no cadastro: ${error.response.data.messages.join(', ')}`);
+      } else {
+        alert('Ocorreu um erro inesperado. Tente novamente.');
+      }
+    }
   };
-  return <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center text-emerald-600 mb-4">
@@ -69,20 +84,6 @@ const Register: React.FC = () => {
                 <Input label="Confirmar Senha" type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />
               </div>
             </div>
-            {/* <div className="mb-8"> passar para o checkout depois
-              <h3 className="text-lg font-medium text-gray-800 mb-4">
-                Endereço
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="CEP" id="zipCode" name="zipCode" value={formData.zipCode} onChange={handleChange} required />
-                <Input label="Rua" id="street" name="street" value={formData.street} onChange={handleChange} required />
-                <Input label="Número" id="number" name="number" value={formData.number} onChange={handleChange} required />
-                <Input label="Complemento" id="complement" name="complement" value={formData.complement} onChange={handleChange} />
-                <Input label="Bairro" id="neighborhood" name="neighborhood" value={formData.neighborhood} onChange={handleChange} required />
-                <Input label="Cidade" id="city" name="city" value={formData.city} onChange={handleChange} required />
-                <Input label="Estado" id="state" name="state" value={formData.state} onChange={handleChange} required />
-              </div>
-            </div> */}
             <div className="flex items-center justify-between mt-8">
               <Button type="button" variant="secondary" onClick={() => navigate('/')}>
                 Cancelar
@@ -92,6 +93,8 @@ const Register: React.FC = () => {
           </form>
         </Card>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Register;

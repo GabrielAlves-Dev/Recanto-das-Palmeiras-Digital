@@ -41,7 +41,7 @@ public class ProdutoService {
             String caminhoImagem = storageService.salvarImagem(imagem);
             produto.setImagem(caminhoImagem);
         } else {
-            produto.setImagem("uploads/padrao.jpg");
+            produto.setImagem("padrao.jpg");
         }
 
         return produtoRepository.save(produto).getId();

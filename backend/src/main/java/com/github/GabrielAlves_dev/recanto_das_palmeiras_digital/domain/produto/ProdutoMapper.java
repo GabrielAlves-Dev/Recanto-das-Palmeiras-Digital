@@ -14,7 +14,7 @@ public class ProdutoMapper {
                 .descricao(produto.getDescricao())
                 .preco(produto.getPreco())
                 .quantidade(produto.getQuantidade())
-                .imagem(produto.getImagem())
+                .imagem(produto.getImagem() != null ? "/uploads/" + produto.getImagem() : null)
                 .ativo(produto.getAtivo())
                 .build();
     }

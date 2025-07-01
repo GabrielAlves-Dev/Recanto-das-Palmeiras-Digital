@@ -49,6 +49,12 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/ativar")
+    public ResponseEntity<Void> ativar(@PathVariable UUID id) {
+        service.ativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
     // RF011 / RF014 - Desativar conta
     @PatchMapping("/{id}/desativar")
     public ResponseEntity<Void> desativar(@PathVariable UUID id) {

@@ -5,7 +5,7 @@
 -- Dumped from database version 15.13 (Debian 15.13-1.pgdg120+1)
 -- Dumped by pg_dump version 15.13
 
--- Started on 2025-07-01 00:58:44 UTC
+-- Started on 2025-07-01 10:34:24 UTC
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -41,7 +41,7 @@ CREATE TABLE public.cliente (
 ALTER TABLE public.cliente OWNER TO admin;
 
 --
--- TOC entry 215 (class 1259 OID 16398)
+-- TOC entry 215 (class 1259 OID 16392)
 -- Name: produto; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -52,14 +52,15 @@ CREATE TABLE public.produto (
     preco numeric(38,2) NOT NULL,
     quantidade integer DEFAULT 0 NOT NULL,
     imagem_url character varying(100),
-    ativo boolean DEFAULT true NOT NULL
+    ativo boolean DEFAULT true NOT NULL,
+    imagem character varying(255)
 );
 
 
 ALTER TABLE public.produto OWNER TO admin;
 
 --
--- TOC entry 216 (class 1259 OID 16406)
+-- TOC entry 216 (class 1259 OID 16400)
 -- Name: usuario; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -107,42 +108,42 @@ d22fc5c0-af69-4423-8588-81f5c4de58b4	Heitor Moreira	heitor.moreira@email.com	(11
 
 
 --
--- TOC entry 3368 (class 0 OID 16398)
+-- TOC entry 3368 (class 0 OID 16392)
 -- Dependencies: 215
 -- Data for Name: produto; Type: TABLE DATA; Schema: public; Owner: admin
 --
 
-COPY public.produto (id, nome, descricao, preco, quantidade, imagem_url, ativo) FROM stdin;
-ed7de540-9f23-4807-8d4a-3c47ee85c827	Orquídea Phalaenopsis	Orquídea branca de haste dupla.	89.90	15	\N	t
-b929a6a0-a0f0-4871-ba30-9e38f7cab06e	Lírio Amarelo	Lírios amarelos vibrantes em vaso.	45.50	25	\N	t
-85eb2f94-cd84-4633-8972-4acfce8d34b5	Begônia	Begônia de flores rosas e folhagem ornamental.	35.00	30	\N	t
-e5c46804-f8ba-4d33-a5ec-8e8b24bebac0	Cacto Mandacaru	Cacto de porte médio, resistente e de fácil cuidado.	55.00	20	\N	t
-775350fa-e135-4706-b5cc-68778680367c	Samambaia	Planta pendente com folhas verdes e longas.	42.00	18	\N	t
-e63d3dc0-971d-4a7f-bc21-713c55e3fc9f	Girassol em Vaso	Girassol plantado, ideal para presentear.	29.90	40	\N	t
-c72b2701-2efd-4c33-a966-919e4f95467d	Violeta	Violeta com flores roxas e aveludadas.	15.00	50	\N	t
-d5d96c96-92b8-4224-8bfb-6e7dab583a22	Suculenta Echeveria	Suculenta em formato de roseta.	12.50	60	\N	t
-9d1f5e15-380c-4f09-8617-3894963db0ba	Antúrio	Antúrio com flores vermelhas brilhantes.	65.00	12	\N	t
-cbc842c1-1d4b-4dfd-a723-500047aa5472	Kalanchoe	Kalanchoe com flores laranjas dobradas.	22.00	35	\N	t
+COPY public.produto (id, nome, descricao, preco, quantidade, imagem_url, ativo, imagem) FROM stdin;
+ed7de540-9f23-4807-8d4a-3c47ee85c827	Orquídea Phalaenopsis	Orquídea branca de haste dupla.	89.90	15	\N	t	\N
+b929a6a0-a0f0-4871-ba30-9e38f7cab06e	Lírio Amarelo	Lírios amarelos vibrantes em vaso.	45.50	25	\N	t	\N
+85eb2f94-cd84-4633-8972-4acfce8d34b5	Begônia	Begônia de flores rosas e folhagem ornamental.	35.00	30	\N	t	\N
+e5c46804-f8ba-4d33-a5ec-8e8b24bebac0	Cacto Mandacaru	Cacto de porte médio, resistente e de fácil cuidado.	55.00	20	\N	t	\N
+775350fa-e135-4706-b5cc-68778680367c	Samambaia	Planta pendente com folhas verdes e longas.	42.00	18	\N	t	\N
+e63d3dc0-971d-4a7f-bc21-713c55e3fc9f	Girassol em Vaso	Girassol plantado, ideal para presentear.	29.90	40	\N	t	\N
+c72b2701-2efd-4c33-a966-919e4f95467d	Violeta	Violeta com flores roxas e aveludadas.	15.00	50	\N	t	\N
+d5d96c96-92b8-4224-8bfb-6e7dab583a22	Suculenta Echeveria	Suculenta em formato de roseta.	12.50	60	\N	t	\N
+9d1f5e15-380c-4f09-8617-3894963db0ba	Antúrio	Antúrio com flores vermelhas brilhantes.	65.00	12	\N	t	\N
+cbc842c1-1d4b-4dfd-a723-500047aa5472	Kalanchoe	Kalanchoe com flores laranjas dobradas.	22.00	35	\N	t	\N
 \.
 
 
 --
--- TOC entry 3369 (class 0 OID 16406)
+-- TOC entry 3369 (class 0 OID 16400)
 -- Dependencies: 216
 -- Data for Name: usuario; Type: TABLE DATA; Schema: public; Owner: admin
 --
 
 COPY public.usuario (id, nome, email, cargo, senha, ativo, cpf_cnpj) FROM stdin;
-8f08805a-3e91-4519-b48e-aa49ca06f9cd	Administrador	gerente@gerente.com	GERENTE	asd	t	\N
-899702a8-6f45-4cdc-b78e-3958a5a0a577	Carlos Pereira	carlos.pereira@email.com	VENDEDOR	senha123	t	\N
-69a39a8a-ddb0-4010-9ad7-58e93ebd8eed	Ana Lima	ana.lima@email.com	VENDEDOR	senha456	t	\N
-9f3b50f4-4e26-4b52-b352-191aae066421	Rafael Souza	rafael.souza@email.com	VENDEDOR	senha789	t	\N
-e9db574c-11ce-45e6-8cb1-344591cc294e	Juliana Costa	juliana.costa@email.com	VENDEDOR	senha101	t	\N
+69a39a8a-ddb0-4010-9ad7-58e93ebd8eed	Ana Lima	ana.lima@email.com	VENDEDOR	senha456	t	550.724.100-72
+899702a8-6f45-4cdc-b78e-3958a5a0a577	Carlos Pereira	carlos.pereira@email.com	VENDEDOR	senha123	t	210.232.350-13
+8f08805a-3e91-4519-b48e-aa49ca06f9cd	Administrador	gerente@gerente.com	GERENTE	asd	t	88.693.399/0001-84
+9f3b50f4-4e26-4b52-b352-191aae066421	Rafael Souza	rafael.souza@email.com	VENDEDOR	senha789	t	494.207.820-26
+e9db574c-11ce-45e6-8cb1-344591cc294e	Juliana Costa	juliana.costa@email.com	VENDEDOR	senha101	t	178.554.820-40
 \.
 
 
 --
--- TOC entry 3214 (class 2606 OID 16418)
+-- TOC entry 3214 (class 2606 OID 16408)
 -- Name: cliente cliente_cpf_cnpj_key; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -151,7 +152,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- TOC entry 3216 (class 2606 OID 16397)
+-- TOC entry 3216 (class 2606 OID 16410)
 -- Name: cliente cliente_email_key; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -160,7 +161,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- TOC entry 3218 (class 2606 OID 16393)
+-- TOC entry 3218 (class 2606 OID 16412)
 -- Name: cliente cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -169,7 +170,7 @@ ALTER TABLE ONLY public.cliente
 
 
 --
--- TOC entry 3220 (class 2606 OID 16405)
+-- TOC entry 3220 (class 2606 OID 16414)
 -- Name: produto produto_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -187,7 +188,7 @@ ALTER TABLE ONLY public.usuario
 
 
 --
--- TOC entry 3224 (class 2606 OID 16414)
+-- TOC entry 3224 (class 2606 OID 16418)
 -- Name: usuario usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -195,7 +196,7 @@ ALTER TABLE ONLY public.usuario
     ADD CONSTRAINT usuario_pkey PRIMARY KEY (id);
 
 
--- Completed on 2025-07-01 00:58:44 UTC
+-- Completed on 2025-07-01 10:34:24 UTC
 
 --
 -- PostgreSQL database dump complete

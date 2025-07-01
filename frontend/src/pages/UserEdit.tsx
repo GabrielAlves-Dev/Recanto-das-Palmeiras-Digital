@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
 import { ArrowLeftIcon } from 'lucide-react';
 import axios from 'axios';
 
@@ -74,7 +74,7 @@ const UserEdit: React.FC = () => {
     const userData = {
       nome: formData.name,
       email: formData.email,
-      cpfCnpj: formData.cpfCnpj,
+      cpfCnpj: formData.cpfCnpj, // Não precisa mais do .replace()
       cargo: formData.role,
       ...(formData.password && { senha: formData.password }),
     };
@@ -96,6 +96,16 @@ const UserEdit: React.FC = () => {
         }
     }
   };
+  
+  const cpfCnpjMask = [
+    {
+      mask: '000.000.000-00',
+      maxLength: 11
+    },
+    {
+      mask: '00.000.000/0000-00'
+    }
+  ];
 
   return (
     <div className="space-y-6">
@@ -119,7 +129,16 @@ const UserEdit: React.FC = () => {
                     </div>
                     <Input label="Nome Completo" id="name" name="name" value={formData.name} onChange={handleChange} required />
                     <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-                    <Input label="CPF/CNPJ" id="cpfCnpj" name="cpfCnpj" value={formData.cpfCnpj} onChange={handleChange} required />
+                    <Input 
+                      label="CPF/CNPJ" 
+                      id="cpfCnpj" 
+                      name="cpfCnpj" 
+                      value={formData.cpfCnpj} 
+                      onChange={handleChange} 
+                      required 
+                      mask={cpfCnpjMask}
+                      unmask={true}
+                    />
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                           Cargo

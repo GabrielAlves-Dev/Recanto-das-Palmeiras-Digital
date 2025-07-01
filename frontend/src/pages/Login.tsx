@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
+import { Input } from '../components/ui/Input';import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, CheckCircleIcon } from 'lucide-react';
 

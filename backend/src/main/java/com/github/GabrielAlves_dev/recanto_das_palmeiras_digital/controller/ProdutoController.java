@@ -37,7 +37,7 @@ public class ProdutoController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProdutoResponseDTO> atualizar(
-            @PathVariable Integer id,
+            @PathVariable UUID id,
             @ModelAttribute @Valid ProdutoRequestDTO dto) {
 
         Produto atualizado = produtoService.atualizarProduto(id, dto);
@@ -47,7 +47,7 @@ public class ProdutoController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> alterarStatus(
-            @PathVariable Integer id,
+            @PathVariable UUID id,
             @RequestParam boolean ativo) {
         produtoService.setAtivo(id, ativo);
         return ResponseEntity.noContent().build();
@@ -68,7 +68,7 @@ public class ProdutoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<ProdutoResponseDTO> buscarPorId(@PathVariable UUID id) {
         Produto produto = produtoService.findById(id);
         ProdutoResponseDTO dto = produtoMapper.toProdutoResponseDTO(produto);
         return ResponseEntity.ok(dto);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Input from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, ArrowLeftIcon } from 'lucide-react';
@@ -33,8 +33,8 @@ const Register: React.FC = () => {
     try {
       const response = await axios.post('/api/clientes/auto-cadastro', {
         nome: formData.fullName,
-        cpfCnpj: formData.document,
-        telefone: formData.phone,
+        cpfCnpj: formData.document, // Não precisa mais do .replace()
+        telefone: formData.phone,   // Não precisa mais do .replace()
         email: formData.email,
         senha: formData.password,
       });
@@ -50,6 +50,17 @@ const Register: React.FC = () => {
       }
     }
   };
+
+  // Máscara dinâmica para CPF/CNPJ com 'react-imask'
+  const cpfCnpjMask = [
+    {
+      mask: '000.000.000-00',
+      maxLength: 11
+    },
+    {
+      mask: '00.000.000/0000-00'
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -80,8 +91,26 @@ const Register: React.FC = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input label="Nome Completo" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required />
-                <Input label="CPF/CNPJ" id="document" name="document" value={formData.document} onChange={handleChange} required />
-                <Input label="Telefone" id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
+                <Input
+                  label="CPF/CNPJ"
+                  id="document"
+                  name="document"
+                  value={formData.document}
+                  onChange={handleChange}
+                  required
+                  mask={cpfCnpjMask}
+                  unmask={true} // Retorna o valor sem a máscara para o state
+                />
+                <Input 
+                  label="Telefone" 
+                  id="phone" 
+                  name="phone" 
+                  value={formData.phone} 
+                  onChange={handleChange} 
+                  required 
+                  mask={'(00) 00000-0000'} 
+                  unmask={true} // Retorna o valor sem a máscara para o state
+                />
                 <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                 <Input label="Senha" type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
                 <Input label="Confirmar Senha" type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />

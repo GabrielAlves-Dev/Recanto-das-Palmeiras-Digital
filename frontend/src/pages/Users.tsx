@@ -1,42 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { SearchIcon, UserIcon, PhoneIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ShieldIcon } from 'lucide-react';
+import { SearchIcon, UserIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ShieldIcon, ArrowLeft, ArrowRight } from 'lucide-react';
+import axios from 'axios';
+
+// Interfaces
+interface BackendUser {
+  id: string;
+  nome: string;
+  email: string;
+  cargo: string;
+  ativo: boolean;
+  cpfCnpj: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  active: boolean;
+  cpfCnpj: string;
+}
+
 const Users: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const users = [{
-    id: '1',
-    name: 'João Silva',
-    email: 'joao.silva@recanto.com',
-    phone: '(11) 98765-4321',
-    role: 'gerente',
-    active: true
-  }, {
-    id: '2',
-    name: 'Maria Santos',
-    email: 'maria.santos@recanto.com',
-    phone: '(11) 97654-3210',
-    role: 'vendedor',
-    active: true
-  }, {
-    id: '3',
-    name: 'Pedro Oliveira',
-    email: 'pedro.oliveira@recanto.com',
-    phone: '(11) 96543-2109',
-    role: 'vendedor',
-    active: true
-  }, {
-    id: '4',
-    name: 'Ana Costa',
-    email: 'ana.costa@recanto.com',
-    phone: '(11) 95432-1098',
-    role: 'vendedor',
-    active: false
-  }];
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      params.append('page', currentPage.toString());
+      params.append('size', '10');
+      // Implementar busca no backend se necessário
+      // if (searchQuery) params.append('search', searchQuery);
+
+      const response = await axios.get<{ content: BackendUser[], totalPages: number, number: number }>(`/api/usuarios?${params.toString()}`);
+      
+      const transformedUsers: User[] = response.data.content.map(u => ({
+        id: u.id,
+        name: u.nome,
+        email: u.email,
+        role: u.cargo,
+        active: u.ativo,
+        cpfCnpj: u.cpfCnpj,
+      }));
+
+      setUsers(transformedUsers);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(response.data.number);
+
+    } catch (err) {
+      console.error("Erro ao buscar usuários:", err);
+      setError('Falha ao carregar usuários. Tente novamente mais tarde.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handleToggleActive = async (userId: string, currentStatus: boolean) => {
+    try {
+      await axios.patch(`/api/usuarios/${userId}?ativo=${!currentStatus}`);
+      fetchUsers(); // Recarrega a lista
+    } catch (err) {
+      console.error("Erro ao alterar status do usuário:", err);
+      setError('Falha ao alterar status do usuário.');
+    }
+  };
+
+  // Filtro local enquanto a busca de backend não é implementada
   const filteredUsers = users.filter(user => {
     const searchLower = searchQuery.toLowerCase();
-    return user.name.toLowerCase().includes(searchLower) || user.email.toLowerCase().includes(searchLower) || user.phone.includes(searchQuery);
+    return user.name.toLowerCase().includes(searchLower) || 
+           user.email.toLowerCase().includes(searchLower);
   });
   return <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -51,7 +98,7 @@ const Users: React.FC = () => {
       <Card>
         <div className="relative">
           <SearchIcon size={18} className="absolute left-3 top-2.5 text-gray-400" />
-          <input type="text" placeholder="Buscar por nome, email ou telefone..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" />
+          <input type="text" placeholder="Buscar por nome ou email..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" />
         </div>
       </Card>
       <Card>
@@ -61,6 +108,9 @@ const Users: React.FC = () => {
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Usuário
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  CPF/CNPJ
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contato
@@ -91,10 +141,9 @@ const Users: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 flex items-center">
-                      <PhoneIcon size={14} className="mr-1" />
-                      {user.phone}
-                    </div>
+                    <div className="text-sm text-gray-900">{user.cpfCnpj}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500 flex items-center">
                       <MailIcon size={14} className="mr-1" />
                       {user.email}
@@ -118,7 +167,7 @@ const Users: React.FC = () => {
                           Editar
                         </Button>
                       </Link>
-                      <Button variant={user.active ? 'outline' : 'primary'} size="sm">
+                      <Button variant={user.active ? 'outline' : 'primary'} size="sm" onClick={() => handleToggleActive(user.id, user.active)}>
                         {user.active ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
                       </Button>
                     </div>

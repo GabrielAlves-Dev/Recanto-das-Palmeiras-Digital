@@ -20,7 +20,6 @@ public class Usuario {
 
     private String nome;
     private String email;
-    private String telefone;
     private String cpfCnpj;
     private String cargo;
     private String senha;

@@ -65,9 +65,6 @@ public class UsuarioService {
             }
             usuario.setEmail(dto.getEmail());
         }
-        if (dto.getTelefone() != null && !dto.getTelefone().isBlank()) {
-            usuario.setTelefone(dto.getTelefone());
-        }
         if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().isBlank() && !dto.getCpfCnpj().equals(usuario.getCpfCnpj())) {
             if (repository.existsByCpfCnpj(dto.getCpfCnpj())) {
                 throw new ValidationException("CPF/CNPJ já está em uso.");

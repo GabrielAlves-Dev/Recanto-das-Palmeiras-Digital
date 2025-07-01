@@ -4,6 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { ArrowLeftIcon } from 'lucide-react';
+
 const UserEdit: React.FC = () => {
   const {
     id
@@ -15,6 +16,7 @@ const UserEdit: React.FC = () => {
   const [formData, setFormData] = useState({
     name: isEditing ? 'Maria Santos' : '',
     email: isEditing ? 'maria.santos@recanto.com' : '',
+    cpfCnpj: isEditing ? '123.456.789-00' : '',
     role: isEditing ? 'vendedor' : '',
     password: '',
     confirmPassword: '',
@@ -62,6 +64,7 @@ const UserEdit: React.FC = () => {
             </div>
             <Input label="Nome Completo" id="name" name="name" value={formData.name} onChange={handleChange} required />
             <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+            <Input label="CPF/CNPJ" id="cpfCnpj" name="cpfCnpj" value={formData.cpfCnpj} onChange={handleChange} required />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Cargo

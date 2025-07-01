@@ -20,9 +20,6 @@ public class UsuarioRequestDTO {
     @NotBlank(message = "CPF/CNPJ é obrigatório")
     private String cpfCnpj;
 
-    @NotBlank(message = "Telefone é obrigatório")
-    private String telefone;
-
     @NotBlank(message = "Cargo é obrigatório")
     private String cargo;
 

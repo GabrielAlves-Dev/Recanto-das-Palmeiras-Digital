@@ -12,6 +12,7 @@ interface BackendUser {
   email: string;
   cargo: string;
   ativo: boolean;
+  cpfCnpj: string;
 }
 
 interface User {
@@ -20,6 +21,7 @@ interface User {
   email: string;
   role: string;
   active: boolean;
+  cpfCnpj: string;
 }
 
 const Users: React.FC = () => {
@@ -48,6 +50,7 @@ const Users: React.FC = () => {
         email: u.email,
         role: u.cargo,
         active: u.ativo,
+        cpfCnpj: u.cpfCnpj,
       }));
 
       setUsers(transformedUsers);
@@ -107,6 +110,9 @@ const Users: React.FC = () => {
                   Usuário
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  CPF/CNPJ
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contato
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -135,6 +141,9 @@ const Users: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{user.cpfCnpj}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500 flex items-center">
                       <MailIcon size={14} className="mr-1" />
                       {user.email}
@@ -158,7 +167,7 @@ const Users: React.FC = () => {
                           Editar
                         </Button>
                       </Link>
-                      <Button variant={user.active ? 'outline' : 'primary'} size="sm">
+                      <Button variant={user.active ? 'outline' : 'primary'} size="sm" onClick={() => handleToggleActive(user.id, user.active)}>
                         {user.active ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
                       </Button>
                     </div>

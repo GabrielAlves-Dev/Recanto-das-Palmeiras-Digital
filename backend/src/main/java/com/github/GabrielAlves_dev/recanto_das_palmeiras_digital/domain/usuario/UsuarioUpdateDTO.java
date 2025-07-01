@@ -14,8 +14,6 @@ public class UsuarioUpdateDTO {
     @Email(message = "Email inválido")
     private String email;
 
-    private String telefone;
-
     private String cpfCnpj;
 
     private String cargo;

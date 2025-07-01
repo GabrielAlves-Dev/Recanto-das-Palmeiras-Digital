@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { SearchIcon, UserIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ShieldIcon, ArrowLeft, ArrowRight } from 'lucide-react';
+import { SearchIcon, UserIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ShieldIcon, ArrowLeft, ArrowRight, CheckCircleIcon } from 'lucide-react';
 import axios from 'axios';
 
 // Interfaces
@@ -25,9 +25,12 @@ interface User {
 }
 
 const Users: React.FC = () => {
+  const location = useLocation();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(location.state?.successMessage || null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -59,7 +62,13 @@ const Users: React.FC = () => {
 
     } catch (err) {
       console.error("Erro ao buscar usuários:", err);
-      setError('Falha ao carregar usuários. Tente novamente mais tarde.');
+      if (axios.isAxiosError(err) && err.response) {
+          const errorData = err.response.data;
+          const message = errorData.messages?.join(' ') || 'Falha ao carregar usuários.';
+          setError(message);
+      } else {
+          setError('Falha ao carregar usuários. Tente novamente mais tarde.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -69,13 +78,29 @@ const Users: React.FC = () => {
     fetchUsers();
   }, [fetchUsers]);
 
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000); // Mensagem some após 5 segundos
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const handleToggleActive = async (userId: string, currentStatus: boolean) => {
+    setActionError(null);
     try {
       await axios.patch(`/api/usuarios/${userId}?ativo=${!currentStatus}`);
       fetchUsers(); // Recarrega a lista
     } catch (err) {
       console.error("Erro ao alterar status do usuário:", err);
-      setError('Falha ao alterar status do usuário.');
+      if (axios.isAxiosError(err) && err.response) {
+          const errorData = err.response.data;
+          const message = errorData.messages?.join(' ') || 'Falha ao alterar status do usuário.';
+          setActionError(message);
+      } else {
+        setActionError('Falha ao alterar status do usuário.');
+      }
     }
   };
 
@@ -85,7 +110,18 @@ const Users: React.FC = () => {
     return user.name.toLowerCase().includes(searchLower) || 
            user.email.toLowerCase().includes(searchLower);
   });
+  
+  if (isLoading && users.length === 0) {
+    return <div className="text-center py-10">Carregando usuários...</div>;
+  }
+
   return <div className="space-y-6">
+      {successMessage && (
+        <div className="mb-4 p-3 bg-green-100 text-green-700 border border-green-300 rounded-md flex items-center">
+          <CheckCircleIcon className="mr-2" size={20} />
+          {successMessage}
+        </div>
+      )}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Gerenciar Usuários</h1>
         <Link to="/users/new">
@@ -101,6 +137,27 @@ const Users: React.FC = () => {
           <input type="text" placeholder="Buscar por nome ou email..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" />
         </div>
       </Card>
+
+      {actionError && (
+        <div className="my-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
+          {actionError}
+        </div>
+      )}
+
+      {error && (
+        <div className="my-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {isLoading && <div className="text-center py-5">Atualizando...</div>}
+
+      {!isLoading && filteredUsers.length === 0 && (
+        <div className="text-center py-10 text-gray-500">
+          Nenhum usuário encontrado.
+        </div>
+      )}
+
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -177,6 +234,33 @@ const Users: React.FC = () => {
           </table>
         </div>
       </Card>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-4 mt-8">
+            <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)} 
+                disabled={currentPage === 0 || isLoading}
+                className="!p-2"
+                title="Página Anterior"
+            >
+                <ArrowLeft size={16} />
+            </Button>
+            <span className="font-medium text-gray-700 text-sm">
+                Página {currentPage + 1} de {totalPages}
+            </span>
+            <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)} 
+                disabled={currentPage >= totalPages - 1 || isLoading}
+                className="!p-2"
+                title="Próxima Página"
+            >
+                <ArrowRight size={16} />
+            </Button>
+        </div>
+      )}
     </div>;
 };
 export default Users;

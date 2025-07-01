@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Input from '../components/ui/Input';
+import { Input } from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, ArrowLeftIcon } from 'lucide-react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const Register: React.FC = () => {
     password: '',
     confirmPassword: '',
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,30 +25,42 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
+      setError("As senhas não coincidem!");
       return;
     }
     try {
       const response = await axios.post('/api/clientes/auto-cadastro', {
         nome: formData.fullName,
-        cpfCnpj: formData.document,
-        telefone: formData.phone,
+        cpfCnpj: formData.document, // Não precisa mais do .replace()
+        telefone: formData.phone,   // Não precisa mais do .replace()
         email: formData.email,
         senha: formData.password,
       });
       if (response.status === 201) {
-        alert('Cadastro realizado com sucesso!');
-        navigate('/');
+        navigate('/', { state: { successMessage: 'Cadastro realizado com sucesso! Faça seu login.' } });
       }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        alert(`Erro no cadastro: ${error.response.data.messages.join(', ')}`);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        const messages = err.response.data.messages || ['Ocorreu um erro.'];
+        setError(`Erro no cadastro: ${messages.join(', ')}`);
       } else {
-        alert('Ocorreu um erro inesperado. Tente novamente.');
+        setError('Ocorreu um erro inesperado. Tente novamente.');
       }
     }
   };
+
+  // Máscara dinâmica para CPF/CNPJ com 'react-imask'
+  const cpfCnpjMask = [
+    {
+      mask: '000.000.000-00',
+      maxLength: 11
+    },
+    {
+      mask: '00.000.000/0000-00'
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -71,14 +84,33 @@ const Register: React.FC = () => {
         </div>
         <Card>
           <form onSubmit={handleSubmit}>
+            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">{error}</div>}
             <div className="mb-8">
               <h3 className="text-lg font-medium text-gray-800 mb-4">
                 Dados Pessoais
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input label="Nome Completo" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} required />
-                <Input label="CPF/CNPJ" id="document" name="document" value={formData.document} onChange={handleChange} required />
-                <Input label="Telefone" id="phone" name="phone" value={formData.phone} onChange={handleChange} required />
+                <Input
+                  label="CPF/CNPJ"
+                  id="document"
+                  name="document"
+                  value={formData.document}
+                  onChange={handleChange}
+                  required
+                  mask={cpfCnpjMask}
+                  unmask={true} // Retorna o valor sem a máscara para o state
+                />
+                <Input 
+                  label="Telefone" 
+                  id="phone" 
+                  name="phone" 
+                  value={formData.phone} 
+                  onChange={handleChange} 
+                  required 
+                  mask={'(00) 00000-0000'} 
+                  unmask={true} // Retorna o valor sem a máscara para o state
+                />
                 <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                 <Input label="Senha" type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
                 <Input label="Confirmar Senha" type="password" id="confirmPassword" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required />

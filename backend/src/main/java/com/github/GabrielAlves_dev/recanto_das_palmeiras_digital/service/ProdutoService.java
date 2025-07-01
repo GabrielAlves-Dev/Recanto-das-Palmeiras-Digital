@@ -47,7 +47,7 @@ public class ProdutoService {
         return produtoRepository.save(produto).getId();
     }
 
-    public Produto atualizarProduto(Integer id, ProdutoRequestDTO dto) {
+    public Produto atualizarProduto(UUID id, ProdutoRequestDTO dto) {
         Produto existente = produtoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
 
@@ -77,7 +77,7 @@ public class ProdutoService {
         return produtoRepository.save(existente);
     }
 
-    public void setAtivo(Integer id, boolean ativo) {
+    public void setAtivo(UUID id, boolean ativo) {
         Produto existente = produtoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
 
@@ -108,7 +108,7 @@ public class ProdutoService {
         return produtoRepository.findAll(spec, pageable);
     }
 
-    public Produto findById(Integer id) {
+    public Produto findById(UUID id) {
         return produtoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado: " + id));
     }

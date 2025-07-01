@@ -1,12 +1,9 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.Cliente;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteRequestDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteAutoCadastroDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteResponseDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteMapper;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,24 +27,26 @@ public class ClienteService {
     private PasswordEncoder passwordEncoder;
 
     public UUID autoCadastrar(ClienteAutoCadastroDTO dto) {
+        String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
+        String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
+        
         Optional<Cliente> existente = repository.findByEmail(dto.getEmail());
 
         if (existente.isPresent()) {
             if (existente.get().getAtivo()) {
                 throw new ValidationException("Email já cadastrado. Faça login.");
             } else {
-                // Simula envio de e-mail
                 throw new ValidationException("Conta desativada. Enviamos um link para reativação.");
             }
         }
 
-        if (repository.existsByCpfCnpj(dto.getCpfCnpj())) {
+        if (repository.existsByCpfCnpj(formattedCpfCnpj)) {
             throw new ValidationException("CPF/CNPJ já cadastrado.");
         }
 
         Cliente novo = new Cliente();
         novo.setNome(dto.getNome());
-        novo.setCpfCnpj(dto.getCpfCnpj());
+        novo.setCpfCnpj(formattedCpfCnpj);
         novo.setTelefone(dto.getTelefone());
         novo.setEmail(dto.getEmail());
         novo.setSenha(passwordEncoder.encode(dto.getSenha()));
@@ -57,14 +56,18 @@ public class ClienteService {
     }
 
     public UUID cadastrarPorGerente(ClienteRequestDTO dto) {
+        String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
+        String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
+
         if (repository.existsByEmail(dto.getEmail())) {
             throw new ValidationException("Email já cadastrado.");
         }
-        if (repository.existsByCpfCnpj(dto.getCpfCnpj())) {
+        if (repository.existsByCpfCnpj(formattedCpfCnpj)) {
             throw new ValidationException("CPF/CNPJ já cadastrado.");
         }
 
         Cliente cliente = mapper.toCliente(dto);
+        cliente.setCpfCnpj(formattedCpfCnpj);
         cliente.setSenha(passwordEncoder.encode(dto.getSenha()));
         cliente.setAtivo(true);
 
@@ -83,11 +86,13 @@ public class ClienteService {
                 .orElseThrow(() -> new ValidationException("Cliente não encontrado."));
 
         if (dto.getNome() != null) cliente.setNome(dto.getNome());
-        if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().equals(cliente.getCpfCnpj())) {
-            if (repository.existsByCpfCnpj(dto.getCpfCnpj())) {
+        if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().isBlank()) {
+            String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
+            String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
+            if (!formattedCpfCnpj.equals(cliente.getCpfCnpj()) && repository.existsByCpfCnpj(formattedCpfCnpj)) {
                 throw new ValidationException("CPF/CNPJ já cadastrado.");
             }
-            cliente.setCpfCnpj(dto.getCpfCnpj());
+            cliente.setCpfCnpj(formattedCpfCnpj);
         }
         if (dto.getTelefone() != null) cliente.setTelefone(dto.getTelefone());
         if (dto.getEmail() != null && !dto.getEmail().equals(cliente.getEmail())) {
@@ -104,14 +109,6 @@ public class ClienteService {
     public void ativar(UUID id) {
         Cliente cliente = repository.findById(id)
                 .orElseThrow(() -> new ValidationException("Cliente não encontrado."));
-
-        // TODO: Implementar validação de pedidos pendentes (RF011).
-        //  Será necessário injetar um `PedidoRepository` e verificar se existe
-        //  algum pedido para este cliente com status 'PENDENTE'.
-        //  Ex: if (pedidoRepository.existsByClienteAndStatus(cliente, "PENDENTE")) {
-        //         throw new ValidationException("Cliente possui pedidos pendentes e não pode ser desativado.");
-        //      }
-
         cliente.setAtivo(true);
         repository.save(cliente);
     }
@@ -119,14 +116,6 @@ public class ClienteService {
     public void desativar(UUID id) {
         Cliente cliente = repository.findById(id)
                 .orElseThrow(() -> new ValidationException("Cliente não encontrado."));
-
-        // TODO: Implementar validação de pedidos pendentes (RF011).
-        //  Será necessário injetar um `PedidoRepository` e verificar se existe
-        //  algum pedido para este cliente com status 'PENDENTE'.
-        //  Ex: if (pedidoRepository.existsByClienteAndStatus(cliente, "PENDENTE")) {
-        //         throw new ValidationException("Cliente possui pedidos pendentes e não pode ser desativado.");
-        //      }
-
         cliente.setAtivo(false);
         repository.save(cliente);
     }

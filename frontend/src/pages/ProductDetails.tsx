@@ -105,21 +105,6 @@ const ProductDetails: React.FC = () => {
               <img src={productData.image} alt={productData.name} className="w-full h-full object-cover" />
             </div>
           </Card>
-          {/* Details section removed as it's not in productData from backend
-          <Card>
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-                <TagIcon size={20} className="text-emerald-600 mr-2" />
-                Detalhes do Produto
-              </h3>
-              <ul className="list-disc list-inside text-gray-600 space-y-1">
-                {productData.details.map((detail, index) => (
-                  <li key={index}>{detail}</li>
-                ))}
-              </ul>
-            </div>
-          </Card>
-          */}
         </div>
         <div className="space-y-6">
           <Card>

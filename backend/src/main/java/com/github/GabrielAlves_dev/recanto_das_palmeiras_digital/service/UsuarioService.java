@@ -2,6 +2,7 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.UsuarioRepository;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +26,18 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     public UUID cadastrar(UsuarioRequestDTO dto) {
+        String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
+        String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
+
         if (repository.existsByEmail(dto.getEmail())) {
             throw new ValidationException("Email já está em uso");
         }
-        if (repository.existsByCpfCnpj(dto.getCpfCnpj())) { // Adicionado
+        if (repository.existsByCpfCnpj(formattedCpfCnpj)) {
             throw new ValidationException("CPF/CNPJ já está em uso");
         }
 
         Usuario usuario = mapper.toUsuario(dto);
+        usuario.setCpfCnpj(formattedCpfCnpj);
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         usuario.setAtivo(true);
 
@@ -55,7 +60,6 @@ public class UsuarioService {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new ValidationException("Usuário não encontrado."));
 
-        // Atualiza os campos se eles foram fornecidos no DTO
         if (dto.getNome() != null && !dto.getNome().isBlank()) {
             usuario.setNome(dto.getNome());
         }
@@ -65,11 +69,13 @@ public class UsuarioService {
             }
             usuario.setEmail(dto.getEmail());
         }
-        if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().isBlank() && !dto.getCpfCnpj().equals(usuario.getCpfCnpj())) {
-            if (repository.existsByCpfCnpj(dto.getCpfCnpj())) {
+        if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().isBlank()) {
+            String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
+            String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
+            if (!formattedCpfCnpj.equals(usuario.getCpfCnpj()) && repository.existsByCpfCnpj(formattedCpfCnpj)) {
                 throw new ValidationException("CPF/CNPJ já está em uso.");
             }
-            usuario.setCpfCnpj(dto.getCpfCnpj());
+            usuario.setCpfCnpj(formattedCpfCnpj);
         }
         if (dto.getCargo() != null && !dto.getCargo().isBlank()) {
             usuario.setCargo(dto.getCargo());

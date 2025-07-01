@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Adicione useEffect
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -22,7 +22,6 @@ const UserEdit: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
-  // **Adicione este useEffect**
   useEffect(() => {
     if (isEditing) {
       const fetchUser = async () => {
@@ -35,7 +34,7 @@ const UserEdit: React.FC = () => {
             cpfCnpj: user.cpfCnpj,
             role: user.cargo,
             active: user.ativo,
-            password: '', // Senha não deve ser pré-preenchida por segurança
+            password: '',
             confirmPassword: '',
           });
         } catch (err) {
@@ -45,7 +44,7 @@ const UserEdit: React.FC = () => {
       };
       fetchUser();
     }
-  }, [id, isEditing]); // A dependência `id` garante que a busca seja refeita se o ID mudar
+  }, [id, isEditing]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
@@ -70,23 +69,19 @@ const UserEdit: React.FC = () => {
       return;
     }
 
-    // Dados a serem enviados para a API
     const userData = {
       nome: formData.name,
       email: formData.email,
       cpfCnpj: formData.cpfCnpj,
       cargo: formData.role,
-      // Envie a senha apenas se ela for alterada
       ...(formData.password && { senha: formData.password }),
     };
 
     try {
       if (isEditing) {
-        // Lógica de ATUALIZAÇÃO (PUT)
         await axios.put(`/api/usuarios/${id}`, userData);
         alert('Usuário atualizado com sucesso!');
       } else {
-        // Lógica de CRIAÇÃO (POST)
         const response = await axios.post('/api/usuarios', { ...userData, senha: formData.password });
         if (response.status === 201) {
           alert('Usuário cadastrado com sucesso!');
@@ -116,32 +111,31 @@ const UserEdit: React.FC = () => {
         {error && <p className="text-red-500">{error}</p>}
         <Card>
             <form onSubmit={handleSubmit}>
-                <Input label="Nome Completo" id="name" name="name" value={formData.name} onChange={handleChange} required />
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                    <h3 className="text-lg font-medium text-gray-800 mb-4">
-                        Dados do Usuário
-                    </h3>
+                      <h3 className="text-lg font-medium text-gray-800 mb-4">
+                          Dados do Usuário
+                      </h3>
                     </div>
                     <Input label="Nome Completo" id="name" name="name" value={formData.name} onChange={handleChange} required />
                     <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                     <Input label="CPF/CNPJ" id="cpfCnpj" name="cpfCnpj" value={formData.cpfCnpj} onChange={handleChange} required />
                     <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Cargo
-                    </label>
-                    <select
-                        id="role"
-                        name="role"
-                        value={formData.role}
-                        onChange={handleChange}
-                        className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm"
-                        required
-                    >
-                        <option value="">Selecione um cargo</option>
-                        <option value="VENDEDOR">Vendedor</option>
-                        <option value="GERENTE">Gerente</option>
-                    </select>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Cargo
+                      </label>
+                      <select
+                          id="role"
+                          name="role"
+                          value={formData.role}
+                          onChange={handleChange}
+                          className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm"
+                          required
+                      >
+                          <option value="">Selecione um cargo</option>
+                          <option value="VENDEDOR">Vendedor</option>
+                          <option value="GERENTE">Gerente</option>
+                      </select>
                     </div>
                     
                     <Input

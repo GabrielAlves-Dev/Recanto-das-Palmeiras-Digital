@@ -101,6 +101,21 @@ public class ClienteService {
         repository.save(cliente);
     }
 
+    public void ativar(UUID id) {
+        Cliente cliente = repository.findById(id)
+                .orElseThrow(() -> new ValidationException("Cliente não encontrado."));
+
+        // TODO: Implementar validação de pedidos pendentes (RF011).
+        //  Será necessário injetar um `PedidoRepository` e verificar se existe
+        //  algum pedido para este cliente com status 'PENDENTE'.
+        //  Ex: if (pedidoRepository.existsByClienteAndStatus(cliente, "PENDENTE")) {
+        //         throw new ValidationException("Cliente possui pedidos pendentes e não pode ser desativado.");
+        //      }
+
+        cliente.setAtivo(true);
+        repository.save(cliente);
+    }
+
     public void desativar(UUID id) {
         Cliente cliente = repository.findById(id)
                 .orElseThrow(() -> new ValidationException("Cliente não encontrado."));

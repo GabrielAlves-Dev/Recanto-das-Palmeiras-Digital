@@ -77,7 +77,7 @@ public class UsuarioService {
             }
             usuario.setCpfCnpj(formattedCpfCnpj);
         }
-        if (dto.getCargo() != null && !dto.getCargo().isBlank()) {
+        if (dto.getCargo() != null) {
             usuario.setCargo(dto.getCargo());
         }
         if (dto.getSenha() != null && !dto.getSenha().isBlank()) {

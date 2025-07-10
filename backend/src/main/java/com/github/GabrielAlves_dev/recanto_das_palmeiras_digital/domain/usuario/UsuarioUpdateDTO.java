@@ -16,7 +16,7 @@ public class UsuarioUpdateDTO {
 
     private String cpfCnpj;
 
-    private String cargo;
+    private CargoUsuario cargo;
 
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
     private String senha;

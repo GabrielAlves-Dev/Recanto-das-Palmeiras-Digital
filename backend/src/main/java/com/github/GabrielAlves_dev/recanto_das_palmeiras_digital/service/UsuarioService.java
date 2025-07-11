@@ -8,6 +8,9 @@ import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,9 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     public UUID cadastrar(UsuarioRequestDTO dto) {
         String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
         String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
@@ -35,6 +41,9 @@ public class UsuarioService {
         if (repository.existsByCpfCnpj(formattedCpfCnpj)) {
             throw new ValidationException("CPF/CNPJ já está em uso");
         }
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
+        dto.setSenha(encryptedPassword);
 
         Usuario usuario = mapper.toUsuario(dto);
         usuario.setCpfCnpj(formattedCpfCnpj);
@@ -92,5 +101,10 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
         usuario.setAtivo(ativo);
         repository.save(usuario);
+    }
+
+    public void login(AuthenticationDTO dto) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
     }
 }

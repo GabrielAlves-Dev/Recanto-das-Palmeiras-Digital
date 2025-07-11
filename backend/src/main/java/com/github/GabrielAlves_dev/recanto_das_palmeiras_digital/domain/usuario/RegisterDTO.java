@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class RegisterDTO {
     String email;
     String senha;
-    String cargo;    
+    CargoUsuario cargo;    
 }

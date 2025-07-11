@@ -16,7 +16,6 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.UsuarioRepository;
 
 import jakarta.validation.Valid;
-import lombok.var;
 
 @RestController
 @RequestMapping("auth")
@@ -39,9 +38,10 @@ public class AuthenticationController {
         if (this.repository.findByEmail(data.getEmail()) != null) return ResponseEntity.badRequest().build();
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.getSenha());
-        Usuario novoUsuario = new Usuario(data.getEmail(), encryptedPassword, data.getCargo());;
+        Usuario novoUsuario = new Usuario(data.getEmail(), encryptedPassword, data.getCargo());
 
-
+        this.repository.save(novoUsuario);
+        return ResponseEntity.ok().build();
     }
     
 }

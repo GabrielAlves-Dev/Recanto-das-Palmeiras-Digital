@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/auth/register").permitAll() //mudar dps para só adm
                         .requestMatchers(HttpMethod.POST,"/usuarios").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.POST,"/produtos").hasRole("GERENTE")
                         .anyRequest().authenticated()

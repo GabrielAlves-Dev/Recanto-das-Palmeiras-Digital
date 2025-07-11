@@ -11,8 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -24,10 +22,6 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService service;
-    
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
 
     @PostMapping
     public ResponseEntity<Void> cadastrar(@RequestBody @Valid UsuarioRequestDTO dto) {
@@ -58,7 +52,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
+    public ResponseEntity<Void> login(@RequestBody @Valid AuthenticationDTO data){
         service.login(data);
         return ResponseEntity.noContent().build();
     }

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon } from 'lucide-react';
+import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 import axios from 'axios';
 
-// Interface do ProdutoResponseDTO
 interface BackendProduct {
-  id: number; // Backend ID is number
+  id: number;
   nome: string;
   descricao: string;
   preco: number;
@@ -17,7 +16,7 @@ interface BackendProduct {
 }
 
 interface Product {
-  id: string; // useParams devolve uma string
+  id: string;
   name: string;
   price: number;
   description: string;
@@ -26,58 +25,79 @@ interface Product {
   active: boolean;
 }
 
-const ProductDetails: React.FC = () => {
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
+interface ProductDetailsProps {
+  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
+}
+
+const ProductDetails: React.FC<ProductDetailsProps> = ({ userRole }) => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [productData, setProductData] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const fetchProductDetails = async () => {
+    if (!id) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get<BackendProduct>(`/api/produtos/${id}`);
+      const backendData = response.data;
+      setProductData({
+        id: String(backendData.id),
+        name: backendData.nome,
+        price: backendData.preco,
+        description: backendData.descricao,
+        stock: backendData.quantidade,
+        image: backendData.imagem || '/placeholder-image.jpg',
+        active: backendData.ativo,
+      });
+    } catch (err) {
+      console.error(`Erro ao carregar detalhes do produto de ID ${id}:`, err);
+      if (axios.isAxiosError(err) && err.response) {
+        const errorData = err.response.data;
+        const message = errorData.messages?.join(' ') || 'Produto não encontrado ou falha ao carregar.';
+        setError(message);
+      } else {
+        setError('Produto não encontrado ou falha ao carregar.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!id) return;
-
-    const fetchProductDetails = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await axios.get<BackendProduct>(`/api/produtos/${id}`);
-            const backendData = response.data;
-
-            setProductData({
-                id: String(backendData.id),
-                name: backendData.nome,
-                price: backendData.preco,
-                description: backendData.descricao,
-                stock: backendData.quantidade,
-                image: backendData.imagem || '/placeholder-image.jpg',
-                active: backendData.ativo,
-            });
-        } catch (err) {
-            console.error(`Erro ao carregar detalhes do produto de ID ${id}:`, err);
-            if (axios.isAxiosError(err) && err.response) {
-                const errorData = err.response.data;
-                const message = errorData.messages?.join(' ') || 'Produto não encontrado ou falha ao carregar.';
-                setError(message);
-            } else {
-                setError('Produto não encontrado ou falha ao carregar.');
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     fetchProductDetails();
   }, [id]);
 
+  const handleToggleActive = async () => {
+    if (!productData) return;
+    setActionError(null);
+    try {
+      await axios.patch(`/api/produtos/${productData.id}?ativo=${!productData.active}`);
+      await fetchProductDetails(); // Re-fetch to get updated data
+    } catch (err) {
+      console.error("Erro ao alterar status do produto:", err);
+      if (axios.isAxiosError(err) && err.response) {
+          const errorData = err.response.data;
+          const message = errorData.messages?.join(' ') || `Falha ao alterar status do produto.`;
+          setActionError(message);
+      } else {
+          setActionError(`Falha ao alterar status do produto ID ${productData.id}. Tente novamente.`);
+      }
+    }
+  };
+
   const updateQuantity = (newQuantity: number) => {
-    if (productData && newQuantity >= 1 && newQuantity <= productData.stock) { 
+    if (productData && newQuantity >= 1 && newQuantity <= productData.stock) {
       setQuantity(newQuantity);
     }
   };
+
+  const isManager = userRole === 'gerente';
+  const isSeller = userRole === 'vendedor';
 
   if (isLoading) {
     return <div className="text-center py-10">Carregando detalhes do produto...</div>;
@@ -91,12 +111,18 @@ const ProductDetails: React.FC = () => {
     return <div className="text-center py-10 text-gray-500">Produto não encontrado.</div>;
   }
 
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/products" className="text-emerald-600 hover:text-emerald-700">
           <ArrowLeftIcon size={20} />
         </Link>
         <h1 className="text-2xl font-bold text-gray-800">{productData.name}</h1>
+        {(isManager || isSeller) && !productData.active && (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+            Inativo
+          </span>
+        )}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
@@ -111,9 +137,7 @@ const ProductDetails: React.FC = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-800">
-                    {productData.name}
-                  </h2>
+                  <h2 className="text-2xl font-bold text-gray-800">{productData.name}</h2>
                   <p className="text-lg font-medium text-emerald-600 mt-1">
                     R$ {productData.price.toFixed(2)}
                   </p>
@@ -135,34 +159,50 @@ const ProductDetails: React.FC = () => {
                     <span className="text-gray-600">Frete a calcular</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-gray-200 rounded-lg">
-                    <button
-                      onClick={() => updateQuantity(quantity - 1)}
-                      className="p-2 hover:bg-gray-50"
-                      disabled={quantity <= 1 || !productData.active || productData.stock === 0}
-                    >
-                      <MinusIcon size={16} />
-                    </button>
-                    <span className="px-4 py-2 text-gray-800">{quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(quantity + 1)}
-                      className="p-2 hover:bg-gray-50"
-                      disabled={quantity >= productData.stock || !productData.active || productData.stock === 0}
-                    >
-                      <PlusIcon size={16} />
-                    </button>
+
+                {actionError && (
+                  <p className="text-red-500 text-sm mt-2 text-center">{actionError}</p>
+                )}
+
+                {userRole === 'cliente' ? (
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border border-gray-200 rounded-lg">
+                      <button onClick={() => updateQuantity(quantity - 1)} className="p-2 hover:bg-gray-50" disabled={quantity <= 1 || !productData.active || productData.stock === 0}>
+                        <MinusIcon size={16} />
+                      </button>
+                      <span className="px-4 py-2 text-gray-800">{quantity}</span>
+                      <button onClick={() => updateQuantity(quantity + 1)} className="p-2 hover:bg-gray-50" disabled={quantity >= productData.stock || !productData.active || productData.stock === 0}>
+                        <PlusIcon size={16} />
+                      </button>
+                    </div>
+                    <Button className="flex-1" disabled={!productData.active || productData.stock === 0}>
+                      <ShoppingCartIcon size={18} className="mr-2" />
+                      {productData.active && productData.stock > 0 ? 'Adicionar ao Carrinho' : 'Indisponível'}
+                    </Button>
                   </div>
-                  <Button
-                    className="flex-1"
-                    disabled={!productData.active || productData.stock === 0}
-                  >
-                    <ShoppingCartIcon size={18} className="mr-2" />
-                    {productData.active && productData.stock > 0 ? 'Adicionar ao Carrinho' : 'Indisponível'}
-                  </Button>
-                </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button variant="secondary" fullWidth onClick={() => navigate(`/products/edit/${id}`)}>
+                      <span className="flex items-center justify-center">
+                        <EditIcon size={18} className="mr-1" />
+                        Editar
+                      </span>
+                    </Button>
+                    {isManager && (
+                      <Button
+                        variant={productData.active ? 'outline' : 'primary'}
+                        size="md"
+                        onClick={handleToggleActive}
+                        title={productData.active ? "Desativar Produto" : "Ativar Produto"}
+                      >
+                        {productData.active ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
+                      </Button>
+                    )}
+                  </div>
+                )}
+
                 {!productData.active && (
-                  <p className="text-red-500 text-sm mt-2 text-center">Este produto não está disponível no momento.</p>
+                  <p className="text-red-500 text-sm mt-2 text-center">Este produto não está disponível para clientes.</p>
                 )}
                  {productData.active && productData.stock === 0 && (
                   <p className="text-yellow-500 text-sm mt-2 text-center">Produto sem estoque.</p>
@@ -172,6 +212,8 @@ const ProductDetails: React.FC = () => {
           </Card>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default ProductDetails;

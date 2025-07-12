@@ -30,7 +30,7 @@ const ProtectedRoutesLayout: React.FC<ProtectedRoutesLayoutProps> = ({ userRole,
         <Route path="/products" element={<Products userRole={userRole} />} />
         <Route path="/products/edit/:id" element={<ProductEdit />} />
         <Route path="/products/new" element={<ProductEdit />} />
-        <Route path="/products/:id" element={<ProductDetails />} />
+        <Route path="/products/:id" element={<ProductDetails userRole={userRole} />} />
         
         {/* carrinho e checkout */}
         <Route path="/cart" element={<Cart />} />

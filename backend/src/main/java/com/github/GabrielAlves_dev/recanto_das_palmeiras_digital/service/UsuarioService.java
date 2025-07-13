@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,9 +23,6 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioMapper mapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -47,7 +43,7 @@ public class UsuarioService {
 
         Usuario usuario = mapper.toUsuario(dto);
         usuario.setCpfCnpj(formattedCpfCnpj);
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        usuario.setSenha(dto.getSenha());
         usuario.setAtivo(true);
 
         return repository.save(usuario).getId();
@@ -90,7 +86,9 @@ public class UsuarioService {
             usuario.setCargo(dto.getCargo());
         }
         if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
-            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+            String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
+            dto.setSenha(encryptedPassword);
+            usuario.setSenha(dto.getSenha());
         }
 
         repository.save(usuario);

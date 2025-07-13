@@ -70,7 +70,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        //return this.ativo;
-        return true;
+        return this.ativo;
     }
 }

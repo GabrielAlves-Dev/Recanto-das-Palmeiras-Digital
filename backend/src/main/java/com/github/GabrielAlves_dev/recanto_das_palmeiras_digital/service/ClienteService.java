@@ -1,6 +1,8 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.*;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.AuthenticationDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.LoginResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
@@ -8,6 +10,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +29,12 @@ public class ClienteService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenService tokenService;
 
     public UUID autoCadastrar(ClienteAutoCadastroDTO dto) {
         String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
@@ -122,5 +132,13 @@ public class ClienteService {
 
     public Page<ClienteResponseDTO> listar(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::toResponseDTO);
+    }
+
+    public LoginResponseDTO login(AuthenticationDTO dto) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+
+        var token = tokenService.generateToken((Cliente) auth.getPrincipal());
+        return new LoginResponseDTO(token);
     }
 }

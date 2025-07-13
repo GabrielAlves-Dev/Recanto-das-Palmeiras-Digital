@@ -1,5 +1,6 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,11 +13,19 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.Usua
 public class AuthorizationService implements UserDetailsService {
 
     @Autowired
-    private UsuarioRepository repository;
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmail(username);
+        UserDetails user = usuarioRepository.findByEmail(username);
+        if (user != null) {
+            return user;
+        }
+        return clienteRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + username));
     }
     
 }

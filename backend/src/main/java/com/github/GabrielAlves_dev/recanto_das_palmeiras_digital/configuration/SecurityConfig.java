@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST,"/usuarios/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/clientes/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/clientes/auto-cadastro").permitAll()
                         .requestMatchers(HttpMethod.POST,"/usuarios").permitAll() //mudar dps para só adm
                         .requestMatchers(HttpMethod.POST,"/usuarios").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.POST,"/produtos").hasRole("GERENTE")

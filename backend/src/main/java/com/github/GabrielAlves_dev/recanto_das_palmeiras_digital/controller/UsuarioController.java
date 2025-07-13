@@ -1,6 +1,7 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.AuthenticationDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.LoginResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioUpdateDTO;
@@ -52,8 +53,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody @Valid AuthenticationDTO data){
-        service.login(data);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
+        return ResponseEntity.ok(service.login(data));
     }
 }

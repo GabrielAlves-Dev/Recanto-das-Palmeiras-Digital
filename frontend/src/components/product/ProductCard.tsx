@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
 import { ShoppingCartIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
@@ -32,25 +32,21 @@ const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e:
   </Button>
 );
 
-const SellerProductActions: React.FC<{ product: Product }> = ({ product }) => (
-  <Link to={`/products/edit/${product.id}`} className="flex-1">
-    <Button variant="secondary" size="sm" fullWidth>
+const SellerProductActions: React.FC<{ onClickEdit: (e: React.MouseEvent) => void }> = ({ onClickEdit }) => (
+    <Button variant="secondary" size="sm" fullWidth onClick={onClickEdit}>
       <EditIcon size={14} className="mr-1" />
       Editar
     </Button>
-  </Link>
 );
 
-const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (productId: string, currentStatus: boolean) => void }> = ({ product, onToggleActive }) => (
+const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (productId: string, currentStatus: boolean) => void, onClickEdit: (e: React.MouseEvent) => void }> = ({ product, onToggleActive, onClickEdit }) => (
   <>
-    <Link to={`/products/edit/${product.id}`} className="flex-1">
-      <Button variant="secondary" size="md" fullWidth>
+    <Button variant="secondary" size="md" fullWidth onClick={onClickEdit}>
         <span className="flex items-center justify-center">
           <EditIcon size={15} className="mr-1" />
           Editar
         </span>
-      </Button>
-    </Link>
+    </Button>
     {onToggleActive && (
       <Button
         variant={product.active ? 'outline' : 'primary'}
@@ -69,6 +65,7 @@ const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (prod
 );
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onToggleActive }) => {
+  const navigate = useNavigate();
   const isManager = userRole === 'gerente';
   const isSeller = userRole === 'vendedor';
   const isCustomer = userRole === 'cliente';
@@ -77,6 +74,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
     e.preventDefault();
     e.stopPropagation();
     console.log(`Add to cart: ${product.name}`);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/products/edit/${product.id}`);
   };
 
   return (
@@ -109,12 +112,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
         )}
         <div className="mt-3">
           {isCustomer && <CustomerProductActions product={product} onClickAddToCart={handleAddToCart} />}
-          {isSeller && !isManager && <SellerProductActions product={product} />}
+          {isSeller && !isManager && <SellerProductActions onClickEdit={handleEditClick} />}
           {isManager && (
             <div className="flex gap-2">
               <ManagerProductActions
                 product={product}
                 onToggleActive={onToggleActive}
+                onClickEdit={handleEditClick}
               />
             </div>
           )}

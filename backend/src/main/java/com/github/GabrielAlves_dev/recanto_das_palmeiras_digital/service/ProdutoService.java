@@ -40,8 +40,6 @@ public class ProdutoService {
             validarImagem(imagem);
             String caminhoImagem = storageService.salvarImagem(imagem);
             produto.setImagem(caminhoImagem);
-        } else {
-            produto.setImagem("padrao.jpg");
         }
 
         return produtoRepository.save(produto).getId();

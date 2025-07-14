@@ -17,7 +17,7 @@ import java.util.UUID;
 public class CarrinhoItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)

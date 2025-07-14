@@ -12,10 +12,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -37,18 +36,24 @@ public class PedidoService {
     @Autowired
     private PedidoMapper pedidoMapper;
 
+    private Cliente getAuthenticatedCliente() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof UserDetails)) {
+            throw new IllegalStateException("O principal de autenticação não é uma instância de UserDetails.");
+        }
+        String username = ((UserDetails) principal).getUsername();
+        return clienteRepository.findByEmail(username)
+                .orElseThrow(() -> new NotFoundException("Cliente autenticado não encontrado. Email: " + username));
+    }
+
     @Transactional
     public PedidoResponseDTO criarPedido(PedidoRequestDTO dto) {
+        Cliente cliente = getAuthenticatedCliente();
         Pedido pedido = new Pedido();
-        pedido.setStatus(StatusPedido.PENDENTE); // Todo pedido começa como pendente
+        pedido.setStatus(StatusPedido.PENDENTE);
         pedido.setFormaPagamento(dto.getFormaPagamento());
         pedido.setObservacoes(dto.getObservacoes());
-
-        if (dto.getClienteId() != null) {
-            Cliente cliente = clienteRepository.findById(dto.getClienteId())
-                    .orElseThrow(() -> new NotFoundException("Cliente com ID " + dto.getClienteId() + " não encontrado."));
-            pedido.setCliente(cliente);
-        }
+        pedido.setCliente(cliente);
 
         List<PedidoItem> itens = new ArrayList<>();
         BigDecimal valorTotal = BigDecimal.ZERO;
@@ -82,9 +87,6 @@ public class PedidoService {
 
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
-        // Aqui seria o local para disparar a notificação para os vendedores (RF033)
-        // Ex: notificacaoService.notificarNovoPedido(pedidoSalvo);
-
         return pedidoMapper.toPedidoResponseDTO(pedidoSalvo);
     }
 
@@ -92,16 +94,24 @@ public class PedidoService {
         return pedidoRepository.findAll(pageable).map(pedidoMapper::toPedidoResponseDTO);
     }
 
-    public Page<PedidoResponseDTO> listarPorCliente(UUID clienteId, Pageable pageable) {
-        if (!clienteRepository.existsById(clienteId)) {
-            throw new NotFoundException("Cliente com ID " + clienteId + " não encontrado.");
-        }
-        return pedidoRepository.findByClienteId(clienteId, pageable).map(pedidoMapper::toPedidoResponseDTO);
+    public Page<PedidoResponseDTO> listarPorClienteAutenticado(Pageable pageable) {
+        Cliente cliente = getAuthenticatedCliente();
+        return pedidoRepository.findByClienteId(cliente.getId(), pageable).map(pedidoMapper::toPedidoResponseDTO);
     }
 
     public PedidoResponseDTO buscarPorId(UUID id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Pedido com ID " + id + " não encontrado."));
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails) principal;
+
+        if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CLIENTE"))) {
+            if (pedido.getCliente() == null || !pedido.getCliente().getEmail().equals(userDetails.getUsername())) {
+                throw new ValidationException("Acesso negado. Você não é o proprietário deste pedido.");
+            }
+        }
+
         return pedidoMapper.toPedidoResponseDTO(pedido);
     }
 
@@ -121,8 +131,13 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO cancelarPedido(UUID id) {
+        Cliente clienteAutenticado = getAuthenticatedCliente();
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Pedido com ID " + id + " não encontrado."));
+
+        if (pedido.getCliente() == null || !pedido.getCliente().getId().equals(clienteAutenticado.getId())) {
+            throw new ValidationException("Acesso negado. Você só pode cancelar seus próprios pedidos.");
+        }
 
         if (pedido.getStatus() != StatusPedido.PENDENTE && pedido.getStatus() != StatusPedido.EM_PREPARO) {
             throw new ValidationException("O pedido não pode ser cancelado, pois já foi " + pedido.getStatus().toString().toLowerCase());

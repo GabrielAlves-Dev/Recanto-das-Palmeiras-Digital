@@ -37,35 +37,42 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes/auto-cadastro").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/produtos", "/produtos/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/produtos", "/produtos/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
 
                         // ENDPOINTS DE PRODUTOS (ADMIN)
                         .requestMatchers(HttpMethod.POST, "/produtos").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.PUT, "/produtos/{id}").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.PATCH, "/produtos/{id}").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.PATCH, "/produtos/**").hasRole("GERENTE")
 
                         // ENDPOINTS DE USUÁRIOS (ADMIN INTERNO - APENAS GERENTE)
-                        .requestMatchers(HttpMethod.GET, "/usuarios", "/usuarios/{id}").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.GET, "/usuarios", "/usuarios/**").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.POST, "/usuarios").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.PUT, "/usuarios/{id}").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.PATCH, "/usuarios/{id}/**").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/**").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.PATCH, "/usuarios/**").hasRole("GERENTE")
 
-                        // ENDPOINTS DE CLIENTES (REGRAS CONSOLIDADAS)
-                        .requestMatchers(HttpMethod.GET, "/clientes").hasAnyRole("GERENTE", "VENDEDOR")
-                        .requestMatchers(HttpMethod.GET, "/clientes/{id}").hasAnyRole("CLIENTE", "GERENTE", "VENDEDOR")
+                        // Rotas de autoatendimento para o cliente logado
+                        .requestMatchers(HttpMethod.GET, "/clientes/me").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/clientes/me").hasRole("CLIENTE")
+
+                        // Rotas administrativas para Gerente/Vendedor
+                        .requestMatchers(HttpMethod.GET, "/clientes", "/clientes/{id}").hasAnyRole("GERENTE", "VENDEDOR")
                         .requestMatchers(HttpMethod.POST, "/clientes").hasAnyRole("GERENTE", "VENDEDOR")
-                        .requestMatchers(HttpMethod.PUT, "/clientes/{id}").hasAnyRole("CLIENTE", "GERENTE")
-                        .requestMatchers(HttpMethod.PATCH, "/clientes/{id}/ativar").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.PATCH, "/clientes/{id}/desativar").hasAnyRole("CLIENTE", "GERENTE")
+                        .requestMatchers(HttpMethod.PUT, "/clientes/{id}").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.PATCH, "/clientes/{id}/**").hasRole("GERENTE")
 
                         // ENDPOINTS DE CARRINHO (APENAS CLIENTE)
                         .requestMatchers("/carrinho/**").hasRole("CLIENTE")
 
-                        // ENDPOINTS DE PEDIDOS
+                        // Rota para o cliente ver seus próprios pedidos
+                        .requestMatchers(HttpMethod.GET, "/pedidos/meus-pedidos").hasRole("CLIENTE")
+
+                        // Rotas administrativas
+                        .requestMatchers(HttpMethod.GET, "/pedidos", "/pedidos/{id}").hasAnyRole("GERENTE", "VENDEDOR")
+
+                        // Rota para o cliente criar um pedido
                         .requestMatchers(HttpMethod.POST, "/pedidos").hasAnyRole("CLIENTE", "GERENTE", "VENDEDOR")
-                        .requestMatchers(HttpMethod.GET, "/pedidos", "/pedidos/{id}").hasAnyRole("CLIENTE", "GERENTE", "VENDEDOR")
-                        .requestMatchers(HttpMethod.POST, "/pedidos/{id}/cancelar").hasAnyRole("CLIENTE", "GERENTE", "VENDEDOR")
+                        .requestMatchers(HttpMethod.POST, "/pedidos/{id}/cancelar").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.PATCH, "/pedidos/{id}/status").hasAnyRole("GERENTE", "VENDEDOR")
 
                         // Qualquer outra requisição precisa estar autenticado

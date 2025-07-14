@@ -1,13 +1,11 @@
 import React from 'react';
-import { UserIcon, LogOutIcon, ShoppingCartIcon, BellIcon } from 'lucide-react';
+import { UserIcon, LogOutIcon, BellIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../services/AuthContext';
 interface HeaderProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
   onLogout: () => void;
 }
 const Header: React.FC<HeaderProps> = ({
-  userRole,
   onLogout
 }) => {
   const { user } = useAuth();

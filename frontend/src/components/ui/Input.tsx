@@ -12,7 +12,7 @@ interface InputProps {
   name?: string;
   required?: boolean;
   fullWidth?: boolean;
-  mask?: any;
+  mask?: unknown;
   unmask?: boolean;
   step?: string;
 }
@@ -40,7 +40,7 @@ export const Input: React.FC<InputProps> = ({
     `;
 
   // Adapta o onAccept do imask para um evento onChange padrão
-  const handleAccept = (acceptedValue: any) => {
+  const handleAccept = (acceptedValue: unknown) => {
     if (onChange && name) {
       const event = {
         target: {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, MapPinIcon, CreditCardIcon, CheckIcon } from 'lucide-react';
+import { ArrowLeftIcon, MapPinIcon, CheckIcon } from 'lucide-react';
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HomeIcon, ShoppingBagIcon, UsersIcon, ShoppingCartIcon, ClipboardListIcon, BarChartIcon, PlusCircleIcon, UserCogIcon, UserCircle } from 'lucide-react';
+import { ShoppingBagIcon, UsersIcon, UserCogIcon, UserCircle } from 'lucide-react';
 interface SidebarProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
 }

@@ -1,6 +1,7 @@
-'''import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import axios from 'axios';
-import { User, UserRole, mapRole, LoginCredentials, RegisterData } from '../types';
+import { type User, type UserRole, mapRole, type LoginCredentials, type RegisterData } from '../types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -39,7 +40,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     fetchUser();
-  }, [token]);
+  }, [fetchUser]);
 
   const login = async (credentials: LoginCredentials) => {
     const { data } = await axios.post<{ token: string }>('/api/auth/login', credentials);
@@ -85,4 +86,4 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};''
+};

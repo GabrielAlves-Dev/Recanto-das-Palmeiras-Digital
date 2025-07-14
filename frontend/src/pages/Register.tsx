@@ -5,8 +5,9 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, ArrowLeftIcon } from 'lucide-react';
 import { useAuth } from '../services/AuthContext';
+import { type AxiosError } from 'axios';
 
-const Register: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
@@ -40,9 +41,10 @@ const Register: React.FC = () => {
         senha: formData.senha,
       });
       navigate('/login', { state: { successMessage: 'Cadastro realizado com sucesso! Faça seu login.' } });
-    } catch (err: any) {
-      if (err.response && err.response.data) {
-        const messages = err.response.data.messages || ['Ocorreu um erro.'];
+    } catch (err) {
+      const axiosError = err as AxiosError<{ messages: string[] }>;
+      if (axiosError.response && axiosError.response.data) {
+        const messages = axiosError.response.data.messages || ['Ocorreu um erro.'];
         setError(`Erro no cadastro: ${messages.join(', ')}`);
       } else {
         setError('Ocorreu um erro inesperado. Tente novamente.');
@@ -126,3 +128,5 @@ const Register: React.FC = () => {
     </div>
   );
 };
+
+export default RegisterPage;

@@ -2,7 +2,6 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util;
 
 import java.io.IOException;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.UsuarioRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.TokenService;
 
 import jakarta.servlet.FilterChain;

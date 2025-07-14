@@ -24,29 +24,46 @@ public class ClienteController {
     @Autowired
     private ClienteService service;
 
-    // RF008 - Auto Cadastro
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
+        return ResponseEntity.ok(service.login(data));
+    }
+
     @PostMapping("/auto-cadastro")
     public ResponseEntity<Void> autoCadastrar(@RequestBody @Valid ClienteAutoCadastroDTO dto) {
         UUID id = service.autoCadastrar(dto);
         return ResponseEntity.created(URI.create("/clientes/" + id)).build();
     }
 
-    // RF012 - Cadastro por gerente/vendedor
+    @GetMapping("/me")
+    public ResponseEntity<ClienteResponseDTO> buscarMeuPerfil() {
+        return ResponseEntity.ok(service.buscarPorClienteAutenticado());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<Void> editarMeuPerfil(@RequestBody @Valid ClienteRequestDTO dto) {
+        service.editarClienteAutenticado(dto);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping
     public ResponseEntity<Void> cadastrar(@RequestBody @Valid ClienteRequestDTO dto) {
         UUID id = service.cadastrarPorGerente(dto);
         return ResponseEntity.created(URI.create("/clientes/" + id)).build();
     }
 
-    // RF009 - Ver dados
+    @GetMapping
+    public ResponseEntity<Page<ClienteResponseDTO>> listar(@PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(service.listar(pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ClienteResponseDTO> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    // RF010 / RF013 - Editar
     @PutMapping("/{id}")
-    public ResponseEntity<Void> editar(@PathVariable UUID id, @RequestBody ClienteRequestDTO dto) {
+    public ResponseEntity<Void> editar(@PathVariable UUID id, @RequestBody @Valid ClienteRequestDTO dto) {
         service.editar(id, dto);
         return ResponseEntity.noContent().build();
     }
@@ -57,21 +74,9 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 
-    // RF011 / RF014 - Desativar conta
     @PatchMapping("/{id}/desativar")
     public ResponseEntity<Void> desativar(@PathVariable UUID id) {
         service.desativar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // RF015 - Listar paginado
-    @GetMapping
-    public ResponseEntity<Page<ClienteResponseDTO>> listar(@PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(service.listar(pageable));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
-        return ResponseEntity.ok(service.login(data));
     }
 }

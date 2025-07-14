@@ -13,6 +13,8 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.Clie
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ProdutoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,14 +34,23 @@ public class CarrinhoService {
     @Autowired
     private CarrinhoMapper carrinhoMapper;
 
-    // Simulação do ID do cliente logado.
-    private UUID getClienteIdLogado() {
-        return UUID.fromString("7460e3a8-e2c8-4d1c-9f10-93d36f093f0e");
+    private Cliente getAuthenticatedCliente() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            throw new IllegalStateException("O principal de autenticação não é uma instância de UserDetails.");
+        }
+
+        return clienteRepository.findByEmail(username)
+                .orElseThrow(() -> new NotFoundException("Cliente autenticado não encontrado no banco de dados. Email: " + username));
     }
 
     public List<CarrinhoItemResponseDTO> getCarrinho() {
-        UUID clienteId = getClienteIdLogado();
-        List<CarrinhoItem> itens = carrinhoItemRepository.findByClienteId(clienteId);
+        Cliente cliente = getAuthenticatedCliente();
+        List<CarrinhoItem> itens = carrinhoItemRepository.findByClienteId(cliente.getId());
         return itens.stream()
                 .map(carrinhoMapper::toResponseDTO)
                 .collect(Collectors.toList());
@@ -47,15 +58,18 @@ public class CarrinhoService {
 
     @Transactional
     public CarrinhoItemResponseDTO adicionarItem(CarrinhoItemRequestDTO requestDTO) {
-        UUID clienteId = getClienteIdLogado();
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new NotFoundException("Cliente não encontrado."));
-        Produto produto = produtoRepository.findById(requestDTO.getProdutoId()).orElseThrow(() -> new NotFoundException("Produto não encontrado."));
+        Cliente cliente = getAuthenticatedCliente();
+        Produto produto = produtoRepository.findById(requestDTO.getProdutoId())
+                .orElseThrow(() -> new NotFoundException("Produto não encontrado."));
 
+        if (!produto.getAtivo()) {
+            throw new ValidationException("Produto '" + produto.getNome() + "' não está disponível para venda.");
+        }
         if (produto.getQuantidade() < requestDTO.getQuantidade()) {
             throw new ValidationException("Estoque insuficiente para o produto: " + produto.getNome());
         }
 
-        Optional<CarrinhoItem> itemExistenteOpt = carrinhoItemRepository.findByClienteIdAndProdutoId(clienteId, produto.getId());
+        Optional<CarrinhoItem> itemExistenteOpt = carrinhoItemRepository.findByClienteIdAndProdutoId(cliente.getId(), produto.getId());
 
         CarrinhoItem item;
         if (itemExistenteOpt.isPresent()) {
@@ -77,8 +91,8 @@ public class CarrinhoService {
 
     @Transactional
     public CarrinhoItemResponseDTO atualizarItem(UUID produtoId, CarrinhoItemRequestDTO requestDTO) {
-        UUID clienteId = getClienteIdLogado();
-        CarrinhoItem item = carrinhoItemRepository.findByClienteIdAndProdutoId(clienteId, produtoId)
+        Cliente cliente = getAuthenticatedCliente();
+        CarrinhoItem item = carrinhoItemRepository.findByClienteIdAndProdutoId(cliente.getId(), produtoId)
                 .orElseThrow(() -> new NotFoundException("Item com produto ID " + produtoId + " não encontrado no carrinho."));
 
         Produto produto = item.getProduto();
@@ -92,16 +106,16 @@ public class CarrinhoService {
 
     @Transactional
     public void removerItem(UUID produtoId) {
-        UUID clienteId = getClienteIdLogado();
-        CarrinhoItem item = carrinhoItemRepository.findByClienteIdAndProdutoId(clienteId, produtoId)
+        Cliente cliente = getAuthenticatedCliente();
+        CarrinhoItem item = carrinhoItemRepository.findByClienteIdAndProdutoId(cliente.getId(), produtoId)
                 .orElseThrow(() -> new NotFoundException("Item não encontrado no carrinho."));
         carrinhoItemRepository.delete(item);
     }
 
     @Transactional
     public void limparCarrinho() {
-        UUID clienteId = getClienteIdLogado();
-        List<CarrinhoItem> itens = carrinhoItemRepository.findByClienteId(clienteId);
+        Cliente cliente = getAuthenticatedCliente();
+        List<CarrinhoItem> itens = carrinhoItemRepository.findByClienteId(cliente.getId());
         if (!itens.isEmpty()) {
             carrinhoItemRepository.deleteAll(itens);
         }

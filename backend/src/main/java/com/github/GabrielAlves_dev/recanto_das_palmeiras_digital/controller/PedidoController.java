@@ -30,23 +30,26 @@ public class PedidoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<PedidoResponseDTO>> listarPedidos(
-            @RequestParam(required = false) UUID clienteId,
-            @PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
-
-        Page<PedidoResponseDTO> pagina;
-        if (clienteId != null) {
-            pagina = pedidoService.listarPorCliente(clienteId, pageable);
-        } else {
-            pagina = pedidoService.listarTodos(pageable);
-        }
+    public ResponseEntity<Page<PedidoResponseDTO>> listarTodosOsPedidos(@PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
+        Page<PedidoResponseDTO> pagina = pedidoService.listarTodos(pageable);
         return ResponseEntity.ok(pagina);
     }
 
+    @GetMapping("/meus-pedidos")
+    public ResponseEntity<Page<PedidoResponseDTO>> listarMeusPedidos(@PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
+        Page<PedidoResponseDTO> pagina = pedidoService.listarPorClienteAutenticado(pageable);
+        return ResponseEntity.ok(pagina);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> buscarPedidoPorId(@PathVariable UUID id) {
         PedidoResponseDTO responseDTO = pedidoService.buscarPorId(id);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @PostMapping("/{id}/cancelar")
+    public ResponseEntity<PedidoResponseDTO> cancelarPedido(@PathVariable UUID id) {
+        PedidoResponseDTO responseDTO = pedidoService.cancelarPedido(id);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -55,12 +58,6 @@ public class PedidoController {
             @PathVariable UUID id,
             @RequestParam("status") StatusPedido novoStatus) {
         PedidoResponseDTO responseDTO = pedidoService.atualizarStatus(id, novoStatus);
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @PostMapping("/{id}/cancelar")
-    public ResponseEntity<PedidoResponseDTO> cancelarPedido(@PathVariable UUID id) {
-        PedidoResponseDTO responseDTO = pedidoService.cancelarPedido(id);
         return ResponseEntity.ok(responseDTO);
     }
 }

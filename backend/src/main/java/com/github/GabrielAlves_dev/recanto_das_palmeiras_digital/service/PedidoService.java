@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -87,6 +90,13 @@ public class PedidoService {
 
     public Page<PedidoResponseDTO> listarTodos(Pageable pageable) {
         return pedidoRepository.findAll(pageable).map(pedidoMapper::toPedidoResponseDTO);
+    }
+
+    public Page<PedidoResponseDTO> listarPorCliente(UUID clienteId, Pageable pageable) {
+        if (!clienteRepository.existsById(clienteId)) {
+            throw new NotFoundException("Cliente com ID " + clienteId + " não encontrado.");
+        }
+        return pedidoRepository.findByClienteId(clienteId, pageable).map(pedidoMapper::toPedidoResponseDTO);
     }
 
     public PedidoResponseDTO buscarPorId(UUID id) {

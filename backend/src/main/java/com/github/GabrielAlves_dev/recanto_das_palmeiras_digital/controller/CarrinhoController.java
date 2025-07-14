@@ -28,6 +28,13 @@ public class CarrinhoController {
         return ResponseEntity.ok(carrinhoService.adicionarItem(requestDTO));
     }
 
+    @PutMapping("/items/{produtoId}")
+    public ResponseEntity<CarrinhoItemResponseDTO> atualizarItem(
+            @PathVariable UUID produtoId,
+            @RequestBody @Valid CarrinhoItemRequestDTO requestDTO) {
+        return ResponseEntity.ok(carrinhoService.atualizarItem(produtoId, requestDTO));
+    }
+
     @DeleteMapping("/items/{produtoId}")
     public ResponseEntity<Void> removerItem(@PathVariable UUID produtoId) {
         carrinhoService.removerItem(produtoId);

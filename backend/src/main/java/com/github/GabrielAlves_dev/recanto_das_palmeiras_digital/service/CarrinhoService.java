@@ -32,10 +32,9 @@ public class CarrinhoService {
     @Autowired
     private CarrinhoMapper carrinhoMapper;
 
+    // Simulação do ID do cliente logado.
     private UUID getClienteIdLogado() {
-        // PROVISÓRIO: Retorna o ID de um cliente fixo para testes.
-        // Substituir pela lógica de autenticação real.
-        return UUID.fromString("7460e3a8-e2c8-4d1c-9f10-93d36f093f0e"); // ID da cliente "Beatriz Martins"
+        return UUID.fromString("7460e3a8-e2c8-4d1c-9f10-93d36f093f0e");
     }
 
     public List<CarrinhoItemResponseDTO> getCarrinho() {
@@ -69,8 +68,26 @@ public class CarrinhoService {
             item.setQuantidade(requestDTO.getQuantidade());
         }
 
-        CarrinhoItem itemSalvo = carrinhoItemRepository.save(item);
-        return carrinhoMapper.toResponseDTO(itemSalvo);
+        if (produto.getQuantidade() < item.getQuantidade()) {
+            throw new ValidationException("Estoque insuficiente para a quantidade total solicitada do produto: " + produto.getNome());
+        }
+
+        return carrinhoMapper.toResponseDTO(carrinhoItemRepository.save(item));
+    }
+
+    @Transactional
+    public CarrinhoItemResponseDTO atualizarItem(UUID produtoId, CarrinhoItemRequestDTO requestDTO) {
+        UUID clienteId = getClienteIdLogado();
+        CarrinhoItem item = carrinhoItemRepository.findByClienteIdAndProdutoId(clienteId, produtoId)
+                .orElseThrow(() -> new NotFoundException("Item com produto ID " + produtoId + " não encontrado no carrinho."));
+
+        Produto produto = item.getProduto();
+        if (produto.getQuantidade() < requestDTO.getQuantidade()) {
+            throw new ValidationException("Estoque insuficiente para a quantidade solicitada do produto: " + produto.getNome());
+        }
+
+        item.setQuantidade(requestDTO.getQuantidade());
+        return carrinhoMapper.toResponseDTO(carrinhoItemRepository.save(item));
     }
 
     @Transactional
@@ -78,7 +95,6 @@ public class CarrinhoService {
         UUID clienteId = getClienteIdLogado();
         CarrinhoItem item = carrinhoItemRepository.findByClienteIdAndProdutoId(clienteId, produtoId)
                 .orElseThrow(() -> new NotFoundException("Item não encontrado no carrinho."));
-
         carrinhoItemRepository.delete(item);
     }
 
@@ -86,6 +102,8 @@ public class CarrinhoService {
     public void limparCarrinho() {
         UUID clienteId = getClienteIdLogado();
         List<CarrinhoItem> itens = carrinhoItemRepository.findByClienteId(clienteId);
-        carrinhoItemRepository.deleteAll(itens);
+        if (!itens.isEmpty()) {
+            carrinhoItemRepository.deleteAll(itens);
+        }
     }
 }

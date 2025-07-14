@@ -75,10 +75,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/pedidos").hasAnyRole("GERENTE", "VENDEDOR")
 
                 // RF026, RF027: Consulta de histórico de pedidos pelo cliente
-                .requestMatchers(HttpMethod.GET, "/pedidos", "/pedidos/{id}").hasRole("CLIENTE")
+                .requestMatchers(HttpMethod.GET, "/pedidos", "/pedidos/{id}").hasAnyRole("CLIENTE", "GERENTE", "VENDEDOR")
 
                 // RF028: Gerenciamento de lista de pedidos por admin
-                .requestMatchers(HttpMethod.GET, "/pedidos").hasAnyRole("GERENTE", "VENDEDOR")
+                // Removed redundant rule for admin roles
 
                 // RF029: Cancelamento de pedido pelo cliente
                 .requestMatchers(HttpMethod.POST, "/pedidos/{id}/cancelar").hasRole("CLIENTE")

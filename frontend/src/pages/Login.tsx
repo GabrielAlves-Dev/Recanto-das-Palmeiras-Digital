@@ -1,37 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Input } from '../components/ui/Input';import Button from '../components/ui/Button';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Input } from '../components/ui/Input';
+import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, CheckCircleIcon } from 'lucide-react';
+import { useAuth } from '../services/AuthContext';
+import axios from 'axios';
 
-interface LoginProps {
-  onLogin: (role: 'gerente' | 'vendedor' | 'cliente') => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(location.state?.successMessage || null);
 
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage(null);
+        navigate(location.pathname, { replace: true, state: {} });
       }, 5000); 
       return () => clearTimeout(timer);
     }
-  }, [successMessage]);
+  }, [successMessage, location.pathname, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, different emails login as different roles
-    if (email.includes('gerente')) {
-      onLogin('gerente');
-    } else if (email.includes('vendedor')) {
-      onLogin('vendedor');
-    } else {
-      onLogin('cliente');
+    setError(null);
+    try {
+      await login({ login: email, senha: password });
+      navigate('/');
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        const messages = err.response.data.messages || ['Login ou senha inválidos.'];
+        setError(messages.join(', '));
+      } else {
+        setError('Ocorreu um erro inesperado. Tente novamente.');
+      }
     }
   };
 
@@ -56,15 +64,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 {successMessage}
             </div>
         )}
+        {error && (
+            <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">
+                {error}
+            </div>
+        )}
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <Input label="E-mail" type="email" id="email" name="email" placeholder="seu@email.com" value={email} onChange={e => setEmail(e.target.value)} required />
             <Input label="Senha" type="password" id="password" name="password" placeholder="********" value={password} onChange={e => setPassword(e.target.value)} required />
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-end">
               <div className="text-sm">
-                <Link to="/forgot-password" className="font-medium text-emerald-600 hover:text-emerald-500">
-                  Esqueceu sua senha?
-                </Link>
+                <a className="font-medium text-emerald-600 hover:text-emerald-500">
+                  {/* Esqueceu sua senha? */}
+                </a>
               </div>
             </div>
             <Button type="submit" fullWidth>
@@ -77,13 +90,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   Cadastre-se
                 </Link>
               </p>
-              <div className="mt-4 text-sm text-gray-500">
-                <p>Para demonstração:</p>
-                <p>
-                  Use "gerente@email.com", "vendedor@email.com", ou qualquer
-                  outro e-mail
-                </p>
-              </div>
             </div>
           </form>
         </Card>

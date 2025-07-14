@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HomeIcon, ShoppingBagIcon, UsersIcon, ShoppingCartIcon, ClipboardListIcon, BarChartIcon, PlusCircleIcon, UserCogIcon } from 'lucide-react';
+import { HomeIcon, ShoppingBagIcon, UsersIcon, ShoppingCartIcon, ClipboardListIcon, BarChartIcon, PlusCircleIcon, UserCogIcon, UserCircle } from 'lucide-react';
 interface SidebarProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
 }
@@ -13,19 +13,20 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   const renderNavItems = () => {
     if (userRole === 'gerente') {
-      return <>
+      return <> 
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Produtos" active={isActive('/products')} />
           <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
           <NavItem to="/users" icon={<UserCogIcon size={20} />} label="Usuários" active={isActive('/users')} />
         </>;
     } else if (userRole === 'vendedor') {
-      return <>
+      return <> 
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
           <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
         </>;
     } else if (userRole === 'cliente') {
-      return <>
+      return <> 
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
+          <NavItem to="/account" icon={<UserCircle size={20} />} label="Minha Conta" active={isActive('/account')} />
         </>;
     }
     return null;

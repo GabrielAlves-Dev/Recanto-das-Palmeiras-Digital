@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -15,6 +15,8 @@ import CustomerDetails from './pages/CustomerDetails';
 import Users from './pages/Users';
 import UserEdit from './pages/UserEdit';
 import Layout from './components/layout/Layout';
+import { useAuth } from './services/AuthContext';
+import Account from './pages/Account';
 
 
 interface ProtectedRoutesLayoutProps {
@@ -26,6 +28,9 @@ const ProtectedRoutesLayout: React.FC<ProtectedRoutesLayoutProps> = ({ userRole,
   return (
     <Layout userRole={userRole} onLogout={onLogout}>
       <Routes>
+        {/* Redirect from root to products */}
+        <Route path="/" element={<Navigate to="/products" replace />} />
+
         {/* rotas de produtos */}
         <Route path="/products" element={<Products userRole={userRole} />} />
         <Route path="/products/edit/:id" element={<ProductEdit />} />
@@ -61,28 +66,38 @@ const ProtectedRoutesLayout: React.FC<ProtectedRoutesLayoutProps> = ({ userRole,
               <Route path="/users/edit/:id" element={<UserEdit />} />
             </>
         )}
+
+        {/* Rota da conta do cliente */}
+        {userRole === 'cliente' && (
+            <Route path="/account" element={<Account />} />
+        )}
+
+        {/* Fallback for any other authenticated route */}
+        <Route path="*" element={<Navigate to="/products" replace />} />
       </Routes>
     </Layout>
   );
 };
 
 export function App() {
-  const [userRole, setUserRole] = useState<'gerente' | 'vendedor' | 'cliente' | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const handleLogin = (role: 'gerente' | 'vendedor' | 'cliente') => {
-    setUserRole(role);
-    setIsAuthenticated(true);
-  };
-  const handleLogout = () => {
-    setUserRole(null);
-    setIsAuthenticated(false);
-  };
-  return <Router>
+  const { isAuthenticated, role, logout } = useAuth();
+
+  return (
+    <Router>
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/products" replace /> : <Login onLogin={handleLogin} />} />
-        <Route path="/register" element={<Register />} />
-        {/* Protected routes */}
-        <Route path="/*" element={isAuthenticated ? <ProtectedRoutesLayout userRole={userRole} onLogout={handleLogout} /> : <Navigate to="/" replace />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" replace />} />
+        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" replace />} />
+        <Route 
+          path="/*" 
+          element={
+            isAuthenticated ? (
+              <ProtectedRoutesLayout userRole={role} onLogout={logout} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
       </Routes>
-    </Router>;
+    </Router>
+  );
 }

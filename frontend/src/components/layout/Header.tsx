@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserIcon, LogOutIcon, ShoppingCartIcon, BellIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../services/AuthContext';
 interface HeaderProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
   onLogout: () => void;
@@ -9,6 +10,7 @@ const Header: React.FC<HeaderProps> = ({
   userRole,
   onLogout
 }) => {
+  const { user } = useAuth();
   return <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
       <div className="md:hidden">{/* Mobile menu button would go here */}</div>
       <div className="flex-1 md:text-center md:flex-none">
@@ -27,14 +29,12 @@ const Header: React.FC<HeaderProps> = ({
           <BellIcon size={20} />
         </button>
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+          <Link to="/account" className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
             <UserIcon size={16} className="text-emerald-700" />
-          </div>
+          </Link>
           <div className="hidden md:block">
             <p className="text-sm font-medium text-gray-700">
-              {userRole === 'gerente' && 'Gerente'}
-              {userRole === 'vendedor' && 'Vendedor'}
-              {userRole === 'cliente' && 'Cliente'}
+              {user?.nome}
             </p>
           </div>
         </div>

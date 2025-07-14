@@ -8,7 +8,9 @@ import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -23,7 +25,10 @@ public class UsuarioService {
     private UsuarioMapper mapper;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenService tokenService;
 
     public UUID cadastrar(UsuarioRequestDTO dto) {
         String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
@@ -36,9 +41,12 @@ public class UsuarioService {
             throw new ValidationException("CPF/CNPJ já está em uso");
         }
 
+        String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
+        dto.setSenha(encryptedPassword);
+
         Usuario usuario = mapper.toUsuario(dto);
         usuario.setCpfCnpj(formattedCpfCnpj);
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        usuario.setSenha(dto.getSenha());
         usuario.setAtivo(true);
 
         return repository.save(usuario).getId();
@@ -77,11 +85,13 @@ public class UsuarioService {
             }
             usuario.setCpfCnpj(formattedCpfCnpj);
         }
-        if (dto.getCargo() != null && !dto.getCargo().isBlank()) {
+        if (dto.getCargo() != null) {
             usuario.setCargo(dto.getCargo());
         }
         if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
-            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+            String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
+            dto.setSenha(encryptedPassword);
+            usuario.setSenha(dto.getSenha());
         }
 
         repository.save(usuario);
@@ -92,5 +102,14 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
         usuario.setAtivo(ativo);
         repository.save(usuario);
+    }
+
+    public LoginResponseDTO login(AuthenticationDTO dto) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+
+        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
+        System.out.println(token);
+        return new LoginResponseDTO(token);
     }
 }

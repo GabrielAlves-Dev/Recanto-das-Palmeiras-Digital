@@ -3,6 +3,8 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteAutoCadastroDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.AuthenticationDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.LoginResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,5 +68,10 @@ public class ClienteController {
     @GetMapping
     public ResponseEntity<Page<ClienteResponseDTO>> listar(@PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(service.listar(pageable));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
+        return ResponseEntity.ok(service.login(data));
     }
 }

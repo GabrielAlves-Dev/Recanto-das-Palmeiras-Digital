@@ -2,6 +2,7 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +21,8 @@ public class UsuarioRequestDTO {
     @NotBlank(message = "CPF/CNPJ é obrigatório")
     private String cpfCnpj;
 
-    @NotBlank(message = "Cargo é obrigatório")
-    private String cargo;
+    @NotNull(message = "Cargo é obrigatório")
+    private CargoUsuario cargo;
 
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")

@@ -10,7 +10,7 @@ export interface User {
 export type UserRole = 'gerente' | 'vendedor' | 'cliente';
 
 export interface LoginCredentials {
-  login: string;
+  email: string;
   senha: string;
 }
 

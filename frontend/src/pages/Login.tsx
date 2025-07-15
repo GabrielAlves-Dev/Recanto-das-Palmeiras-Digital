@@ -27,21 +27,21 @@ const Login: React.FC = () => {
     }
   }, [successMessage, location.pathname, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      await login({ login: email, senha: password });
-      navigate('/');
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        const messages = err.response.data.messages || ['Login ou senha inválidos.'];
-        setError(messages.join(', '));
-      } else {
-        setError('Ocorreu um erro inesperado. Tente novamente.');
-      }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  try {
+    await login({ email: email, senha: password });
+    navigate('/');
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response) {
+      const messages = err.response.data.messages || ['Login ou senha inválidos.'];
+      setError(messages.join(', '));
+    } else {
+      setError('Ocorreu um erro inesperado. Tente novamente.');
     }
-  };
+  }
+};
 
   return <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">

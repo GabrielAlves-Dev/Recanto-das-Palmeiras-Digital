@@ -4,6 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 interface BackendProduct {
   id: number;
@@ -25,11 +26,10 @@ interface Product {
   active: boolean;
 }
 
-interface ProductDetailsProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-}
+const ProductDetails: React.FC = () => {
+  const { currentUser } = useAuth();
+  const userRole = currentUser?.role;
 
-const ProductDetails: React.FC<ProductDetailsProps> = ({ userRole }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
@@ -204,7 +204,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ userRole }) => {
                 {!productData.active && (
                   <p className="text-red-500 text-sm mt-2 text-center">Este produto não está disponível para clientes.</p>
                 )}
-                 {productData.active && productData.stock === 0 && (
+                  {productData.active && productData.stock === 0 && (
                   <p className="text-yellow-500 text-sm mt-2 text-center">Produto sem estoque.</p>
                 )}
               </div>

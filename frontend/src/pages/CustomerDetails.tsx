@@ -3,12 +3,12 @@ import { Link, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, EyeOffIcon, EditIcon } from 'lucide-react';
-interface CustomerDetailsProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-}
-const CustomerDetails: React.FC<CustomerDetailsProps> = ({
-  userRole
-}) => {
+import { useAuth } from '../context/AuthContext';
+
+const CustomerDetails: React.FC = () => {
+  const { currentUser } = useAuth();
+  const userRole = currentUser?.role;
+
   const {
     id
   } = useParams<{

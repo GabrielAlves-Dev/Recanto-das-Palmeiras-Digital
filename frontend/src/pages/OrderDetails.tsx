@@ -2,19 +2,20 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, ClipboardListIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, CreditCardIcon, TruckIcon, AlertCircleIcon, EditIcon, XIcon } from 'lucide-react';
-interface OrderDetailsProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-}
-const OrderDetails: React.FC<OrderDetailsProps> = ({
-  userRole
-}) => {
+import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, CreditCardIcon, EditIcon, XIcon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+
+const OrderDetails: React.FC = () => {
+  const { currentUser } = useAuth();
+  const userRole = currentUser?.role;
+
   const {
     id
   } = useParams<{
     id: string;
   }>();
-  // Mock data for order details
+
   const order = {
     id,
     date: '12/05/2023',
@@ -54,17 +55,19 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     }],
     payment: {
       method: 'credit',
-      status: 'paid' // paid, pending, failed
+      status: 'paid'
     },
     notes: 'Entregar no período da tarde, preferencialmente.',
     subtotal: 300,
     shipping: 'A combinar',
     total: 300
   };
+
   const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const isCustomer = userRole === 'cliente';
   const canEdit = !isCustomer && order.status === 'pending';
   const canCancel = order.status === 'pending' || order.status === 'preparing';
+
   const getStatusBadgeClasses = (status: string) => {
     switch (status) {
       case 'pending':
@@ -81,6 +84,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         return 'bg-gray-100 text-gray-800';
     }
   };
+
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'pending':
@@ -97,6 +101,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         return status;
     }
   };
+
   return <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/orders" className="text-emerald-600 hover:text-emerald-700">
@@ -178,21 +183,21 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
               <p className="text-gray-800">{order.notes}</p>
             </Card>}
           {!isCustomer && order.status !== 'canceled' && order.status !== 'delivered' && <Card title="Atualizar Status">
-                <div className="flex flex-wrap gap-2">
-                  <Button variant={order.status === 'pending' ? 'primary' : 'secondary'} disabled={order.status !== 'pending'} size="sm">
-                    Pendente
-                  </Button>
-                  <Button variant={order.status === 'preparing' ? 'primary' : 'secondary'} disabled={order.status === 'shipped' || order.status === 'delivered' || order.status === 'canceled'} size="sm">
-                    Em Preparo
-                  </Button>
-                  <Button variant={order.status === 'shipped' ? 'primary' : 'secondary'} disabled={order.status === 'delivered' || order.status === 'canceled'} size="sm">
-                    Enviado
-                  </Button>
-                  <Button variant={order.status === 'delivered' ? 'primary' : 'secondary'} disabled={order.status === 'canceled'} size="sm">
-                    Entregue
-                  </Button>
-                </div>
-              </Card>}
+              <div className="flex flex-wrap gap-2">
+                <Button variant={order.status === 'pending' ? 'primary' : 'secondary'} disabled={order.status !== 'pending'} size="sm">
+                  Pendente
+                </Button>
+                <Button variant={order.status === 'preparing' ? 'primary' : 'secondary'} disabled={order.status === 'shipped' || order.status === 'delivered' || order.status === 'canceled'} size="sm">
+                  Em Preparo
+                </Button>
+                <Button variant={order.status === 'shipped' ? 'primary' : 'secondary'} disabled={order.status === 'delivered' || order.status === 'canceled'} size="sm">
+                  Enviado
+                </Button>
+                <Button variant={order.status === 'delivered' ? 'primary' : 'secondary'} disabled={order.status === 'canceled'} size="sm">
+                  Entregue
+                </Button>
+              </div>
+            </Card>}
         </div>
         <div className="lg:col-span-1 space-y-6">
           <Card title="Resumo do Pedido">
@@ -248,4 +253,5 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
       </div>
     </div>;
 };
+
 export default OrderDetails;

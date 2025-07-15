@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,75 +13,55 @@ import Customers from './pages/Customers';
 import CustomerDetails from './pages/CustomerDetails';
 import Users from './pages/Users';
 import UserEdit from './pages/UserEdit';
+import Unauthorized from './pages/Unauthorized';
+import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
+import RoleBasedRoute from './components/RoleBasedRoute';
 
-
-interface ProtectedRoutesLayoutProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-  onLogout: () => void;
-}
-
-const ProtectedRoutesLayout: React.FC<ProtectedRoutesLayoutProps> = ({ userRole, onLogout }) => {
+export function App() {
   return (
-    <Layout userRole={userRole} onLogout={onLogout}>
-      <Routes>
-        {/* rotas de produtos */}
-        <Route path="/products" element={<Products userRole={userRole} />} />
-        <Route path="/products/edit/:id" element={<ProductEdit />} />
-        <Route path="/products/new" element={<ProductEdit />} />
-        <Route path="/products/:id" element={<ProductDetails userRole={userRole} />} />
-        
-        {/* carrinho e checkout */}
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* rotas de pedidos */}
-        {(userRole === 'cliente' || userRole === 'vendedor' || userRole === 'gerente') && (
-          <>
-            <Route path="/orders" element={<Orders userRole={userRole} />} />
-            <Route path="/orders/:id" element={<OrderDetails userRole={userRole} />} />
-          </>
-        )}
-        {(userRole === 'vendedor' || userRole === 'gerente') && <Route path="/create-order" element={<CreateOrder />} />}
-        
-        {/* rotas de cliente (gerente e vendedor) */}
-        {(userRole === 'gerente' || userRole === 'vendedor') && (
-            <>
-              <Route path="/customers" element={<Customers userRole={userRole} />} />
-              <Route path="/customers/:id" element={<CustomerDetails userRole={userRole} />} />
-            </>
-        )}
+          <Route element={<Layout />}>
+            
+            <Route element={<RoleBasedRoute allowedRoles={['cliente', 'vendedor', 'gerente']} />}>
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDetails />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders/:id" element={<OrderDetails />} />
+            </Route>
 
-        {/* Rotas de usuario (somente gerente) */}
-        {userRole === 'gerente' && (
-            <>
+            <Route element={<RoleBasedRoute allowedRoles={['vendedor', 'gerente']} />}>
+              <Route path="/products/new" element={<ProductEdit />} />
+              <Route path="/products/edit/:id" element={<ProductEdit />} />
+              <Route path="/create-order" element={<CreateOrder />} />
+              <Route path="/customers" element={<Customers />} />
+              <Route path="/customers/:id" element={<CustomerDetails />} />
+            </Route>
+
+
+            <Route element={<RoleBasedRoute allowedRoles={['gerente']} />}>
               <Route path="/users" element={<Users />} />
               <Route path="/users/new" element={<UserEdit />} />
               <Route path="/users/edit/:id" element={<UserEdit />} />
-            </>
-        )}
-      </Routes>
-    </Layout>
-  );
-};
+            </Route>
 
-export function App() {
-  const [userRole, setUserRole] = useState<'gerente' | 'vendedor' | 'cliente' | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const handleLogin = (role: 'gerente' | 'vendedor' | 'cliente') => {
-    setUserRole(role);
-    setIsAuthenticated(true);
-  };
-  const handleLogout = () => {
-    setUserRole(null);
-    setIsAuthenticated(false);
-  };
-  return <Router>
-      <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/products" replace /> : <Login onLogin={handleLogin} />} />
-        <Route path="/register" element={<Register />} />
-        {/* Protected routes */}
-        <Route path="/*" element={isAuthenticated ? <ProtectedRoutesLayout userRole={userRole} onLogout={handleLogout} /> : <Navigate to="/" replace />} />
-      </Routes>
-    </Router>;
+          </Route>
+          
+
+          <Route path="/" element={<Navigate to="/products" replace />} />
+          
+          <Route path="*" element={<Navigate to="/products" replace />} />
+
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }

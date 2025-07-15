@@ -154,12 +154,4 @@ public class ClienteService {
     public Page<ClienteResponseDTO> listar(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
-
-    public LoginResponseDTO login(AuthenticationDTO dto) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-
-        var token = tokenService.generateToken((Cliente) auth.getPrincipal());
-        return new LoginResponseDTO(token);
-    }
 }

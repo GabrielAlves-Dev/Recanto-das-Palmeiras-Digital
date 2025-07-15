@@ -103,13 +103,4 @@ public class UsuarioService {
         usuario.setAtivo(ativo);
         repository.save(usuario);
     }
-
-    public LoginResponseDTO login(AuthenticationDTO dto) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-
-        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
-        System.out.println(token);
-        return new LoginResponseDTO(token);
-    }
 }

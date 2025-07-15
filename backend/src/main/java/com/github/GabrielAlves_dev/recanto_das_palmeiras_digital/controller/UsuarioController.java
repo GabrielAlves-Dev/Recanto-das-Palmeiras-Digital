@@ -51,9 +51,4 @@ public class UsuarioController {
         service.alterarStatus(id, ativo);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
-        return ResponseEntity.ok(service.login(data));
-    }
 }

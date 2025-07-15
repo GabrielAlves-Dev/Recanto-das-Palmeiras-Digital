@@ -35,9 +35,8 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // ENDPOINTS PÚBLICOS
-                        .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/clientes/login").permitAll()
+                        // ===== NOVOS ENDPOINTS PÚBLICOS =====
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes/auto-cadastro").permitAll()
                         .requestMatchers(HttpMethod.GET, "/produtos", "/produtos/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()

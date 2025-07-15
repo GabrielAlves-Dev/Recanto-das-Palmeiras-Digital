@@ -48,7 +48,8 @@ public class SecurityConfig {
 
                         // ENDPOINTS DE USUÁRIOS (ADMIN INTERNO - APENAS GERENTE)
                         .requestMatchers(HttpMethod.GET, "/usuarios", "/usuarios/**").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.POST, "/usuarios").hasRole("GERENTE")
+                        //.requestMatchers(HttpMethod.POST, "/usuarios").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/usuarios/**").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.PATCH, "/usuarios/**").hasRole("GERENTE")
 

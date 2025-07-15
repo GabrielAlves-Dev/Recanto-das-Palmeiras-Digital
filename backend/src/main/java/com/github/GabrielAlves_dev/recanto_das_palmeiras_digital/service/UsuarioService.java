@@ -84,8 +84,7 @@ public class UsuarioService {
         }
         if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
             String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
-            dto.setSenha(encryptedPassword);
-            usuario.setSenha(dto.getSenha());
+            usuario.setSenha(encryptedPassword);
         }
 
         repository.save(usuario);

@@ -31,13 +31,6 @@ public class Usuario implements UserDetails {
     private CargoUsuario cargo;
     private String senha;
     private Boolean ativo;
-
-    public Usuario(String email, String senha, CargoUsuario cargo){
-        this.email = email;
-        this.senha = senha;
-        this.cargo = cargo;
-        //this.ativo = true;
-    }
     
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

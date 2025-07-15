@@ -24,11 +24,6 @@ public class ClienteController {
     @Autowired
     private ClienteService service;
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data){
-        return ResponseEntity.ok(service.login(data));
-    }
-
     @PostMapping("/auto-cadastro")
     public ResponseEntity<Void> autoCadastrar(@RequestBody @Valid ClienteAutoCadastroDTO dto) {
         UUID id = service.autoCadastrar(dto);

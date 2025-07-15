@@ -24,12 +24,6 @@ public class UsuarioService {
     @Autowired
     private UsuarioMapper mapper;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TokenService tokenService;
-
     public UUID cadastrar(UsuarioRequestDTO dto) {
         String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
         String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
@@ -102,14 +96,5 @@ public class UsuarioService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
         usuario.setAtivo(ativo);
         repository.save(usuario);
-    }
-
-    public LoginResponseDTO login(AuthenticationDTO dto) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-
-        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
-        System.out.println(token);
-        return new LoginResponseDTO(token);
     }
 }

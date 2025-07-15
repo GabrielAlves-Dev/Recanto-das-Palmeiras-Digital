@@ -5,7 +5,8 @@ import Button from '../components/ui/Button';
 import { PlusCircleIcon, ArrowLeft, ArrowRight } from 'lucide-react';
 import { ProductCard } from '../components/product/ProductCard';
 import { ProductFilters } from '../components/product/ProductFilters';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 interface BackendProduct {
   id: number;
@@ -39,11 +40,11 @@ const formatPrice = (price: number): string => {
   return `R$ ${price.toFixed(2).replace('.', ',')}`;
 };
 
-interface ProductsProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-}
 
-const Products: React.FC<ProductsProps> = ({ userRole }) => {
+const Products: React.FC = () => {
+  const { currentUser } = useAuth();
+  const userRole = currentUser?.role;
+
   const [productsData, setProductsData] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +63,7 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
     try {
       const params = new URLSearchParams();
       params.append('page', currentPage.toString());
-      params.append('size', '8'); 
+      params.append('size', '8');
       if (filters.searchQuery) {
         params.append('nome', filters.searchQuery);
       }
@@ -72,13 +73,14 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
       if (filters.priceRange.max) {
         params.append('maxPreco', filters.priceRange.max);
       }
+
       if (userRole === 'cliente') {
         params.append('ativo', 'true');
       }
 
-      const response = await axios.get<{ content: BackendProduct[], totalPages: number, number: number }>(`/api/produtos?${params.toString()}`);
-      
-      const transformedProducts: Product[] = response.data.content.map(
+      const response = await api<{ content: BackendProduct[], totalPages: number, number: number }>(`/produtos?${params.toString()}`);
+
+      const transformedProducts: Product[] = response.content.map(
         (p: BackendProduct): Product => ({
           id: String(p.id),
           name: p.nome,
@@ -90,18 +92,12 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
         })
       );
       setProductsData(transformedProducts);
-      setTotalPages(response.data.totalPages);
-      setCurrentPage(response.data.number);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.number);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching products:", err);
-      if (axios.isAxiosError(err) && err.response) {
-          const errorData = err.response.data;
-          const message = errorData.messages?.join(' ') || 'Falha ao carregar produtos.';
-          setError(message);
-      } else {
-          setError('Falha ao carregar produtos. Tente novamente mais tarde.');
-      }
+      setError(err.message || 'Falha ao carregar produtos.');
     } finally {
       setIsLoading(false);
     }
@@ -119,19 +115,14 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
   const handleToggleActive = async (productId: string, currentStatus: boolean) => {
     setActivationError(null);
     try {
-        await axios.patch(`/api/produtos/${productId}?ativo=${!currentStatus}`);
+        await api(`/produtos/${productId}?ativo=${!currentStatus}`, { method: 'PATCH' });
         fetchProducts();
-    } catch (err) {
+    } catch (err: any) {
         console.error("Erro ao alterar status do produto:", err);
-        if (axios.isAxiosError(err) && err.response) {
-            const errorData = err.response.data;
-            const message = errorData.messages?.join(' ') || `Falha ao alterar status do produto.`;
-            setActivationError(message);
-        } else {
-            setActivationError(`Falha ao alterar status do produto ID ${productId}. Tente novamente.`);
-        }
+        setActivationError(err.message || `Falha ao alterar status do produto.`);
     }
   };
+
 
   const isManager = userRole === 'gerente';
   const isCustomer = userRole === 'cliente';
@@ -192,7 +183,7 @@ const Products: React.FC<ProductsProps> = ({ userRole }) => {
               active: product.active,
               image: product.image,
             }}
-            userRole={userRole}
+            userRole={userRole ?? null}
             onToggleActive={isManager ? handleToggleActive : undefined}
           />
         ))}

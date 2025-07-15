@@ -4,6 +4,9 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { UserIcon, PhoneIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ArrowLeft, ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+
+const API_BASE_URL = 'http://localhost:8080';
 
 interface BackendCustomer {
   id: string;
@@ -21,13 +24,10 @@ interface Customer {
   ativo: boolean;
 }
 
-interface CustomersProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-}
+const Customers: React.FC = () => {
+  const { currentUser } = useAuth();
+  const userRole = currentUser?.role;
 
-const API_BASE_URL = '/api';
-
-const Customers: React.FC<CustomersProps> = ({ userRole }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,9 +122,9 @@ const Customers: React.FC<CustomersProps> = ({ userRole }) => {
       {isLoading && <div className="text-center py-4">Atualizando...</div>}
       
       {!isLoading && customers.length === 0 && (
-         <div className="text-center py-10 text-gray-500">
-           Nenhum cliente encontrado.
-         </div>
+          <div className="text-center py-10 text-gray-500">
+            Nenhum cliente encontrado.
+          </div>
       )}
 
       <Card>

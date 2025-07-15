@@ -3,20 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { SearchIcon, FilterIcon, EyeIcon, ClipboardListIcon, CheckCircleIcon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-interface OrdersProps {
-  userRole: 'gerente' | 'vendedor' | 'cliente' | null;
-}
+const Orders: React.FC = () => {
+ 
+  const { currentUser } = useAuth();
+  const userRole = currentUser?.role;
 
-const Orders: React.FC<OrdersProps> = ({
-  userRole
-}) => {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(location.state?.successMessage || null);
-  
+
   const statusOptions = [{
     value: 'all',
     label: 'Todos os Status'
@@ -36,7 +35,7 @@ const Orders: React.FC<OrdersProps> = ({
     value: 'canceled',
     label: 'Cancelado'
   }];
-  
+
   const orders = [{
     id: 'PED-1234',
     customer: 'Maria Silva',
@@ -94,16 +93,16 @@ const Orders: React.FC<OrdersProps> = ({
     total: 'R$ 320,00',
     items: 3
   }];
-  
+
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage(null);
-      }, 5000); // Mensagem some após 5 segundos
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
-  
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || order.customer.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;

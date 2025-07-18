@@ -28,7 +28,7 @@ interface Product {
 
 const ProductDetails: React.FC = () => {
   const { currentUser } = useAuth();
-  const userRole = currentUser?.role;
+  const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

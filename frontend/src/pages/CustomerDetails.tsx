@@ -44,7 +44,7 @@ interface CustomerDetailsProps {
 
 const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerProp, isOwnProfile = false }) => {
   const { currentUser, logout } = useAuth();
-  const userRole = currentUser?.role;
+  const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
   const navigate = useNavigate();
   const { id } = useParams<{ id: string; }>();
   const [customer, setCustomer] = useState(customerProp);

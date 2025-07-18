@@ -26,7 +26,7 @@ interface Customer {
 
 const Customers: React.FC = () => {
   const { currentUser } = useAuth();
-  const userRole = currentUser?.role;
+  const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -17,10 +17,11 @@ const RoleBasedRoute: React.FC<RoleBasedRouteProps> = ({ allowedRoles }) => {
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
+  
+  const userRole = currentUser.cargo?.toLowerCase() ?? 'cliente';
+  const allowedRolesLower = allowedRoles.map(role => role?.toLowerCase());
 
-  const isAuthorized = allowedRoles.includes(currentUser.role);
-
-  console.log('Current User Role:', currentUser);
+  const isAuthorized = allowedRolesLower.includes(userRole);
 
   if (!isAuthorized) {
     return <Navigate to="/unauthorized" replace />;

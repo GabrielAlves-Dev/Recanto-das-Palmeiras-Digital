@@ -8,10 +8,9 @@ const headers: Record<string, string> = {
   ...(options.headers && !Array.isArray(options.headers) ? options.headers as Record<string, string> : {}),
 };
 
-
   const user = getCurrentUser();
-  if (user && user.accessToken) {
-    headers['Authorization'] = `Bearer ${user.accessToken}`;
+  if (user && user.token) {
+    headers['Authorization'] = `Bearer ${user.token}`;
   }
 
   const config: RequestInit = {
@@ -25,7 +24,7 @@ const headers: Record<string, string> = {
     const errorData = await response.json().catch(() => ({ message: response.statusText }));
     throw new Error(errorData.message || 'Ocorreu um erro na requisição');
   }
-  
+
   const contentType = response.headers.get("content-type");
   if (contentType && contentType.indexOf("application/json") !== -1) {
     return response.json() as Promise<T>;

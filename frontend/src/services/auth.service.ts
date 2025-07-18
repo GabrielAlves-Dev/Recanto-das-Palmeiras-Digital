@@ -10,12 +10,12 @@ export const getCurrentUser = (): User | null => {
 };
 
 const login = async (email: string, senha: string): Promise<User> => {
-  const user = await customFetch<User>('/clientes/login', {
+  const user = await customFetch<User>('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, senha }),
   });
 
-  if (user && user.accessToken) {
+  if (user && user.token) {
     localStorage.setItem('user', JSON.stringify(user));
   }
   return user;

@@ -1,10 +1,8 @@
-export type UserRole = 'gerente' | 'vendedor' | 'cliente';
+export type UserRole = 'GERENTE' | 'VENDEDOR' | 'CLIENTE' | null;
 
 export interface User {
-  id: number | string;
-  email: string;
-  role: UserRole;
-  accessToken: string;
+  token: string;
+  cargo: UserRole;
 }
 
 export interface AuthContextType {

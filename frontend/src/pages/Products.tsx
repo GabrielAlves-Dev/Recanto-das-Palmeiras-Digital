@@ -43,7 +43,7 @@ const formatPrice = (price: number): string => {
 
 const Products: React.FC = () => {
   const { currentUser } = useAuth();
-  const userRole = currentUser?.role;
+  const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
 
   const [productsData, setProductsData] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);

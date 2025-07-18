@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HomeIcon, ShoppingBagIcon, UsersIcon, ShoppingCartIcon, ClipboardListIcon, BarChartIcon, PlusCircleIcon, UserCogIcon } from 'lucide-react';
+import { HomeIcon, ShoppingBagIcon, UsersIcon, ShoppingCartIcon, ClipboardListIcon, BarChartIcon, PlusCircleIcon, UserCogIcon, UserIcon } from 'lucide-react';
+
 interface SidebarProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
 }
+
 const Sidebar: React.FC<SidebarProps> = ({
   userRole
 }) => {
@@ -11,6 +13,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+
   const renderNavItems = () => {
     if (userRole === 'gerente') {
       return <>
@@ -33,6 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
     return null;
   };
+
   return <aside className="w-64 bg-white border-r border-gray-200 h-full hidden md:block">
       <div className="p-6">
         <div className="flex items-center justify-center">
@@ -46,12 +50,14 @@ const Sidebar: React.FC<SidebarProps> = ({
       </nav>
     </aside>;
 };
+
 interface NavItemProps {
   to: string;
   icon: React.ReactNode;
   label: string;
   active: boolean;
 }
+
 const NavItem: React.FC<NavItemProps> = ({
   to,
   icon,
@@ -65,4 +71,5 @@ const NavItem: React.FC<NavItemProps> = ({
       </Link>
     </li>;
 };
+
 export default Sidebar;

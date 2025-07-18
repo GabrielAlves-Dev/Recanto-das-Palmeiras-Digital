@@ -22,26 +22,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // 👇 A MUDANÇA ESTÁ NESTA FUNÇÃO 👇
   const login = async (email: string, password: string) => {
-    // 1. Chama o serviço de autenticação para fazer o login real no backend
     const user = await authService.login(email, password);
-
-    // 2. LÓGICA ADICIONADA: Sobrescreve o papel (role) do usuário com base no e-mail
-    if (email.toLowerCase() === 'gerente@gmail.com') {
-      user.role = 'gerente';
-    } else if (email.toLowerCase() === 'vendedor@gmail.com') {
-      user.role = 'vendedor';
-    } else {
-      user.role = 'cliente';
-    }
-
-    // 3. Atualiza o estado da aplicação com o usuário MODIFICADO
     setCurrentUser(user);
-    
-    // 4. IMPORTANTE: Garante que o usuário MODIFICADO seja salvo no localStorage também,
-    // sobrescrevendo o que foi salvo originalmente pelo authService.
-    localStorage.setItem('user', JSON.stringify(user));
   };
 
   const logout = () => {

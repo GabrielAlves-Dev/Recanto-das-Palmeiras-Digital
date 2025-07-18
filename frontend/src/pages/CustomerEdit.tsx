@@ -7,6 +7,14 @@ import { ArrowLeftIcon } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
+
+// Define the type for the data coming from the backend API
+interface BackendCustomerData {
+    nome: string;
+    telefone: string;
+    email: string;
+}
+
 const CustomerEdit: React.FC = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -22,7 +30,8 @@ const CustomerEdit: React.FC = () => {
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        const data = await api('/clientes/me'); 
+        // Specify the expected type for the api call
+        const data = await api<BackendCustomerData>('/clientes/me');
         setFormData({
           nome: data.nome,
           telefone: data.telefone,
@@ -92,14 +101,14 @@ const CustomerEdit: React.FC = () => {
             <div className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input label="Nome Completo" id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
-                <Input 
-                  label="Telefone" 
-                  id="telefone" 
-                  name="telefone" 
-                  value={formData.telefone} 
-                  onChange={handleChange} 
-                  required 
-                  mask={'(00) 00000-0000'} 
+                <Input
+                  label="Telefone"
+                  id="telefone"
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleChange}
+                  required
+                  mask={'(00) 00000-0000'}
                   unmask={true}
                 />
                 <div className="md:col-span-2">

@@ -26,6 +26,16 @@ interface Customer {
     orderHistory: any[];
 }
 
+interface BackendCustomerData {
+    id: string;
+    nome: string;
+    cpfCnpj: string;
+    telefone: string;
+    email: string;
+    ativo: boolean;
+}
+
+
 interface CustomerDetailsProps {
     customer?: Customer;
     isOwnProfile?: boolean;
@@ -47,7 +57,8 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
     if (!isOwnProfile && id) {
       const fetchCustomerData = async () => {
         try {
-          const data = await api(`/clientes/${id}`);
+          // Specify the expected type for the api call
+          const data = await api<BackendCustomerData>(`/clientes/${id}`);
           setCustomer({
             id: data.id,
             name: data.nome,
@@ -178,7 +189,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
                 </p>
                 <p className="text-gray-600">{customer.address.neighborhood}</p>
                 <p className="text-gray-600">
-                  {customer.address.city} - {customer.address.state},{' '
+                  {customer.address.city} - {customer.address.state},{' '}
                   {customer.address.zipCode}
                 </p>
               </div>

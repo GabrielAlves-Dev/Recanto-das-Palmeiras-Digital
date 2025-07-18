@@ -29,6 +29,7 @@ export function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
+          
 
           <Route element={<Layout />}>
             
@@ -56,7 +57,7 @@ export function App() {
             <Route element={<RoleBasedRoute allowedRoles={['gerente']} />}>
               <Route path="/users" element={<Users />} />
               <Route path="/users/new" element={<UserEdit />} />
-              <Route path="/users/edit/:id"={<UserEdit />} />
+              <Route path="/users/edit/:id" element={<UserEdit />} />
             </Route>
 
           </Route>

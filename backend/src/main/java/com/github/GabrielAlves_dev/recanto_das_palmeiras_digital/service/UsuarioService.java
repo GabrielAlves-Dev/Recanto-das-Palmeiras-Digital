@@ -8,8 +8,6 @@ import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +22,6 @@ public class UsuarioService {
     @Autowired
     private UsuarioMapper mapper;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TokenService tokenService;
 
     public UUID cadastrar(UsuarioRequestDTO dto) {
         String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());

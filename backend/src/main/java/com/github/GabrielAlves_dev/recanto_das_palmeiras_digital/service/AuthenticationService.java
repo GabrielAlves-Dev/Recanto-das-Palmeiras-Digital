@@ -34,6 +34,6 @@ public class AuthenticationService {
             throw new BadCredentialsException("Tipo de usuário desconhecido.");
         }
 
-        return new LoginResponseDTO(token);
+        return new LoginResponseDTO(token, ((Usuario) principal).getCargo());
     }
 }

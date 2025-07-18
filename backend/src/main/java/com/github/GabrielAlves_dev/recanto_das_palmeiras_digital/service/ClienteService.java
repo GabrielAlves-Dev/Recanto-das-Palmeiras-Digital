@@ -4,6 +4,12 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.NotFoundException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.*;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido.StatusPedido;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.PedidoRepository;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.NotFoundException;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +29,9 @@ public class ClienteService {
 
     @Autowired
     private ClienteRepository repository;
+
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     @Autowired
     private ClienteMapper mapper;
@@ -137,6 +147,22 @@ public class ClienteService {
     public void desativar(UUID id) {
         Cliente cliente = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cliente não encontrado."));
+        cliente.setAtivo(false);
+        repository.save(cliente);
+    }
+
+    @Transactional
+    public void desativarContaPropria() {
+        Cliente cliente = getAuthenticatedCliente();
+        boolean hasPedidosPendentes = pedidoRepository.existsByClienteIdAndStatusIn(
+                cliente.getId(),
+                List.of(StatusPedido.PENDENTE, StatusPedido.EM_PREPARO)
+        );
+
+        if (hasPedidosPendentes) {
+            throw new ValidationException("Você possui pedidos pendentes ou em preparo e não pode desativar sua conta.");
+        }
+
         cliente.setAtivo(false);
         repository.save(cliente);
     }

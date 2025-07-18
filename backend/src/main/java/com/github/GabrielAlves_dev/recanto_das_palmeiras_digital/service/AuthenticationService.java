@@ -27,13 +27,13 @@ public class AuthenticationService {
         String token;
         if (principal instanceof Usuario) {
             token = tokenService.generateToken((Usuario) principal);
+            return new LoginResponseDTO(token, ((Usuario) principal).getCargo());
         } else if (principal instanceof Cliente) {
             token = tokenService.generateToken((Cliente) principal);
+            return new LoginResponseDTO(token, null); // Cliente não tem cargo, então retorna null
         } else {
             // Isso não deve acontecer se o AuthorizationService estiver correto
             throw new BadCredentialsException("Tipo de usuário desconhecido.");
         }
-
-        return new LoginResponseDTO(token, ((Usuario) principal).getCargo());
     }
 }

@@ -24,9 +24,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
         </>;
     } else if (userRole === 'cliente') {
-      return <>
+      return (
+        <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
-        </>;
+          <NavItem to="/my-profile" icon={<UserIcon size={20} />} label="Meu Perfil" active={isActive('/my-profile')} />
+        </>
+      );
     }
     return null;
   };

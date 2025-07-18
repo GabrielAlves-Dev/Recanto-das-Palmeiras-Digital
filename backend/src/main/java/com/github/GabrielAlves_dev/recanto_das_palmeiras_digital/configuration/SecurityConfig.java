@@ -55,6 +55,7 @@ public class SecurityConfig {
                         // Rotas de autoatendimento para o cliente logado
                         .requestMatchers(HttpMethod.GET, "/clientes/me").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.PUT, "/clientes/me").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/clientes/me").hasRole("CLIENTE")
 
                         // Rotas administrativas para Gerente/Vendedor
                         .requestMatchers(HttpMethod.GET, "/clientes", "/clientes/{id}").hasAnyRole("GERENTE", "VENDEDOR")

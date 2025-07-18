@@ -1,7 +1,5 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.AuthenticationDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.LoginResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioUpdateDTO;

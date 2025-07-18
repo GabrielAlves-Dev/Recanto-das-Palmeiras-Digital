@@ -3,8 +3,6 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteAutoCadastroDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteResponseDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.AuthenticationDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.LoginResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +70,12 @@ public class ClienteController {
     @PatchMapping("/{id}/desativar")
     public ResponseEntity<Void> desativar(@PathVariable UUID id) {
         service.desativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> desativarContaPropria() {
+        service.desativarContaPropria();
         return ResponseEntity.noContent().build();
     }
 }

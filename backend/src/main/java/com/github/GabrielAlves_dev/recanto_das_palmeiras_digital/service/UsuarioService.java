@@ -2,13 +2,15 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.UsuarioRepository;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -74,6 +76,23 @@ public class UsuarioService {
         }
 
         repository.save(usuario);
+    }
+
+    private Usuario getAuthenticatedUsuario() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        return (Usuario) repository.findByEmail(username);
+    }
+
+    public UsuarioResponseDTO buscarPorUsuarioAutenticado() {
+        Usuario usuario = getAuthenticatedUsuario();
+        return mapper.toUsuarioResponseDTO(usuario);
+    }
+
+    @Transactional
+    public void editarUsuarioAutenticado(UsuarioUpdateDTO dto) {
+        Usuario usuario = getAuthenticatedUsuario();
+        this.editar(usuario.getId(), dto);
     }
 
     public void alterarStatus(UUID id, boolean ativo) {

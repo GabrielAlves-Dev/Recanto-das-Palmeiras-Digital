@@ -44,6 +44,17 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> buscarMeuPerfil() {
+        return ResponseEntity.ok(service.buscarPorUsuarioAutenticado());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<Void> editarMeuPerfil(@RequestBody @Valid UsuarioUpdateDTO dto) {
+        service.editarUsuarioAutenticado(dto);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<Void> alterarStatus(@PathVariable UUID id, @RequestParam boolean ativo) {
         service.alterarStatus(id, ativo);

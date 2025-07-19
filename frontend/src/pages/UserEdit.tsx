@@ -30,7 +30,7 @@ const UserEdit: React.FC = () => {
           setFormData({
             name: user.nome,
             email: user.email,
-            cpfCnpj: user.cpfCnpj,
+            
             role: user.cargo,
             active: user.ativo,
             password: '',
@@ -89,15 +89,7 @@ const UserEdit: React.FC = () => {
     }
   };
   
-  const cpfCnpjMask = [
-    {
-      mask: '000.000.000-00',
-      maxLength: 11
-    },
-    {
-      mask: '00.000.000/0000-00'
-    }
-  ];
+  
 
   return (
     <div className="space-y-6">

@@ -19,6 +19,8 @@ import MyProfileEdit from './pages/MyProfileEdit';
 import CustomerEdit from './pages/CustomerEdit';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
+import UserProfile from './pages/UserProfile';
+import UserSelfEdit from './pages/UserSelfEdit';
 import RoleBasedRoute from './components/RoleBasedRoute';
 
 export function App() {

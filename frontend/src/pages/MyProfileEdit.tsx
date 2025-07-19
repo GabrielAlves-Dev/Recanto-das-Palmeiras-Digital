@@ -1,39 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import UserEdit from './UserEdit';
-import api from '../services/api';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import CustomerEdit from './CustomerEdit';
+import UserSelfEdit from './UserSelfEdit';
 
-const MyProfileEdit = () => {
-  const { currentUser } = useAuth();
-  const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const data = await api('/clientes/me');
-        setUserData(data);
-      } catch (error) {
-        console.error('Failed to fetch user data', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (currentUser) {
-      fetchUserData();
-    }
-  }, [currentUser]);
+const MyProfileEdit: React.FC = () => {
+  const { currentUser, isLoading } = useAuth();
 
   if (isLoading) {
     return <div>Carregando...</div>;
   }
 
-  if (!userData) {
-    return <div>Não foi possível carregar os dados do usuário.</div>;
+  if (!currentUser) {
+    return <div>Você precisa estar logado para ver esta página.</div>;
   }
 
-  return <UserEdit user={userData} isProfileEdit={true} />;
+  const isCustomer = currentUser.cargo === 'CLIENTE';
+
+  return isCustomer ? <CustomerEdit /> : <UserSelfEdit />;
 };
 
 export default MyProfileEdit;

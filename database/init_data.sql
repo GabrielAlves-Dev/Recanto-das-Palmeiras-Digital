@@ -1,6 +1,6 @@
 CREATE TYPE tipo_cargo AS ENUM (
-    'Gerente',
-    'Vendedor'
+    'GERENTE',
+    'VENDEDOR'
 );
 
 CREATE TYPE tipo_status_pedido AS ENUM (
@@ -121,8 +121,8 @@ CREATE INDEX idx_notificacao_destinatario ON public.notificacao(destinatario_id)
 -- Senhas são 'senha123' e 'senha456' em BCrypt
 -- =============================================
 INSERT INTO public.usuario (nome, email, telefone, cargo, senha, ativo) VALUES
-('Gabriel Alves', 'gerente@email.com', '(85) 99999-0001', 'Gerente', '$2a$10$R9P.G2I.w3j.H8k.w2m.l.uQd2F4G3j.Y8k.w2m.l.R', true),
-('Tiago Tito', 'vendedor@email.com', '(85) 99999-0002', 'Vendedor', '$2a$10$h7k.X2m.l.uQd2F4G3j.Y8k.w2m.l.R9P.G2I.w3j.H8', true);
+('Gabriel Alves', 'gerente@email.com', '(85) 99999-0001', 'GERENTE', '$2a$10$R9P.G2I.w3j.H8k.w2m.l.uQd2F4G3j.Y8k.w2m.l.R', true),
+('Tiago Tito', 'vendedor@email.com', '(85) 99999-0002', 'VENDEDOR', '$2a$10$h7k.X2m.l.uQd2F4G3j.Y8k.w2m.l.R9P.G2I.w3j.H8', true);
 
 -- =============================================
 -- INSERIR CLIENTES (10)

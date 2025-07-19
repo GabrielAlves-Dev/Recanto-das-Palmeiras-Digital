@@ -52,40 +52,38 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
 
 
-  // Se não for o perfil próprio, busca os dados do cliente
   React.useEffect(() => {
-    if (!isOwnProfile && id) {
-      const fetchCustomerData = async () => {
-        try {
-          // Specify the expected type for the api call
-          const data = await api<BackendCustomerData>(`/clientes/${id}`);
-          setCustomer({
-            id: data.id,
-            name: data.nome,
-            document: data.cpfCnpj,
-            phone: data.telefone,
-            email: data.email,
-            address: { // Mocked address for now
-                street: 'Rua das Flores',
-                number: '123',
-                complement: 'Apto 45',
-                neighborhood: 'Jardim Primavera',
-                city: 'São Paulo',
-                state: 'SP',
-                zipCode: '01234-567'
-            },
-            active: data.ativo,
-            orderHistory: [], // Mocked order history
-          });
-        } catch (err) {
-          setError("Falha ao carregar dados do cliente.");
-        }
-      };
-      fetchCustomerData();
-    } else {
-        setCustomer(customerProp)
+    const fetchCustomerData = async () => {
+      try {
+        const endpoint = isOwnProfile ? '/clientes/me' : `/clientes/${id}`;
+        const data = await api<BackendCustomerData>(endpoint);
+        setCustomer({
+          id: data.id,
+          name: data.nome,
+          document: data.cpfCnpj,
+          phone: data.telefone,
+          email: data.email,
+          address: { // Mocked address for now
+              street: 'Rua das Flores',
+              number: '123',
+              complement: 'Apto 45',
+              neighborhood: 'Jardim Primavera',
+              city: 'São Paulo',
+              state: 'SP',
+              zipCode: '01234-567'
+          },
+          active: data.ativo,
+          orderHistory: [], // Mocked order history
+        });
+      } catch (err) {
+        setError("Falha ao carregar dados do cliente.");
+      }
+    };
+
+    if (isOwnProfile || id) {
+        fetchCustomerData();
     }
-  }, [id, isOwnProfile, customerProp]);
+  }, [id, isOwnProfile]);
 
   const handleDeactivate = async () => {
     setError(null);

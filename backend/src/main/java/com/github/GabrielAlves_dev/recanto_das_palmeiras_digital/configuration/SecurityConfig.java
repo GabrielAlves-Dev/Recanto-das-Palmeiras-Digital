@@ -46,6 +46,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.PATCH, "/produtos/**").hasRole("GERENTE")
 
+                        // Rotas de autoatendimento para o funcionário logado
+                        .requestMatchers(HttpMethod.GET, "/usuarios/me").hasAnyRole("VENDEDOR", "GERENTE")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/me").hasAnyRole("VENDEDOR", "GERENTE")
+
                         // ENDPOINTS DE USUÁRIOS (ADMIN INTERNO - APENAS GERENTE)
                         .requestMatchers(HttpMethod.GET, "/usuarios", "/usuarios/**").hasRole("GERENTE")
                         //.requestMatchers(HttpMethod.POST, "/usuarios").hasRole("GERENTE")

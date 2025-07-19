@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({
         <button className="text-gray-600 hover:text-emerald-700">
           <BellIcon size={20} />
         </button>
-        <div className="flex items-center space-x-2">
+        <Link to="/my-profile" className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
             <UserIcon size={16} className="text-emerald-700" />
           </div>
@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({
               {userRole === 'cliente' && 'Cliente'}
             </p>
           </div>
-        </div>
+        </Link>
         <button onClick={onLogout} className="text-gray-600 hover:text-emerald-700">
           <LogOutIcon size={20} />
         </button>

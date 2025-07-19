@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 const Orders: React.FC = () => {
  
   const { currentUser } = useAuth();
-  const userRole = currentUser?.role;
+  const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
 
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');

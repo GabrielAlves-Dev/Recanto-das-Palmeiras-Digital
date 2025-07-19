@@ -1,7 +1,5 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.controller;
 
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.AuthenticationDTO;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.LoginResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioRequestDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioResponseDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioUpdateDTO;
@@ -43,6 +41,17 @@ public class UsuarioController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> editar(@PathVariable UUID id, @RequestBody @Valid UsuarioUpdateDTO dto) {
         service.editar(id, dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioResponseDTO> buscarMeuPerfil() {
+        return ResponseEntity.ok(service.buscarPorUsuarioAutenticado());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<Void> editarMeuPerfil(@RequestBody @Valid UsuarioUpdateDTO dto) {
+        service.editarUsuarioAutenticado(dto);
         return ResponseEntity.noContent().build();
     }
 

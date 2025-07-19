@@ -14,8 +14,13 @@ import CustomerDetails from './pages/CustomerDetails';
 import Users from './pages/Users';
 import UserEdit from './pages/UserEdit';
 import Unauthorized from './pages/Unauthorized';
+import MyProfile from './pages/MyProfile';
+import MyProfileEdit from './pages/MyProfileEdit';
+import CustomerEdit from './pages/CustomerEdit';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
+import UserProfile from './pages/UserProfile';
+import UserSelfEdit from './pages/UserSelfEdit';
 import RoleBasedRoute from './components/RoleBasedRoute';
 
 export function App() {
@@ -26,6 +31,7 @@ export function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
+          
 
           <Route element={<Layout />}>
             
@@ -36,6 +42,8 @@ export function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/orders/:id" element={<OrderDetails />} />
+              <Route path="/my-profile" element={<MyProfile />} />
+              <Route path="/my-profile/edit" element={<MyProfileEdit />} />
             </Route>
 
             <Route element={<RoleBasedRoute allowedRoles={['vendedor', 'gerente']} />}>
@@ -44,6 +52,7 @@ export function App() {
               <Route path="/create-order" element={<CreateOrder />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/customers/:id" element={<CustomerDetails />} />
+               <Route path="/customers/edit/:id" element={<CustomerEdit />} />
             </Route>
 
 

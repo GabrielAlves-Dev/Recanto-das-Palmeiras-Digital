@@ -18,5 +18,4 @@ public class UsuarioResponseDTO {
     private String email;
     private CargoUsuario cargo;
     private Boolean ativo;
-    private String cpfCnpj;
 }

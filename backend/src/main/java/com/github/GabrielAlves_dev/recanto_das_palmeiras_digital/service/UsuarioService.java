@@ -2,15 +2,15 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.UsuarioRepository;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
+
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,28 +24,17 @@ public class UsuarioService {
     @Autowired
     private UsuarioMapper mapper;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private TokenService tokenService;
 
     public UUID cadastrar(UsuarioRequestDTO dto) {
-        String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
-        String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
 
         if (repository.existsByEmail(dto.getEmail())) {
             throw new ValidationException("Email já está em uso");
-        }
-        if (repository.existsByCpfCnpj(formattedCpfCnpj)) {
-            throw new ValidationException("CPF/CNPJ já está em uso");
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
         dto.setSenha(encryptedPassword);
 
         Usuario usuario = mapper.toUsuario(dto);
-        usuario.setCpfCnpj(formattedCpfCnpj);
         usuario.setSenha(dto.getSenha());
         usuario.setAtivo(true);
 
@@ -77,14 +66,6 @@ public class UsuarioService {
             }
             usuario.setEmail(dto.getEmail());
         }
-        if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().isBlank()) {
-            String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
-            String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
-            if (!formattedCpfCnpj.equals(usuario.getCpfCnpj()) && repository.existsByCpfCnpj(formattedCpfCnpj)) {
-                throw new ValidationException("CPF/CNPJ já está em uso.");
-            }
-            usuario.setCpfCnpj(formattedCpfCnpj);
-        }
         if (dto.getCargo() != null) {
             usuario.setCargo(dto.getCargo());
         }
@@ -95,6 +76,23 @@ public class UsuarioService {
         }
 
         repository.save(usuario);
+    }
+
+    private Usuario getAuthenticatedUsuario() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = ((UserDetails) principal).getUsername();
+        return (Usuario) repository.findByEmail(username);
+    }
+
+    public UsuarioResponseDTO buscarPorUsuarioAutenticado() {
+        Usuario usuario = getAuthenticatedUsuario();
+        return mapper.toUsuarioResponseDTO(usuario);
+    }
+
+    @Transactional
+    public void editarUsuarioAutenticado(UsuarioUpdateDTO dto) {
+        Usuario usuario = getAuthenticatedUsuario();
+        this.editar(usuario.getId(), dto);
     }
 
     public void alterarStatus(UUID id, boolean ativo) {

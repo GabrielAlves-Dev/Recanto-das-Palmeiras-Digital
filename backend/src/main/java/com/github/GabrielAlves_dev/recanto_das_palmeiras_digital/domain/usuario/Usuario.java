@@ -26,7 +26,6 @@ public class Usuario implements UserDetails {
 
     private String nome;
     private String email;
-    private String cpfCnpj;
     @Enumerated(EnumType.STRING)
     private CargoUsuario cargo;
     private String senha;

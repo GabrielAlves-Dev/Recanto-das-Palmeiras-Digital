@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { SearchIcon, UserIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ShieldIcon, ArrowLeft, ArrowRight, CheckCircleIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 // Interfaces
 interface BackendUser {
@@ -12,7 +12,6 @@ interface BackendUser {
   email: string;
   cargo: string;
   ativo: boolean;
-  cpfCnpj: string;
 }
 
 interface User {
@@ -21,7 +20,6 @@ interface User {
   email: string;
   role: string;
   active: boolean;
-  cpfCnpj: string;
 }
 
 const Users: React.FC = () => {
@@ -45,30 +43,23 @@ const Users: React.FC = () => {
       // Implementar busca no backend se necessário
       // if (searchQuery) params.append('search', searchQuery);
 
-      const response = await axios.get<{ content: BackendUser[], totalPages: number, number: number }>(`/api/usuarios?${params.toString()}`);
+      const response = await api<{ content: BackendUser[], totalPages: number, number: number }>(`/usuarios?${params.toString()}`);
       
-      const transformedUsers: User[] = response.data.content.map(u => ({
+      const transformedUsers: User[] = response.content.map(u => ({
         id: u.id,
         name: u.nome,
         email: u.email,
         role: u.cargo,
         active: u.ativo,
-        cpfCnpj: u.cpfCnpj,
       }));
 
       setUsers(transformedUsers);
-      setTotalPages(response.data.totalPages);
-      setCurrentPage(response.data.number);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.number);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao buscar usuários:", err);
-      if (axios.isAxiosError(err) && err.response) {
-          const errorData = err.response.data;
-          const message = errorData.messages?.join(' ') || 'Falha ao carregar usuários.';
-          setError(message);
-      } else {
-          setError('Falha ao carregar usuários. Tente novamente mais tarde.');
-      }
+      setError(err.message || 'Falha ao carregar usuários. Tente novamente mais tarde.');
     } finally {
       setIsLoading(false);
     }
@@ -90,17 +81,11 @@ const Users: React.FC = () => {
   const handleToggleActive = async (userId: string, currentStatus: boolean) => {
     setActionError(null);
     try {
-      await axios.patch(`/api/usuarios/${userId}?ativo=${!currentStatus}`);
+      await api(`/usuarios/${userId}?ativo=${!currentStatus}`, { method: 'PATCH' });
       fetchUsers(); // Recarrega a lista
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao alterar status do usuário:", err);
-      if (axios.isAxiosError(err) && err.response) {
-          const errorData = err.response.data;
-          const message = errorData.messages?.join(' ') || 'Falha ao alterar status do usuário.';
-          setActionError(message);
-      } else {
-        setActionError('Falha ao alterar status do usuário.');
-      }
+      setActionError(err.message || 'Falha ao alterar status do usuário.');
     }
   };
 
@@ -167,9 +152,6 @@ const Users: React.FC = () => {
                   Usuário
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  CPF/CNPJ
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contato
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -196,9 +178,6 @@ const Users: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.cpfCnpj}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-500 flex items-center">

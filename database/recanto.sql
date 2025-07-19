@@ -1,6 +1,6 @@
 CREATE TYPE tipo_cargo AS ENUM (
-    'Gerente',
-    'Vendedor'
+    'GERENTE',
+    'VENDEDOR'
 );
 
 CREATE TYPE tipo_status_pedido AS ENUM (

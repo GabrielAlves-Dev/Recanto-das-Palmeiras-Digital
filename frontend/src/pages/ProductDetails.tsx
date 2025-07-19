@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 interface BackendProduct {
@@ -28,7 +28,7 @@ interface Product {
 
 const ProductDetails: React.FC = () => {
   const { currentUser } = useAuth();
-  const userRole = currentUser?.role;
+  const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -43,8 +43,7 @@ const ProductDetails: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get<BackendProduct>(`/api/produtos/${id}`);
-      const backendData = response.data;
+      const backendData = await api<BackendProduct>(`/produtos/${id}`);
       setProductData({
         id: String(backendData.id),
         name: backendData.nome,
@@ -54,15 +53,9 @@ const ProductDetails: React.FC = () => {
         image: backendData.imagem || '/placeholder-image.jpg',
         active: backendData.ativo,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Erro ao carregar detalhes do produto de ID ${id}:`, err);
-      if (axios.isAxiosError(err) && err.response) {
-        const errorData = err.response.data;
-        const message = errorData.messages?.join(' ') || 'Produto não encontrado ou falha ao carregar.';
-        setError(message);
-      } else {
-        setError('Produto não encontrado ou falha ao carregar.');
-      }
+      setError(err.message || 'Produto não encontrado ou falha ao carregar.');
     } finally {
       setIsLoading(false);
     }
@@ -76,17 +69,11 @@ const ProductDetails: React.FC = () => {
     if (!productData) return;
     setActionError(null);
     try {
-      await axios.patch(`/api/produtos/${productData.id}?ativo=${!productData.active}`);
+      await api(`/produtos/${productData.id}?ativo=${!productData.active}`, { method: 'PATCH' });
       await fetchProductDetails(); // Re-fetch to get updated data
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao alterar status do produto:", err);
-      if (axios.isAxiosError(err) && err.response) {
-          const errorData = err.response.data;
-          const message = errorData.messages?.join(' ') || `Falha ao alterar status do produto.`;
-          setActionError(message);
-      } else {
-          setActionError(`Falha ao alterar status do produto ID ${productData.id}. Tente novamente.`);
-      }
+      setActionError(err.message || `Falha ao alterar status do produto ID ${productData.id}. Tente novamente.`);
     }
   };
 

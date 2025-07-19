@@ -46,15 +46,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/produtos/**").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.PATCH, "/produtos/**").hasRole("GERENTE")
 
+                        // Rotas de autoatendimento para o funcionário logado
+                        .requestMatchers(HttpMethod.GET, "/usuarios/me").hasAnyRole("VENDEDOR", "GERENTE")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/me").hasAnyRole("VENDEDOR", "GERENTE")
+
                         // ENDPOINTS DE USUÁRIOS (ADMIN INTERNO - APENAS GERENTE)
                         .requestMatchers(HttpMethod.GET, "/usuarios", "/usuarios/**").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.POST, "/usuarios").hasRole("GERENTE")
+                        //.requestMatchers(HttpMethod.POST, "/usuarios").hasRole("GERENTE")
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll() //remover depois de testes
                         .requestMatchers(HttpMethod.PUT, "/usuarios/**").hasRole("GERENTE")
                         .requestMatchers(HttpMethod.PATCH, "/usuarios/**").hasRole("GERENTE")
 
                         // Rotas de autoatendimento para o cliente logado
                         .requestMatchers(HttpMethod.GET, "/clientes/me").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.PUT, "/clientes/me").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/clientes/me").hasRole("CLIENTE")
 
                         // Rotas administrativas para Gerente/Vendedor
                         .requestMatchers(HttpMethod.GET, "/clientes", "/clientes/{id}").hasAnyRole("GERENTE", "VENDEDOR")

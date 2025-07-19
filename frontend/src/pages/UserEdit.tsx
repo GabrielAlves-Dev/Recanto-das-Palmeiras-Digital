@@ -4,7 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ArrowLeftIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 const UserEdit: React.FC = () => {
   const { id } = useParams<{ id: string; }>();
@@ -14,7 +14,6 @@ const UserEdit: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    cpfCnpj: '',
     role: '',
     password: '',
     confirmPassword: '',
@@ -27,20 +26,19 @@ const UserEdit: React.FC = () => {
     if (isEditing) {
       const fetchUser = async () => {
         try {
-          const response = await axios.get(`/api/usuarios/${id}`);
-          const user = response.data;
+          const user = await api<any>(`/usuarios/${id}`);
           setFormData({
             name: user.nome,
             email: user.email,
-            cpfCnpj: user.cpfCnpj,
+            
             role: user.cargo,
             active: user.ativo,
             password: '',
             confirmPassword: '',
           });
-        } catch (err) {
+        } catch (err: any) {
           console.error("Erro ao buscar usuário:", err);
-          setError("Não foi possível carregar os dados do usuário.");
+          setError(err.message || "Não foi possível carregar os dados do usuário.");
         }
       };
       fetchUser();
@@ -74,7 +72,6 @@ const UserEdit: React.FC = () => {
     const userData = {
       nome: formData.name,
       email: formData.email,
-      cpfCnpj: formData.cpfCnpj, // Não precisa mais do .replace()
       cargo: formData.role,
       ...(formData.password && { senha: formData.password }),
     };
@@ -82,30 +79,17 @@ const UserEdit: React.FC = () => {
     try {
       const successMessage = isEditing ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!';
       if (isEditing) {
-        await axios.put(`/api/usuarios/${id}`, userData);
+        await api(`/usuarios/${id}`, { method: 'PUT', body: JSON.stringify(userData) });
       } else {
-        await axios.post('/api/usuarios', { ...userData, senha: formData.password });
+        await api('/usuarios', { method: 'POST', body: JSON.stringify({ ...userData, senha: formData.password }) });
       }
       navigate('/users', { state: { successMessage } });
-    } catch (axiosError) {
-        if (axios.isAxiosError(axiosError) && axiosError.response) {
-            const messages = axiosError.response.data.messages || ['Ocorreu um erro.'];
-            setFormError(`Erro: ${messages.join(', ')}`);
-        } else {
-            setFormError('Ocorreu um erro inesperado. Tente novamente.');
-        }
+    } catch (err: any) {
+      setFormError(err.message || 'Ocorreu um erro inesperado. Tente novamente.');
     }
   };
   
-  const cpfCnpjMask = [
-    {
-      mask: '000.000.000-00',
-      maxLength: 11
-    },
-    {
-      mask: '00.000.000/0000-00'
-    }
-  ];
+  
 
   return (
     <div className="space-y-6">
@@ -129,16 +113,6 @@ const UserEdit: React.FC = () => {
                     </div>
                     <Input label="Nome Completo" id="name" name="name" value={formData.name} onChange={handleChange} required />
                     <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-                    <Input 
-                      label="CPF/CNPJ" 
-                      id="cpfCnpj" 
-                      name="cpfCnpj" 
-                      value={formData.cpfCnpj} 
-                      onChange={handleChange} 
-                      required 
-                      mask={cpfCnpjMask}
-                      unmask={true}
-                    />
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                           Cargo

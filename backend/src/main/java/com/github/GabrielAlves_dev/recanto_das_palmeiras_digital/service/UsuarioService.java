@@ -24,21 +24,15 @@ public class UsuarioService {
 
 
     public UUID cadastrar(UsuarioRequestDTO dto) {
-        String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
-        String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
 
         if (repository.existsByEmail(dto.getEmail())) {
             throw new ValidationException("Email já está em uso");
-        }
-        if (repository.existsByCpfCnpj(formattedCpfCnpj)) {
-            throw new ValidationException("CPF/CNPJ já está em uso");
         }
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
         dto.setSenha(encryptedPassword);
 
         Usuario usuario = mapper.toUsuario(dto);
-        usuario.setCpfCnpj(formattedCpfCnpj);
         usuario.setSenha(dto.getSenha());
         usuario.setAtivo(true);
 
@@ -69,14 +63,6 @@ public class UsuarioService {
                 throw new ValidationException("Email já está em uso.");
             }
             usuario.setEmail(dto.getEmail());
-        }
-        if (dto.getCpfCnpj() != null && !dto.getCpfCnpj().isBlank()) {
-            String cleanedCpfCnpj = CpfCnpjUtils.clean(dto.getCpfCnpj());
-            String formattedCpfCnpj = CpfCnpjUtils.format(cleanedCpfCnpj);
-            if (!formattedCpfCnpj.equals(usuario.getCpfCnpj()) && repository.existsByCpfCnpj(formattedCpfCnpj)) {
-                throw new ValidationException("CPF/CNPJ já está em uso.");
-            }
-            usuario.setCpfCnpj(formattedCpfCnpj);
         }
         if (dto.getCargo() != null) {
             usuario.setCargo(dto.getCargo());

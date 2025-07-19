@@ -18,9 +18,6 @@ public class UsuarioRequestDTO {
     @Email(message = "Email inválido")
     private String email;
 
-    @NotBlank(message = "CPF/CNPJ é obrigatório")
-    private String cpfCnpj;
-
     @NotNull(message = "Cargo é obrigatório")
     private CargoUsuario cargo;
 

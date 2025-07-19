@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { UserIcon, PhoneIcon, MailIcon, EyeIcon, EyeOffIcon, UserPlusIcon, ArrowLeft, ArrowRight } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
-
-const API_BASE_URL = 'http://localhost:8080';
 
 interface BackendCustomer {
   id: string;
@@ -43,11 +41,11 @@ const Customers: React.FC = () => {
       params.append('page', currentPage.toString());
       params.append('size', '10');
 
-      const response = await axios.get<{ content: BackendCustomer[], totalPages: number, number: number }>(
-        `${API_BASE_URL}/clientes?${params.toString()}`
+      const response = await api<{ content: BackendCustomer[], totalPages: number, number: number }>(
+        `/clientes?${params.toString()}`
       );
       
-      const { content, totalPages: newTotalPages, number: newCurrentPage } = response.data;
+      const { content, totalPages: newTotalPages, number: newCurrentPage } = response;
 
       const transformedCustomers: Customer[] = content.map(c => ({
         id: c.id,
@@ -61,9 +59,9 @@ const Customers: React.FC = () => {
       setTotalPages(newTotalPages);
       setCurrentPage(newCurrentPage);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao buscar clientes:", err);
-      setError('Falha ao carregar clientes. Tente novamente.');
+      setError(err.message || 'Falha ao carregar clientes. Tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -77,17 +75,11 @@ const Customers: React.FC = () => {
     const action = customer.ativo ? 'desativar' : 'ativar';
     setActionError(null);
     try {
-      await axios.patch(`${API_BASE_URL}/clientes/${customer.id}/${action}`);
+      await api(`/clientes/${customer.id}/${action}`, { method: 'PATCH' });
       fetchCustomers();
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Erro ao ${action} cliente:`, err);
-      if (axios.isAxiosError(err) && err.response) {
-          const errorData = err.response.data;
-          const message = errorData.messages?.join(' ') || `Falha ao ${action} o cliente.`;
-          setActionError(message);
-      } else {
-          setActionError(`Falha ao ${action} o cliente. Tente novamente.`);
-      }
+      setActionError(err.message || `Falha ao ${action} o cliente. Tente novamente.`);
     }
   };
 

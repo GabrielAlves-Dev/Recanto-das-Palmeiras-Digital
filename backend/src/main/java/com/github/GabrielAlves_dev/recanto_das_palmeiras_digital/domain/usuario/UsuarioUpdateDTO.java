@@ -14,8 +14,6 @@ public class UsuarioUpdateDTO {
     @Email(message = "Email inválido")
     private String email;
 
-    private String cpfCnpj;
-
     private CargoUsuario cargo;
 
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")

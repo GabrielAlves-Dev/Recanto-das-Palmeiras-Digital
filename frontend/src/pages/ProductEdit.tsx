@@ -4,7 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ArrowLeftIcon, ImageIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 const ProductEdit: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,8 +30,7 @@ const ProductEdit: React.FC = () => {
       setIsLoading(true);
       const fetchProduct = async () => {
         try {
-          const response = await axios.get(`/api/produtos/${id}`);
-          const product = response.data;
+          const product = await api<any>(`/produtos/${id}`);
           setFormData({
             name: product.nome,
             description: product.descricao,
@@ -42,9 +41,9 @@ const ProductEdit: React.FC = () => {
           if (product.imagem) {
             setImagePreview(product.imagem);
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error("Erro ao buscar produto:", err);
-          setFormError("Não foi possível carregar os dados do produto.");
+          setFormError(err.message || "Não foi possível carregar os dados do produto.");
         } finally {
           setIsLoading(false);
         }
@@ -100,22 +99,25 @@ const ProductEdit: React.FC = () => {
 
     try {
       if (isEditing) {
-        await axios.put(`/api/produtos/${id}`, apiFormData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        await api(`/produtos/${id}`, {
+          method: 'PUT',
+          body: apiFormData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
       } else {
-        await axios.post('/api/produtos', apiFormData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        await api('/produtos', {
+          method: 'POST',
+          body: apiFormData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
       }
       navigate('/products');
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        const messages = err.response.data.messages || ['Ocorreu um erro.'];
-        setFormError(`Erro: ${messages.join(', ')}`);
-      } else {
-        setFormError('Ocorreu um erro inesperado. Tente novamente.');
-      }
+    } catch (err: any) {
+      setFormError(err.message || 'Ocorreu um erro inesperado. Tente novamente.');
     } finally {
       setIsLoading(false);
     }

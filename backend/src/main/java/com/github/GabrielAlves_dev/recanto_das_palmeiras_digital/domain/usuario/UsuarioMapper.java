@@ -8,7 +8,6 @@ public class UsuarioMapper {
         Usuario usuario = new Usuario();
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
-        usuario.setCpfCnpj(dto.getCpfCnpj());
         usuario.setCargo(dto.getCargo());
         return usuario;
     }
@@ -18,7 +17,6 @@ public class UsuarioMapper {
                 .id(usuario.getId())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .cpfCnpj(usuario.getCpfCnpj())
                 .cargo(usuario.getCargo())
                 .ativo(usuario.getAtivo())
                 .build();

@@ -4,7 +4,7 @@ import { Input } from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { LeafIcon, ArrowLeftIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -31,23 +31,19 @@ const Register: React.FC = () => {
       return;
     }
     try {
-      const response = await axios.post('/api/clientes/auto-cadastro', {
-        nome: formData.fullName,
-        cpfCnpj: formData.document, // Não precisa mais do .replace()
-        telefone: formData.phone,   // Não precisa mais do .replace()
-        email: formData.email,
-        senha: formData.password,
+      const response = await api('/clientes/auto-cadastro', {
+        method: 'POST',
+        body: JSON.stringify({
+          nome: formData.fullName,
+          cpfCnpj: formData.document,
+          telefone: formData.phone,
+          email: formData.email,
+          senha: formData.password,
+        }),
       });
-      if (response.status === 201) {
-        navigate('/', { state: { successMessage: 'Cadastro realizado com sucesso! Faça seu login.' } });
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        const messages = err.response.data.messages || ['Ocorreu um erro.'];
-        setError(`Erro no cadastro: ${messages.join(', ')}`);
-      } else {
-        setError('Ocorreu um erro inesperado. Tente novamente.');
-      }
+      navigate('/', { state: { successMessage: 'Cadastro realizado com sucesso! Faça seu login.' } });
+    } catch (err: any) {
+      setError(err.message || 'Ocorreu um erro inesperado. Tente novamente.');
     }
   };
 

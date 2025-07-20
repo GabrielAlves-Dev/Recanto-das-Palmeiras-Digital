@@ -3,6 +3,7 @@ export type UserRole = 'GERENTE' | 'VENDEDOR' | 'CLIENTE' | null;
 export interface User {
   token: string;
   cargo: UserRole;
+  nome: string;
 }
 
 export interface AuthContextType {

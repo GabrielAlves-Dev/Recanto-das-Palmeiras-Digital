@@ -4,12 +4,8 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.NotFoundException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido.StatusPedido;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.PedidoRepository;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.NotFoundException;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

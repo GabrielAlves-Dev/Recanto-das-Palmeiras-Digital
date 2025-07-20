@@ -11,6 +11,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout }) => {
   const { currentUser } = useAuth();
 
   const firstName = currentUser?.nome?.split(' ')[0];
+  const isCustomer = currentUser?.cargo === 'CLIENTE';
 
   return (
     <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
@@ -24,6 +25,11 @@ const Header: React.FC<HeaderProps> = ({ onLogout }) => {
         <button className="text-gray-600 hover:text-emerald-700">
           <BellIcon size={20} />
         </button>
+        {isCustomer && (
+          <Link to="/cart" className="text-gray-600 hover:text-emerald-700">
+            <ShoppingCartIcon size={20} />
+          </Link>
+        )}
         <Link to="/my-profile" className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
             <UserIcon size={16} className="text-emerald-700" />

@@ -9,11 +9,11 @@ import api from '../services/api';
 // Interfaces
 interface BackendOrder {
   id: string;
-  nomeCliente: string;
+  cliente: { nome: string } | null;
   dataPedido: string;
   valorTotal: number;
   status: string;
-  itens: any[]; // Simplificado, pode ser mais detalhado se necessário
+  itens: any[];
 }
 
 interface Order {
@@ -69,7 +69,7 @@ const Orders: React.FC = () => {
       
       const transformedOrders: Order[] = response.content.map(o => ({
         id: o.id,
-        customer: o.nomeCliente,
+        customer: o.cliente?.nome ?? 'Venda de Balcão',
         date: new Date(o.dataPedido).toLocaleDateString('pt-BR'),
         total: `R$ ${o.valorTotal.toFixed(2)}`,
         status: o.status,

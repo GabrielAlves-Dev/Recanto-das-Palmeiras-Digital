@@ -13,15 +13,16 @@ interface Customer {
     document: string;
     phone: string;
     email: string;
-    address: {
-        street: string;
-        number: string;
-        complement: string;
-        neighborhood: string;
-        city: string;
-        state: string;
-        zipCode: string;
-    };
+    // address: {
+    //     street: string;
+    //     number: string;
+    //     complement: string;
+    //     neighborhood: string;
+    //     city: string;
+    //     state: string;
+    //     zipCode: string;
+    // };
+    address: string;
     active: boolean;
     orderHistory: any[];
 }
@@ -57,23 +58,17 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
       try {
         const endpoint = isOwnProfile ? '/clientes/me' : `/clientes/${id}`;
         const data = await api<BackendCustomerData>(endpoint);
+        const orderHistory = await api<any>(`/pedidos/cliente/${data.id}`);
+
         setCustomer({
           id: data.id,
           name: data.nome,
           document: data.cpfCnpj,
           phone: data.telefone,
           email: data.email,
-          address: { // Mocked address for now
-              street: 'Rua das Flores',
-              number: '123',
-              complement: 'Apto 45',
-              neighborhood: 'Jardim Primavera',
-              city: 'São Paulo',
-              state: 'SP',
-              zipCode: '01234-567'
-          },
+          address: data.endereco,
           active: data.ativo,
-          orderHistory: [], // Mocked order history
+          orderHistory: orderHistory.content,
         });
       } catch (err) {
         setError("Falha ao carregar dados do cliente.");

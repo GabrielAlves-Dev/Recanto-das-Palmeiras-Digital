@@ -35,9 +35,9 @@ public class PedidoController {
         return ResponseEntity.ok(pagina);
     }
 
-    @GetMapping("/meus-pedidos")
-    public ResponseEntity<Page<PedidoResponseDTO>> listarMeusPedidos(@PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
-        Page<PedidoResponseDTO> pagina = pedidoService.listarPorClienteAutenticado(pageable);
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<Page<PedidoResponseDTO>> listarPedidosPorCliente(@PathVariable UUID clienteId, @PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
+        Page<PedidoResponseDTO> pagina = pedidoService.listarPorCliente(clienteId, pageable);
         return ResponseEntity.ok(pagina);
     }
 

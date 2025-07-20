@@ -4,12 +4,12 @@ CREATE TYPE tipo_cargo AS ENUM (
 );
 
 CREATE TYPE tipo_status_pedido AS ENUM (
-    'Pendente',      -- Pedido recebido, aguardando processamento.
-    'Em preparo',    -- Pedido confirmado e sendo preparado.
-    'Enviado',       -- Pedido despachado para entrega.
-    'Entregue',      -- Pedido concluído e entregue ao cliente.
-    'Cancelado',     -- Pedido cancelado (pelo cliente ou admin).
-    'Negado'         -- Pedido não aprovado pela administração.
+    'PENDENTE',
+    'EM_PREPARO',
+    'ENVIADO',
+    'ENTREGUE',
+    'CANCELADO',
+    'NEGADO'
 );
 
 CREATE TABLE public.usuario (
@@ -225,7 +225,7 @@ BEGIN
             VALUES (
                 cliente_rec.id, 
                 data_pedido_base, 
-                (ARRAY['Pendente', 'Em preparo', 'Enviado', 'Entregue', 'Cancelado'])[floor(random() * 5 + 1)]::tipo_status_pedido,
+                (ARRAY['PENDENTE', 'EM_PREPARO', 'ENVIADO', 'ENTREGUE', 'CANCELADO'])[floor(random() * 5 + 1)]::tipo_status_pedido,
                 (produto1_rec.preco * 1) + (produto2_rec.preco * 2), 
                 (ARRAY['Cartão de Crédito', 'PIX', 'Dinheiro'])[floor(random() * 3 + 1)],
                 'Pedido de teste gerado por script.'

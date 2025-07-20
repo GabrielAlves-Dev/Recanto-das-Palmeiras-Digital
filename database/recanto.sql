@@ -4,12 +4,12 @@ CREATE TYPE tipo_cargo AS ENUM (
 );
 
 CREATE TYPE tipo_status_pedido AS ENUM (
-    'Pendente',      -- Pedido recebido, aguardando processamento.
-    'Em preparo',    -- Pedido confirmado e sendo preparado.
-    'Enviado',       -- Pedido despachado para entrega.
-    'Entregue',      -- Pedido concluído e entregue ao cliente.
-    'Cancelado',     -- Pedido cancelado (pelo cliente ou admin).
-    'Negado'         -- Pedido não aprovado pela administração.
+    'PENDENTE',
+    'EM_PREPARO',
+    'ENVIADO',
+    'ENTREGUE',
+    'CANCELADO',
+    'NEGADO'
 );
 
 CREATE TABLE public.usuario (

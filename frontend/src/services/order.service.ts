@@ -1,4 +1,5 @@
 import api from './api';
+import type { Address } from '../types/address.types';
 
 interface OrderItemRequest {
   produtoId: string;
@@ -6,6 +7,7 @@ interface OrderItemRequest {
 }
 
 interface OrderRequest {
+  endereco: Address;
   itens: OrderItemRequest[];
   formaPagamento: string;
   observacoes?: string;

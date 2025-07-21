@@ -1,6 +1,7 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.Cliente;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.endereco.EnderecoMapper;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.Usuario;
@@ -38,6 +39,9 @@ public class PedidoService {
     @Autowired
     private PedidoMapper pedidoMapper;
 
+    @Autowired
+    private EnderecoMapper enderecoMapper;
+
     private UserDetails getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -73,6 +77,7 @@ public class PedidoService {
             }
         }
 
+        pedido.setEndereco(enderecoMapper.toEntity(dto.getEndereco()));
         pedido.setStatus(StatusPedido.PENDENTE);
         pedido.setFormaPagamento(dto.getFormaPagamento());
         pedido.setObservacoes(dto.getObservacoes());

@@ -8,21 +8,12 @@ import cartService from '../services/cart.service';
 import orderService from '../services/order.service';
 import api from '../services/api';
 import type { CartItem } from '../types/cart.types';
+import type { Address } from '../types/address.types';
 
 interface CustomerProfile {
     nome: string;
     telefone: string;
     email: string;
-}
-
-interface Address {
-    street: string;
-    number: string;
-    complement: string;
-    neighborhood: string;
-    city: string;
-    state: string;
-    zipCode: string;
 }
 
 const Checkout: React.FC = () => {
@@ -36,13 +27,13 @@ const Checkout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState('Cartão de Crédito');
   const [observations, setObservations] = useState('');
   const [address, setAddress] = useState<Address>({
-    street: '',
-    number: '',
-    complement: '',
-    neighborhood: '',
-    city: '',
-    state: '',
-    zipCode: '',
+    rua: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
+    cep: '',
   });
 
   const fetchData = useCallback(async () => {
@@ -85,24 +76,15 @@ const Checkout: React.FC = () => {
     setError(null);
     setIsSubmitting(true);
 
-    // Formata o endereço para inclusão nas observações
-    const addressString = `
-      Endereço de Entrega:
-      Rua: ${address.street}, Nº: ${address.number} ${address.complement ? `, Compl: ${address.complement}` : ''}
-      Bairro: ${address.neighborhood}
-      Cidade: ${address.city} - ${address.state}
-      CEP: ${address.zipCode}
-    `;
-    const finalObservations = `${addressString}\n\nObservações do cliente:\n${observations}`;
-
     try {
       await orderService.createOrder({
+        endereco: address,
         itens: cartItems.map(item => ({
           produtoId: item.produtoId,
           quantidade: item.quantidade,
         })),
         formaPagamento: paymentMethod,
-        observacoes: finalObservations,
+        observacoes: observations,
       });
 
       await cartService.clearCart();
@@ -138,14 +120,14 @@ const Checkout: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                    <Input label="Rua" id="street" name="street" value={address.street} onChange={handleAddressChange} required />
+                    <Input label="Rua" id="rua" name="rua" value={address.rua} onChange={handleAddressChange} required />
                 </div>
-                <Input label="Número" id="number" name="number" value={address.number} onChange={handleAddressChange} required />
-                <Input label="Complemento" id="complement" name="complement" value={address.complement} onChange={handleAddressChange} />
-                <Input label="Bairro" id="neighborhood" name="neighborhood" value={address.neighborhood} onChange={handleAddressChange} required />
-                <Input label="Cidade" id="city" name="city" value={address.city} onChange={handleAddressChange} required />
-                <Input label="Estado (UF)" id="state" name="state" value={address.state} onChange={handleAddressChange} required maxLength={2} />
-                <Input label="CEP" id="zipCode" name="zipCode" value={address.zipCode} onChange={handleAddressChange} required mask="00000-000" />
+                <Input label="Número" id="numero" name="numero" value={address.numero} onChange={handleAddressChange} required />
+                <Input label="Complemento" id="complemento" name="complemento" value={address.complemento} onChange={handleAddressChange} />
+                <Input label="Bairro" id="bairro" name="bairro" value={address.bairro} onChange={handleAddressChange} required />
+                <Input label="Cidade" id="cidade" name="cidade" value={address.cidade} onChange={handleAddressChange} required />
+                <Input label="Estado (UF)" id="uf" name="uf" value={address.uf} onChange={handleAddressChange} required maxLength={2} />
+                <Input label="CEP" id="cep" name="cep" value={address.cep} onChange={handleAddressChange} required mask="00000-000" />
             </div>
           </Card>
           <Card title="Forma de Pagamento">

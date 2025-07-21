@@ -81,7 +81,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
   const handleDeactivate = async () => {
     setError(null);
     try {
-      await api('/clientes/me/desativar', { method: 'PATCH' });
+      await api('/clientes/me', { method: 'DELETE' });
       setShowDeactivateModal(false);
       logout();
       navigate('/login', { state: { successMessage: 'Sua conta foi desativada.' } });
@@ -170,22 +170,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
           </Card>
         </div>
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Endereço">
-            <div className="flex items-start">
-              <MapPinIcon size={18} className="text-emerald-600 mr-2 mt-0.5" />
-              {/* <div>
-                <p className="text-gray-800">
-                  {customer.address.street}, {customer.address.number}
-                  {customer.address.complement && `, ${customer.address.complement}`}
-                </p>
-                <p className="text-gray-600">{customer.address.neighborhood}</p>
-                <p className="text-gray-600">
-                  {customer.address.city} - {customer.address.state},{' '}
-                  {customer.address.zipCode}
-                </p>
-              </div> */}
-            </div>
-          </Card>
+          
           <Card title="Histórico de Compras">
             <div className="space-y-4">
               {customer.orderHistory.length > 0 ? customer.orderHistory.map(order => <Link key={order.id} to={`/orders/${order.id}`} className="flex justify-between items-center p-4 border border-gray-100 rounded-lg hover:bg-gray-50">

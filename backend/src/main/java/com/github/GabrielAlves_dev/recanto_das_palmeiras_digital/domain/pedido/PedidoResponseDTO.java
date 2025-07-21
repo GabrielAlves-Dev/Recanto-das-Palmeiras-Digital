@@ -1,6 +1,7 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.endereco.EnderecoDTO;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioResponseDTO;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ public class PedidoResponseDTO {
     private UUID id;
     private ClienteResponseDTO cliente;
     private UsuarioResponseDTO vendedor;
+    private EnderecoDTO endereco;
     private List<PedidoItemResponseDTO> itens;
     private ZonedDateTime dataPedido;
     private StatusPedido status;

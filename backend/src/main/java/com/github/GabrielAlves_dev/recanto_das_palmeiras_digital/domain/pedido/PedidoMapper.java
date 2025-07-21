@@ -1,5 +1,7 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.endereco.EnderecoMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
@@ -8,6 +10,9 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.
 
 @Component
 public class PedidoMapper {
+
+    @Autowired
+    private EnderecoMapper enderecoMapper;
 
     public PedidoItemResponseDTO toPedidoItemResponseDTO(PedidoItem item) {
         return PedidoItemResponseDTO.builder()
@@ -24,6 +29,7 @@ public class PedidoMapper {
                 .id(pedido.getId())
                 .cliente(pedido.getCliente() != null ? ClienteResponseDTO.builder().nome(pedido.getCliente().getNome()).build() : ClienteResponseDTO.builder().nome("Venda Balcão").build())
                 .vendedor(pedido.getUsuario() != null ? UsuarioResponseDTO.builder().nome(pedido.getUsuario().getNome()).build() : UsuarioResponseDTO.builder().nome("Venda Online").build())
+                .endereco(enderecoMapper.toDTO(pedido.getEndereco()))
                 .itens(pedido.getItens().stream().map(this::toPedidoItemResponseDTO).collect(Collectors.toList()))
                 .dataPedido(pedido.getDataPedido())
                 .status(pedido.getStatus())

@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, CreditCardIcon, EditIcon, XIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import type { Address } from '../types/address.types';
 
 // Interfaces
 interface OrderItem {
@@ -20,7 +21,6 @@ interface Customer {
     nome: string;
     email: string;
     telefone: string;
-    endereco: string;
 }
 
 interface Seller {
@@ -33,6 +33,7 @@ interface Order {
   id: string;
   cliente: Customer | null;
   vendedor: Seller | null;
+  endereco: Address | null;
   dataPedido: string;
   valorTotal: number;
   status: string;
@@ -166,23 +167,18 @@ const OrderDetails: React.FC = () => {
                   <PhoneIcon size={16} className="text-emerald-600 mr-2" />
                   <p className="text-gray-800">{order.cliente?.telefone ?? 'N/A'}</p>
                 </div>
-                 <div className="flex items-center">
-                  <MapPinIcon size={16} className="text-emerald-600 mr-2" />
-                  <p className="text-gray-800">{order.cliente?.endereco ?? 'N/A'}</p>
-                </div>
               </div>
             </Card>
-            <Card title="Dados do Vendedor">
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <UserIcon size={16} className="text-emerald-600 mr-2" />
-                  <p className="text-gray-800">{order.vendedor?.nome ?? 'N/A'}</p>
+            <Card title="Endereço de Entrega">
+              {order.endereco ? (
+                <div className="space-y-1">
+                  <p>{order.endereco.rua}, {order.endereco.numero}</p>
+                  {order.endereco.complemento && <p>{order.endereco.complemento}</p>}
+                  <p>{order.endereco.bairro}</p>
+                  <p>{order.endereco.cidade} - {order.endereco.uf}</p>
+                  <p>{order.endereco.cep}</p>
                 </div>
-                <div className="flex items-center">
-                  <MailIcon size={16} className="text-emerald-600 mr-2" />
-                  <p className="text-gray-800">{order.vendedor?.email ?? 'N/A'}</p>
-                </div>
-              </div>
+              ) : <p>Endereço não informado.</p>}
             </Card>
           </div>
           {order.observacoes && <Card title="Observações">

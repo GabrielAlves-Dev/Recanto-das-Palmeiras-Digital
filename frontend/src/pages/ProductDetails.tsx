@@ -71,7 +71,7 @@ const ProductDetails: React.FC = () => {
     if (!productData) return;
     setActionError(null);
     try {
-      await api(`/produtos/${productData.id}/status?ativo=${!productData.active}`, { method: 'PATCH' });
+      await api(`/produtos/${productData.id}?ativo=${!productData.active}`, { method: 'PATCH' });
       await fetchProductDetails(); // Re-fetch to get updated data
     } catch (err: any) {
       console.error("Erro ao alterar status do produto:", err);

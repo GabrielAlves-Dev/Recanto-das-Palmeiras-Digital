@@ -88,7 +88,7 @@ public class ProdutoService {
     }
 
     public Page<Produto> listar(String nome, BigDecimal minPreco, BigDecimal maxPreco, Boolean ativo, Boolean comEstoque, Pageable pageable) {
-        Specification<Produto> spec = Specification.where(null);
+        Specification<Produto> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
 
         if (nome != null && !nome.isBlank()) {
             spec = spec.and(ProdutoSpecification.porNome(nome));

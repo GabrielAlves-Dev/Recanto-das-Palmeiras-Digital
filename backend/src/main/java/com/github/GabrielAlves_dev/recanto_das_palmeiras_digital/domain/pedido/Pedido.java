@@ -2,6 +2,7 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.Cliente;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.Usuario;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.endereco.Endereco;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,9 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PedidoItem> itens;
+
+    @Embedded
+    private Endereco endereco;
 
     @Column(name = "data_pedido", nullable = false)
     private ZonedDateTime dataPedido;

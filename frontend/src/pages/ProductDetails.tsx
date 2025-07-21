@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { ArrowLeftIcon, ShoppingCartIcon, MinusIcon, PlusIcon, PackageIcon, TruckIcon, EditIcon, EyeIcon, EyeOffIcon, CheckCircleIcon } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import cartService from '../services/cart.service';
 
 interface BackendProduct {
   id: number;
@@ -37,6 +38,7 @@ const ProductDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [isAdded, setIsAdded] = useState(false);
 
   const fetchProductDetails = async () => {
     if (!id) return;
@@ -80,6 +82,18 @@ const ProductDetails: React.FC = () => {
   const updateQuantity = (newQuantity: number) => {
     if (productData && newQuantity >= 1 && newQuantity <= productData.stock) {
       setQuantity(newQuantity);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!productData) return;
+    try {
+      await cartService.addToCart({ produtoId: productData.id, quantidade: quantity });
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 2000); // Reset after 2 seconds
+    } catch (error) {
+      console.error("Failed to add to cart", error);
+      setActionError("Falha ao adicionar o produto ao carrinho.");
     }
   };
 
@@ -162,9 +176,18 @@ const ProductDetails: React.FC = () => {
                         <PlusIcon size={16} />
                       </button>
                     </div>
-                    <Button className="flex-1" disabled={!productData.active || productData.stock === 0}>
-                      <ShoppingCartIcon size={18} className="mr-2" />
-                      {productData.active && productData.stock > 0 ? 'Adicionar ao Carrinho' : 'Indisponível'}
+                    <Button disabled={!productData.active || productData.stock === 0 || isAdded} onClick={handleAddToCart}>
+                      {isAdded ? (
+                        <span className="flex items-center justify-center">
+                          <CheckCircleIcon size={18} className="mr-2" />
+                          Adicionado!
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center">
+                          <ShoppingCartIcon size={18} className="mr-2" />
+                          {productData.active && productData.stock > 0 ? 'Adicionar ao Carrinho' : 'Indisponível'}
+                        </span>
+                      )}
                     </Button>
                   </div>
                 ) : (
@@ -180,7 +203,6 @@ const ProductDetails: React.FC = () => {
                         variant={productData.active ? 'outline' : 'primary'}
                         size="md"
                         onClick={handleToggleActive}
-                        title={productData.active ? "Desativar Produto" : "Ativar Produto"}
                       >
                         {productData.active ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
                       </Button>

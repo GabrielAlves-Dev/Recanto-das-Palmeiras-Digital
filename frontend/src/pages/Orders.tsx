@@ -1,98 +1,98 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { SearchIcon, FilterIcon, EyeIcon, ClipboardListIcon, CheckCircleIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, EyeIcon, ClipboardListIcon, CheckCircleIcon, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
+
+// Interfaces
+interface BackendOrder {
+  id: string;
+  cliente: { nome: string } | null;
+  dataPedido: string;
+  valorTotal: number;
+  status: string;
+  itens: any[];
+}
+
+interface Order {
+  id: string;
+  customer: string;
+  date: string;
+  total: string;
+  status: string;
+  items: number;
+}
+
 
 const Orders: React.FC = () => {
- 
   const { currentUser } = useAuth();
   const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
+  const isCustomer = userRole === 'cliente';
 
   const location = useLocation();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(location.state?.successMessage || null);
 
-  const statusOptions = [{
-    value: 'all',
-    label: 'Todos os Status'
-  }, {
-    value: 'pending',
-    label: 'Pendente'
-  }, {
-    value: 'preparing',
-    label: 'Em preparo'
-  }, {
-    value: 'shipped',
-    label: 'Enviado'
-  }, {
-    value: 'delivered',
-    label: 'Entregue'
-  }, {
-    value: 'canceled',
-    label: 'Cancelado'
-  }];
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const orders = [{
-    id: 'PED-1234',
-    customer: 'Maria Silva',
-    date: '12/05/2023',
-    total: 'R$ 350,00',
-    status: 'pending',
-    items: 3
-  }, {
-    id: 'PED-1233',
-    customer: 'João Santos',
-    date: '11/05/2023',
-    total: 'R$ 520,00',
-    status: 'preparing',
-    items: 5
-  }, {
-    id: 'PED-1232',
-    customer: 'Ana Oliveira',
-    date: '10/05/2023',
-    total: 'R$ 175,00',
-    status: 'shipped',
-    items: 2
-  }, {
-    id: 'PED-1231',
-    customer: 'Carlos Lima',
-    date: '09/05/2023',
-    total: 'R$ 420,00',
-    status: 'delivered',
-    items: 4
-  }, {
-    id: 'PED-1230',
-    customer: 'Fernanda Costa',
-    date: '08/05/2023',
-    total: 'R$ 280,00',
-    status: 'delivered',
-    items: 3
-  }, {
-    id: 'PED-1229',
-    customer: 'Roberto Almeida',
-    date: '07/05/2023',
-    total: 'R$ 150,00',
-    status: 'canceled',
-    items: 1
-  }, {
-    id: 'PED-1228',
-    customer: 'Juliana Ferreira',
-    date: '05/05/2023',
-    total: 'R$ 145,00',
-    status: 'delivered',
-    items: 2
-  }, {
-    id: 'PED-1225',
-    customer: 'Pedro Souza',
-    date: '28/04/2023',
-    status: 'delivered',
-    total: 'R$ 320,00',
-    items: 3
-  }];
+  const statusOptions = [
+    { value: 'all', label: 'Todos os Status' },
+    { value: 'PENDENTE', label: 'Pendente' },
+    { value: 'EM_PREPARO', label: 'Em preparo' },
+    { value: 'ENVIADO', label: 'Enviado' },
+    { value: 'ENTREGUE', label: 'Entregue' },
+    { value: 'CANCELADO', label: 'Cancelado' },
+  ];
+
+  const fetchOrders = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const endpoint = isCustomer ? '/pedidos/meus-pedidos' : '/pedidos';
+      const params = new URLSearchParams();
+      params.append('page', currentPage.toString());
+      params.append('size', '10');
+      // Adicionar filtros de busca e status se o backend suportar
+      // if (searchQuery) params.append('search', searchQuery);
+      // if (statusFilter !== 'all') params.append('status', statusFilter);
+
+      const response = await api<{ content: BackendOrder[], totalPages: number, number: number }>(`${endpoint}?${params.toString()}`);
+      
+      const transformedOrders: Order[] = response.content.map(o => ({
+        id: o.id,
+        customer: o.cliente?.nome ?? 'Venda de Balcão',
+        date: new Date(o.dataPedido).toLocaleDateString('pt-BR'),
+        total: `R$ ${o.valorTotal.toFixed(2)}`,
+        status: o.status,
+        items: o.itens.length,
+      }));
+
+      setOrders(transformedOrders);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.number);
+
+    } catch (err: any) {
+      console.error("Erro ao buscar pedidos:", err);
+      setError(err.message || 'Falha ao carregar pedidos. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, isCustomer]);
+
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
 
   useEffect(() => {
     if (successMessage) {
@@ -103,12 +103,29 @@ const Orders: React.FC = () => {
     }
   }, [successMessage]);
 
+  const getStatusLabel = (status: string) => {
+    const statusOption = statusOptions.find(opt => opt.value === status);
+    return statusOption ? statusOption.label : status;
+  };
+
+  const getStatusBadgeClasses = (status: string) => {
+    switch (status) {
+      case 'PENDENTE': return 'bg-yellow-100 text-yellow-800';
+      case 'EM_PREPARO': return 'bg-blue-100 text-blue-800';
+      case 'ENVIADO': return 'bg-purple-100 text-purple-800';
+      case 'ENTREGUE': return 'bg-green-100 text-green-800';
+      case 'CANCELADO': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+
+  // Filtro local temporário, idealmente seria feito no backend
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || order.customer.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-  const isCustomer = userRole === 'cliente';
 
   return <div className="space-y-6">
       {successMessage && (
@@ -129,7 +146,7 @@ const Orders: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-grow">
             <SearchIcon size={18} className="absolute left-3 top-2.5 text-gray-400" />
-            <input type="text" placeholder="Buscar por número do pedido ou cliente..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" />
+            <input type="text" placeholder="Buscar por ID do pedido ou cliente..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" />
           </div>
           <div className="flex gap-2">
             <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500">
@@ -160,8 +177,19 @@ const Orders: React.FC = () => {
             </div>
           </div>}
       </Card>
+
+      {error && <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">{error}</div>}
+
       <Card>
-        {filteredOrders.length > 0 ? <div className="overflow-x-auto">
+        {isLoading && orders.length === 0 ? <p className="text-center py-12">Carregando pedidos...</p> :
+         !isLoading && filteredOrders.length === 0 ? <div className="text-center py-12">
+            <ClipboardListIcon size={48} className="mx-auto text-gray-300" />
+            <h3 className="mt-4 text-lg font-medium text-gray-800">
+              Nenhum pedido encontrado
+            </h3>
+            <p className="text-gray-500">Tente ajustar os filtros de busca ou realize um novo pedido.</p>
+          </div> :
+        <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -190,11 +218,11 @@ const Orders: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <ClipboardListIcon size={18} className="text-emerald-600 mr-2" />
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.id}
+                        <div className="text-sm font-medium text-gray-900 truncate" style={{ maxWidth: '120px' }} title={order.id}>
+                          #{order.id.substring(0, 8)}...
                         </div>
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 ml-7">
                         {order.items} itens
                       </div>
                     </td>
@@ -212,8 +240,8 @@ const Orders: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : order.status === 'preparing' ? 'bg-blue-100 text-blue-800' : order.status === 'shipped' ? 'bg-purple-100 text-purple-800' : order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {order.status === 'pending' ? 'Pendente' : order.status === 'preparing' ? 'Em preparo' : order.status === 'shipped' ? 'Enviado' : order.status === 'delivered' ? 'Entregue' : 'Cancelado'}
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClasses(order.status)}`}>
+                        {getStatusLabel(order.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -227,14 +255,31 @@ const Orders: React.FC = () => {
                   </tr>)}
               </tbody>
             </table>
-          </div> : <div className="text-center py-12">
-            <ClipboardListIcon size={48} className="mx-auto text-gray-300" />
-            <h3 className="mt-4 text-lg font-medium text-gray-800">
-              Nenhum pedido encontrado
-            </h3>
-            <p className="text-gray-500">Tente ajustar os filtros de busca</p>
           </div>}
       </Card>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-4 mt-8">
+            <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage - 1)} 
+                disabled={currentPage === 0 || isLoading}
+            >
+                <ArrowLeft size={16} />
+            </Button>
+            <span className="font-medium text-gray-700 text-sm">
+                Página {currentPage + 1} de {totalPages}
+            </span>
+            <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(currentPage + 1)} 
+                disabled={currentPage >= totalPages - 1 || isLoading}
+            >
+                <ArrowRight size={16} />
+            </Button>
+        </div>
+      )}
     </div>;
 };
 export default Orders;

@@ -15,6 +15,7 @@ interface InputProps {
   mask?: any;
   unmask?: boolean;
   step?: string;
+  maxLength?: number; // Adicionada a propriedade maxLength
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -31,6 +32,7 @@ export const Input: React.FC<InputProps> = ({
   mask,
   unmask = false,
   step,
+  maxLength, // Recebendo a propriedade
 }) => {
   const className = `
       px-3 py-2 bg-white border ${error ? 'border-red-500' : 'border-gray-300'} 
@@ -69,6 +71,7 @@ export const Input: React.FC<InputProps> = ({
           onAccept={handleAccept}
           required={required}
           className={className}
+          maxLength={maxLength} 
         />
       ) : (
         <input
@@ -81,6 +84,7 @@ export const Input: React.FC<InputProps> = ({
           required={required}
           step={step}
           className={className}
+          maxLength={maxLength} 
         />
       )}
       {error && <p className="mt-1 text-sm text-red-600">{error}</p>}

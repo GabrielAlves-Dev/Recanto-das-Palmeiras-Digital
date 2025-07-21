@@ -1,8 +1,10 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.service;
 
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.Cliente;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.endereco.EnderecoMapper;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido.*;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.produto.Produto;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.Usuario;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.NotFoundException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
@@ -12,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -36,24 +39,48 @@ public class PedidoService {
     @Autowired
     private PedidoMapper pedidoMapper;
 
-    private Cliente getAuthenticatedCliente() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    @Autowired
+    private EnderecoMapper enderecoMapper;
+
+    private UserDetails getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("Nenhum usuário autenticado encontrado.");
+        }
+        Object principal = authentication.getPrincipal();
         if (!(principal instanceof UserDetails)) {
             throw new IllegalStateException("O principal de autenticação não é uma instância de UserDetails.");
         }
-        String username = ((UserDetails) principal).getUsername();
-        return clienteRepository.findByEmail(username)
-                .orElseThrow(() -> new NotFoundException("Cliente autenticado não encontrado. Email: " + username));
+        return (UserDetails) principal;
+    }
+
+    private Cliente getAuthenticatedCliente() {
+        UserDetails userDetails = getAuthenticatedUser();
+        return clienteRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new NotFoundException("Cliente autenticado não encontrado. Email: " + userDetails.getUsername()));
     }
 
     @Transactional
     public PedidoResponseDTO criarPedido(PedidoRequestDTO dto) {
-        Cliente cliente = getAuthenticatedCliente();
+        UserDetails userDetails = getAuthenticatedUser();
         Pedido pedido = new Pedido();
+
+        // Define o cliente e o usuário com base no tipo de usuário logado
+        if (userDetails instanceof Cliente) {
+            pedido.setCliente((Cliente) userDetails);
+        } else if (userDetails instanceof Usuario) {
+            pedido.setUsuario((Usuario) userDetails);
+            if (dto.getClienteId() != null) {
+                Cliente clienteDoPedido = clienteRepository.findById(dto.getClienteId())
+                        .orElseThrow(() -> new NotFoundException("Cliente com ID " + dto.getClienteId() + " não encontrado."));
+                pedido.setCliente(clienteDoPedido);
+            }
+        }
+
+        pedido.setEndereco(enderecoMapper.toEntity(dto.getEndereco()));
         pedido.setStatus(StatusPedido.PENDENTE);
         pedido.setFormaPagamento(dto.getFormaPagamento());
         pedido.setObservacoes(dto.getObservacoes());
-        pedido.setCliente(cliente);
 
         List<PedidoItem> itens = new ArrayList<>();
         BigDecimal valorTotal = BigDecimal.ZERO;
@@ -94,6 +121,10 @@ public class PedidoService {
         return pedidoRepository.findAll(pageable).map(pedidoMapper::toPedidoResponseDTO);
     }
 
+    public Page<PedidoResponseDTO> listarPorCliente(UUID clienteId, Pageable pageable) {
+        return pedidoRepository.findByClienteId(clienteId, pageable).map(pedidoMapper::toPedidoResponseDTO);
+    }
+
     public Page<PedidoResponseDTO> listarPorClienteAutenticado(Pageable pageable) {
         Cliente cliente = getAuthenticatedCliente();
         return pedidoRepository.findByClienteId(cliente.getId(), pageable).map(pedidoMapper::toPedidoResponseDTO);
@@ -103,14 +134,14 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Pedido com ID " + id + " não encontrado."));
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails) principal;
+        UserDetails userDetails = getAuthenticatedUser();
 
-        if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CLIENTE"))) {
+        if (userDetails instanceof Cliente) {
             if (pedido.getCliente() == null || !pedido.getCliente().getEmail().equals(userDetails.getUsername())) {
                 throw new ValidationException("Acesso negado. Você não é o proprietário deste pedido.");
             }
         }
+        // Gerentes e Vendedores podem ver qualquer pedido
 
         return pedidoMapper.toPedidoResponseDTO(pedido);
     }

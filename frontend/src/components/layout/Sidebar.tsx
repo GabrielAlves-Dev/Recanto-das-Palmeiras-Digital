@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HomeIcon, ShoppingBagIcon, UsersIcon, ShoppingCartIcon, ClipboardListIcon, BarChartIcon, PlusCircleIcon, UserCogIcon, UserIcon } from 'lucide-react';
+import { ShoppingBagIcon, UsersIcon, ShoppingCartIcon, UserCogIcon, UserIcon, ClipboardListIcon } from 'lucide-react';
 
 interface SidebarProps {
   userRole: 'gerente' | 'vendedor' | 'cliente' | null;
@@ -18,18 +18,22 @@ const Sidebar: React.FC<SidebarProps> = ({
     if (userRole === 'gerente') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Produtos" active={isActive('/products')} />
+          <NavItem to="/orders" icon={<ClipboardListIcon size={20} />} label="Pedidos" active={isActive('/orders')} />
           <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
           <NavItem to="/users" icon={<UserCogIcon size={20} />} label="Usuários" active={isActive('/users')} />
         </>;
     } else if (userRole === 'vendedor') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
+          <NavItem to="/orders" icon={<ClipboardListIcon size={20} />} label="Pedidos" active={isActive('/orders')} />
           <NavItem to="/customers" icon={<UsersIcon size={20} />} label="Clientes" active={isActive('/customers')} />
         </>;
     } else if (userRole === 'cliente') {
       return (
         <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Catálogo" active={isActive('/products')} />
+          <NavItem to="/cart" icon={<ShoppingCartIcon size={20} />} label="Carrinho" active={isActive('/cart')} />
+          <NavItem to="/orders" icon={<ClipboardListIcon size={20} />} label="Meus Pedidos" active={isActive('/orders')} />
           <NavItem to="/my-profile" icon={<UserIcon size={20} />} label="Meu Perfil" active={isActive('/my-profile')} />
         </>
       );

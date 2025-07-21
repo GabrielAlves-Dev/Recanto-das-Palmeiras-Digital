@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../ui/Button';
-import { ShoppingCartIcon, EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { ShoppingCartIcon, EditIcon, EyeIcon, EyeOffIcon, CheckCircleIcon } from 'lucide-react';
+import cartService from '../../services/cart.service';
 
 interface Product {
   id: string;
@@ -18,17 +19,24 @@ export interface ProductCardProps {
   onToggleActive?: (productId: string, currentStatus: boolean) => void;
 }
 
-const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e: React.MouseEvent) => void }> = ({ product, onClickAddToCart }) => (
+const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e: React.MouseEvent) => void, isAdded: boolean }> = ({ product, onClickAddToCart, isAdded }) => (
   <Button
     fullWidth
     size="md"
-    disabled={product.stock === 0}
+    disabled={product.stock === 0 || isAdded}
     onClick={onClickAddToCart}
   >
-    <span className="flex items-center justify-center">
-      <ShoppingCartIcon size={18} className="mr-2" />
-      {product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
-    </span>
+    {isAdded ? (
+      <span className="flex items-center justify-center">
+        <CheckCircleIcon size={18} className="mr-2" />
+        Adicionado!
+      </span>
+    ) : (
+      <span className="flex items-center justify-center">
+        <ShoppingCartIcon size={18} className="mr-2" />
+        {product.stock > 0 ? 'Comprar' : 'Sem Estoque'}
+      </span>
+    )}
   </Button>
 );
 
@@ -66,14 +74,22 @@ const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (prod
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onToggleActive }) => {
   const navigate = useNavigate();
+  const [isAdded, setIsAdded] = useState(false);
   const isManager = userRole === 'gerente';
   const isSeller = userRole === 'vendedor';
   const isCustomer = userRole === 'cliente';
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(`Add to cart: ${product.name}`);
+    try {
+      await cartService.addToCart({ produtoId: product.id, quantidade: 1 });
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 2000); // Reset after 2 seconds
+    } catch (error) {
+      console.error("Failed to add to cart", error);
+      // Here you could show an error message to the user
+    }
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -111,7 +127,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
           </>
         )}
         <div className="mt-3">
-          {isCustomer && <CustomerProductActions product={product} onClickAddToCart={handleAddToCart} />}
+          {isCustomer && <CustomerProductActions product={product} onClickAddToCart={handleAddToCart} isAdded={isAdded} />}
           {isSeller && !isManager && <SellerProductActions onClickEdit={handleEditClick} />}
           {isManager && (
             <div className="flex gap-2">

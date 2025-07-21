@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Input } from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { ArrowLeftIcon } from 'lucide-react';
 import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
 
-
-// Define the type for the data coming from the backend API
 interface BackendCustomerData {
     nome: string;
     telefone: string;
     email: string;
+    cpfCnpj: string;
 }
 
 const CustomerEdit: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState({
     nome: '',
     telefone: '',
     email: '',
+    cpfCnpj: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,25 +29,25 @@ const CustomerEdit: React.FC = () => {
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        // Specify the expected type for the api call
-        const data = await api<BackendCustomerData>('/clientes/me');
+        const data = await api<BackendCustomerData>(`/clientes/${id}`);
         setFormData({
           nome: data.nome,
           telefone: data.telefone,
           email: data.email,
+          cpfCnpj: data.cpfCnpj,
         });
       } catch (err) {
         console.error('Failed to fetch user data', err);
-        setError('Não foi possível carregar seus dados. Tente novamente.');
+        setError('Não foi possível carregar os dados do cliente. Tente novamente.');
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (currentUser) {
+    if (id) {
       fetchUserData();
     }
-  }, [currentUser]);
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -60,15 +59,11 @@ const CustomerEdit: React.FC = () => {
     setError(null);
     setIsLoading(true);
     try {
-      await api('/clientes/me', {
+      await api(`/clientes/${id}`, {
         method: 'PUT',
-        body: JSON.stringify({
-          nome: formData.nome,
-          telefone: formData.telefone,
-          email: formData.email,
-        }),
+        body: JSON.stringify(formData),
       });
-      navigate('/my-profile', { state: { successMessage: 'Dados atualizados com sucesso!' } });
+      navigate(`/customers/${id}`, { state: { successMessage: 'Dados atualizados com sucesso!' } });
     } catch (err: any) {
       setError(err.message || 'Falha ao atualizar os dados. Verifique as informações e tente novamente.');
     } finally {
@@ -84,16 +79,13 @@ const CustomerEdit: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <Link to="/my-profile" className="inline-flex items-center text-emerald-600 mb-4">
+          <Link to={`/customers/${id}`} className="inline-flex items-center text-emerald-600 mb-4">
             <ArrowLeftIcon size={16} className="mr-1" />
-            Voltar para o Perfil
+            Voltar para Detalhes do Cliente
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Editar Meus Dados
+            Editar Dados do Cliente
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Atualize suas informações cadastrais
-          </p>
         </div>
         <Card>
           <form onSubmit={handleSubmit}>
@@ -111,9 +103,8 @@ const CustomerEdit: React.FC = () => {
                   mask={'(00) 00000-0000'}
                   unmask={true}
                 />
-                <div className="md:col-span-2">
-                    <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-                </div>
+                <Input label="E-mail" type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+                <Input label="CPF/CNPJ" id="cpfCnpj" name="cpfCnpj" value={formData.cpfCnpj} onChange={handleChange} required />
               </div>
             </div>
             <div className="flex items-center justify-end mt-8">

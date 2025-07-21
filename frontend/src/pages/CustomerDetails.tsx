@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, EyeOffIcon, EditIcon } from 'lucide-react';
+import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, EyeOffIcon, EditIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -13,15 +13,6 @@ interface Customer {
     document: string;
     phone: string;
     email: string;
-    address: {
-        street: string;
-        number: string;
-        complement: string;
-        neighborhood: string;
-        city: string;
-        state: string;
-        zipCode: string;
-    };
     active: boolean;
     orderHistory: any[];
 }
@@ -57,23 +48,16 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
       try {
         const endpoint = isOwnProfile ? '/clientes/me' : `/clientes/${id}`;
         const data = await api<BackendCustomerData>(endpoint);
+        const orderHistory = await api<any>(`/pedidos/cliente/${data.id}`);
+
         setCustomer({
           id: data.id,
           name: data.nome,
           document: data.cpfCnpj,
           phone: data.telefone,
           email: data.email,
-          address: { // Mocked address for now
-              street: 'Rua das Flores',
-              number: '123',
-              complement: 'Apto 45',
-              neighborhood: 'Jardim Primavera',
-              city: 'São Paulo',
-              state: 'SP',
-              zipCode: '01234-567'
-          },
           active: data.ativo,
-          orderHistory: [], // Mocked order history
+          orderHistory: orderHistory.content,
         });
       } catch (err) {
         setError("Falha ao carregar dados do cliente.");
@@ -88,7 +72,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
   const handleDeactivate = async () => {
     setError(null);
     try {
-      await api('/clientes/me/desativar', { method: 'PATCH' });
+      await api('/clientes/me', { method: 'DELETE' });
       setShowDeactivateModal(false);
       logout();
       navigate('/login', { state: { successMessage: 'Sua conta foi desativada.' } });
@@ -159,12 +143,12 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
                     </>
                   ) : (
                     <>
-                        <Link to={`/customers/edit/${customer.id}`}>
+                        {isManager && <Link to={`/customers/edit/${customer.id}`}>
                             <Button variant="secondary">
                             <EditIcon size={16} className="mr-1" />
                             Editar Dados
                             </Button>
-                        </Link>
+                        </Link>}
                         {isManager && <Button variant="outline">
                             <EyeOffIcon size={16} className="mr-1" />
                             Desativar
@@ -177,22 +161,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
           </Card>
         </div>
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Endereço">
-            <div className="flex items-start">
-              <MapPinIcon size={18} className="text-emerald-600 mr-2 mt-0.5" />
-              <div>
-                <p className="text-gray-800">
-                  {customer.address.street}, {customer.address.number}
-                  {customer.address.complement && `, ${customer.address.complement}`}
-                </p>
-                <p className="text-gray-600">{customer.address.neighborhood}</p>
-                <p className="text-gray-600">
-                  {customer.address.city} - {customer.address.state},{' '}
-                  {customer.address.zipCode}
-                </p>
-              </div>
-            </div>
-          </Card>
+          
           <Card title="Histórico de Compras">
             <div className="space-y-4">
               {customer.orderHistory.length > 0 ? customer.orderHistory.map(order => <Link key={order.id} to={`/orders/${order.id}`} className="flex justify-between items-center p-4 border border-gray-100 rounded-lg hover:bg-gray-50">

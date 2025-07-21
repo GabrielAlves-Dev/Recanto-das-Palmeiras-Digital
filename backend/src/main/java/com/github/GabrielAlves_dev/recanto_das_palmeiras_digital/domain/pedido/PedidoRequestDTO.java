@@ -1,5 +1,7 @@
 package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.endereco.EnderecoDTO;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -14,7 +16,9 @@ public class PedidoRequestDTO {
 
     private UUID clienteId; // Opcional para venda de balcão
 
-    // private UUID usuarioId; // Será pego do usuário autenticado no futuro
+    @Valid
+    @NotNull(message = "Endereço é obrigatório")
+    private EnderecoDTO endereco;
 
     @NotEmpty(message = "O pedido deve conter pelo menos um item.")
     private List<PedidoItemRequestDTO> itens;

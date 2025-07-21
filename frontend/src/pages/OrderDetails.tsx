@@ -1,113 +1,130 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, CreditCardIcon, EditIcon, XIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
+import type { Address } from '../types/address.types';
 
+// Interfaces
+interface OrderItem {
+  id: string;
+  nomeProduto: string;
+  quantidade: number;
+  precoUnitario: number;
+  subtotal: number;
+}
+
+interface Customer {
+    id: string;
+    nome: string;
+    email: string;
+    telefone: string;
+}
+
+interface Seller {
+    id: string;
+    nome: string;
+    email: string;
+}
+
+interface Order {
+  id: string;
+  cliente: Customer | null;
+  vendedor: Seller | null;
+  endereco: Address | null;
+  dataPedido: string;
+  valorTotal: number;
+  status: string;
+  itens: OrderItem[];
+  formaPagamento: string;
+  observacoes: string;
+}
 
 const OrderDetails: React.FC = () => {
   const { currentUser } = useAuth();
   const userRole = currentUser?.cargo?.toLowerCase() ?? 'cliente';
+  const { id } = useParams<{ id: string }>();
 
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const order = {
-    id,
-    date: '12/05/2023',
-    status: 'pending',
-    customer: {
-      name: 'Maria Silva',
-      phone: '(11) 98765-4321',
-      email: 'maria@email.com',
-      address: {
-        street: 'Rua das Flores',
-        number: '123',
-        complement: 'Apto 45',
-        neighborhood: 'Jardim Primavera',
-        city: 'São Paulo',
-        state: 'SP',
-        zipCode: '01234-567'
-      }
-    },
-    items: [{
-      id: '1',
-      name: 'Arranjo de Rosas',
-      price: 70,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1587556930799-8dca6fad6d71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-    }, {
-      id: '2',
-      name: 'Buquê Primavera',
-      price: 75,
-      quantity: 2,
-      image: 'https://images.unsplash.com/photo-1561181286-d5c88c3490c9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-    }, {
-      id: '3',
-      name: 'Orquídea Phalaenopsis',
-      price: 80,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-    }],
-    payment: {
-      method: 'credit',
-      status: 'paid'
-    },
-    notes: 'Entregar no período da tarde, preferencialmente.',
-    subtotal: 300,
-    shipping: 'A combinar',
-    total: 300
+  const fetchOrderDetails = useCallback(async () => {
+    if (!id) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await api<Order>(`/pedidos/${id}`);
+      setOrder(data);
+    } catch (err: any) {
+      setError(err.message || 'Falha ao carregar os detalhes do pedido.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchOrderDetails();
+  }, [fetchOrderDetails]);
+
+  const handleUpdateStatus = async (newStatus: string) => {
+    if (!id) return;
+    try {
+      await api(`/pedidos/${id}/status?status=${newStatus}`, { method: 'PATCH' });
+      fetchOrderDetails();
+    } catch (err: any) {
+      setError(err.message || 'Falha ao atualizar o status do pedido.');
+    }
   };
 
-  const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const isCustomer = userRole === 'cliente';
-  const canEdit = !isCustomer && order.status === 'pending';
-  const canCancel = order.status === 'pending' || order.status === 'preparing';
 
   const getStatusBadgeClasses = (status: string) => {
     switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'preparing':
-        return 'bg-blue-100 text-blue-800';
-      case 'shipped':
-        return 'bg-purple-100 text-purple-800';
-      case 'delivered':
-        return 'bg-green-100 text-green-800';
-      case 'canceled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'PENDENTE': return 'bg-yellow-100 text-yellow-800';
+      case 'EM_PREPARO': return 'bg-blue-100 text-blue-800';
+      case 'ENVIADO': return 'bg-purple-100 text-purple-800';
+      case 'ENTREGUE': return 'bg-green-100 text-green-800';
+      case 'CANCELADO': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'pending':
-        return 'Pendente';
-      case 'preparing':
-        return 'Em preparo';
-      case 'shipped':
-        return 'Enviado';
-      case 'delivered':
-        return 'Entregue';
-      case 'canceled':
-        return 'Cancelado';
-      default:
-        return status;
+      case 'PENDENTE': return 'Pendente';
+      case 'EM_PREPARO': return 'Em Preparo';
+      case 'ENVIADO': return 'Enviado';
+      case 'ENTREGUE': return 'Entregue';
+      case 'CANCELADO': return 'Cancelado';
+      default: return status;
     }
   };
 
-  return <div className="space-y-6">
+  if (isLoading) {
+    return <div className="text-center py-10">Carregando detalhes do pedido...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-10 text-red-600">{error}</div>;
+  }
+
+  if (!order) {
+    return <div className="text-center py-10 text-gray-500">Pedido não encontrado.</div>;
+  }
+
+  const canEdit = !isCustomer && order.status === 'PENDENTE';
+  const canCancel = order.status === 'PENDENTE' || order.status === 'EM_PREPARO';
+
+  return (
+    <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/orders" className="text-emerald-600 hover:text-emerald-700">
           <ArrowLeftIcon size={20} />
         </Link>
-        <h1 className="text-2xl font-bold text-gray-800">Pedido #{id}</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Pedido #{order.id.substring(0, 8)}...</h1>
         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClasses(order.status)}`}>
           {getStatusLabel(order.status)}
         </span>
@@ -116,24 +133,23 @@ const OrderDetails: React.FC = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card title="Itens do Pedido">
             <div className="space-y-4">
-              {order.items.map(item => <div key={item.id} className="flex items-center p-4 border border-gray-100 rounded-lg">
-                  <div className="h-16 w-16 flex-shrink-0 rounded-md overflow-hidden">
-                    <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-                  </div>
+              {order.itens.map(item => (
+                <div key={item.id} className="flex items-center p-4 border border-gray-100 rounded-lg">
                   <div className="ml-4 flex-grow">
                     <h3 className="text-sm font-medium text-gray-800">
-                      {item.name}
+                      {item.nomeProduto}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      R$ {item.price.toFixed(2)} x {item.quantity}
+                      R$ {item.precoUnitario.toFixed(2)} x {item.quantidade}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      R$ {(item.price * item.quantity).toFixed(2)}
+                      R$ {item.subtotal.toFixed(2)}
                     </p>
                   </div>
-                </div>)}
+                </div>
+              ))}
             </div>
           </Card>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -141,84 +157,68 @@ const OrderDetails: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center">
                   <UserIcon size={16} className="text-emerald-600 mr-2" />
-                  <p className="text-gray-800">{order.customer.name}</p>
-                </div>
-                <div className="flex items-center">
-                  <PhoneIcon size={16} className="text-emerald-600 mr-2" />
-                  <p className="text-gray-800">{order.customer.phone}</p>
+                  <p className="text-gray-800">{order.cliente?.nome ?? 'N/A'}</p>
                 </div>
                 <div className="flex items-center">
                   <MailIcon size={16} className="text-emerald-600 mr-2" />
-                  <p className="text-gray-800">{order.customer.email}</p>
+                  <p className="text-gray-800">{order.cliente?.email ?? 'N/A'}</p>
+                </div>
+                <div className="flex items-center">
+                  <PhoneIcon size={16} className="text-emerald-600 mr-2" />
+                  <p className="text-gray-800">{order.cliente?.telefone ?? 'N/A'}</p>
                 </div>
               </div>
-              {!isCustomer && <div className="mt-4 pt-4 border-t border-gray-100">
-                  <Link to={`/customers/${order.customer.name}`} className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
-                    Ver perfil completo
-                  </Link>
-                </div>}
             </Card>
             <Card title="Endereço de Entrega">
-              <div className="flex items-start">
-                <MapPinIcon size={16} className="text-emerald-600 mr-2 mt-0.5" />
-                <div>
-                  <p className="text-gray-800">
-                    {order.customer.address.street},{' '}
-                    {order.customer.address.number}
-                    {order.customer.address.complement && `, ${order.customer.address.complement}`}
-                  </p>
-                  <p className="text-gray-600">
-                    {order.customer.address.neighborhood}
-                  </p>
-                  <p className="text-gray-600">
-                    {order.customer.address.city} -{' '}
-                    {order.customer.address.state},{' '}
-                    {order.customer.address.zipCode}
-                  </p>
+              {order.endereco ? (
+                <div className="space-y-1">
+                  <p>{order.endereco.rua}, {order.endereco.numero}</p>
+                  {order.endereco.complemento && <p>{order.endereco.complemento}</p>}
+                  <p>{order.endereco.bairro}</p>
+                  <p>{order.endereco.cidade} - {order.endereco.uf}</p>
+                  <p>{order.endereco.cep}</p>
                 </div>
-              </div>
+              ) : <p>Endereço não informado.</p>}
             </Card>
           </div>
-          {order.notes && <Card title="Observações">
-              <p className="text-gray-800">{order.notes}</p>
+          {order.observacoes && <Card title="Observações">
+              <p className="text-gray-800">{order.observacoes}</p>
             </Card>}
-          {!isCustomer && order.status !== 'canceled' && order.status !== 'delivered' && <Card title="Atualizar Status">
+          {!isCustomer && order.status !== 'CANCELADO' && order.status !== 'ENTREGUE' && (
+            <Card title="Atualizar Status">
               <div className="flex flex-wrap gap-2">
-                <Button variant={order.status === 'pending' ? 'primary' : 'secondary'} disabled={order.status !== 'pending'} size="sm">
+                <Button variant={order.status === 'PENDENTE' ? 'primary' : 'secondary'} onClick={() => handleUpdateStatus('PENDENTE')} size="sm">
                   Pendente
                 </Button>
-                <Button variant={order.status === 'preparing' ? 'primary' : 'secondary'} disabled={order.status === 'shipped' || order.status === 'delivered' || order.status === 'canceled'} size="sm">
+                <Button variant={order.status === 'EM_PREPARO' ? 'primary' : 'secondary'} onClick={() => handleUpdateStatus('EM_PREPARO')} size="sm">
                   Em Preparo
                 </Button>
-                <Button variant={order.status === 'shipped' ? 'primary' : 'secondary'} disabled={order.status === 'delivered' || order.status === 'canceled'} size="sm">
+                <Button variant={order.status === 'ENVIADO' ? 'primary' : 'secondary'} onClick={() => handleUpdateStatus('ENVIADO')} size="sm">
                   Enviado
                 </Button>
-                <Button variant={order.status === 'delivered' ? 'primary' : 'secondary'} disabled={order.status === 'canceled'} size="sm">
+                <Button variant={order.status === 'ENTREGUE' ? 'primary' : 'secondary'} onClick={() => handleUpdateStatus('ENTREGUE')} size="sm">
                   Entregue
                 </Button>
               </div>
-            </Card>}
+            </Card>
+          )}
         </div>
         <div className="lg:col-span-1 space-y-6">
           <Card title="Resumo do Pedido">
             <div className="space-y-4">
               <div className="flex justify-between">
                 <p className="text-gray-600">Data do Pedido</p>
-                <p className="font-medium">{order.date}</p>
+                <p className="font-medium">{new Date(order.dataPedido).toLocaleDateString('pt-BR')}</p>
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-600">Subtotal</p>
-                <p className="font-medium">R$ {subtotal.toFixed(2)}</p>
-              </div>
-              <div className="flex justify-between">
-                <p className="text-gray-600">Frete</p>
-                <p className="font-medium">{order.shipping}</p>
+                <p className="font-medium">R$ {order.valorTotal.toFixed(2)}</p>
               </div>
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex justify-between">
                   <p className="text-lg font-medium">Total</p>
                   <p className="text-lg font-semibold">
-                    R$ {order.total.toFixed(2)}
+                    R$ {order.valorTotal.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -228,15 +228,8 @@ const OrderDetails: React.FC = () => {
             <div className="flex items-center">
               <CreditCardIcon size={16} className="text-emerald-600 mr-2" />
               <p className="text-gray-800">
-                {order.payment.method === 'credit' && 'Cartão de Crédito'}
-                {order.payment.method === 'pix' && 'PIX'}
-                {order.payment.method === 'cash' && 'Dinheiro'}
+                {order.formaPagamento}
               </p>
-            </div>
-            <div className="mt-2">
-              <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${order.payment.status === 'paid' ? 'bg-green-100 text-green-800' : order.payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                {order.payment.status === 'paid' ? 'Pago' : order.payment.status === 'pending' ? 'Pendente' : 'Falhou'}
-              </span>
             </div>
           </Card>
           <div className="space-y-2">
@@ -244,14 +237,15 @@ const OrderDetails: React.FC = () => {
                 <EditIcon size={16} className="mr-1" />
                 Editar Pedido
               </Button>}
-            {canCancel && <Button variant="outline" fullWidth>
+            {canCancel && <Button variant="outline" fullWidth onClick={() => handleUpdateStatus('CANCELADO')}>
                 <XIcon size={16} className="mr-1" />
                 Cancelar Pedido
               </Button>}
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default OrderDetails;

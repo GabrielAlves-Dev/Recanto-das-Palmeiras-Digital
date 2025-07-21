@@ -1,39 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { ArrowLeftIcon, MinusIcon, PlusIcon, TrashIcon, ShoppingBagIcon } from 'lucide-react';
+import cartService from '../services/cart.service';
+import type { CartItem } from '../types/cart.types';
+
 const Cart: React.FC = () => {
-  const [cartItems, setCartItems] = useState([{
-    id: '1',
-    name: 'Arranjo de Rosas',
-    price: 70,
-    quantity: 1,
-    image: 'https://images.unsplash.com/photo-1587556930799-8dca6fad6d71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }, {
-    id: '2',
-    name: 'Buquê Primavera',
-    price: 75,
-    quantity: 2,
-    image: 'https://images.unsplash.com/photo-1561181286-d5c88c3490c9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }, {
-    id: '3',
-    name: 'Orquídea Phalaenopsis',
-    price: 80,
-    quantity: 1,
-    image: 'https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }]);
-  const updateQuantity = (id: string, newQuantity: number) => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCartItems = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const items = await cartService.getCart();
+      setCartItems(items);
+    } catch (err) {
+      setError("Falha ao carregar o carrinho.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCartItems();
+  }, [fetchCartItems]);
+
+  const handleUpdateQuantity = async (productId: string, currentQuantity: number, change: number) => {
+    const newQuantity = currentQuantity + change;
     if (newQuantity < 1) return;
-    setCartItems(prevItems => prevItems.map(item => item.id === id ? {
-      ...item,
-      quantity: newQuantity
-    } : item));
+
+    try {
+      await cartService.updateCartItem(productId, { produtoId: productId, quantidade: newQuantity });
+      fetchCartItems(); // Re-fetch to ensure consistency
+    } catch (err) {
+      setError("Falha ao atualizar a quantidade.");
+      console.error(err);
+    }
   };
-  const removeItem = (id: string) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+
+  const handleRemoveItem = async (productId: string) => {
+    try {
+      await cartService.removeFromCart(productId);
+      fetchCartItems();
+    } catch (err) {
+      setError("Falha ao remover o item.");
+      console.error(err);
+    }
   };
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.precoUnitario * item.quantidade, 0);
+
   return <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Link to="/products" className="text-emerald-600 hover:text-emerald-700">
@@ -41,37 +61,40 @@ const Cart: React.FC = () => {
         </Link>
         <h1 className="text-2xl font-bold text-gray-800">Meu Carrinho</h1>
       </div>
-      {cartItems.length > 0 ? <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      {error && <p className="text-red-500">{error}</p>}
+      {isLoading ? <p>Carregando carrinho...</p> :
+      cartItems.length > 0 ? <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Card>
               <div className="space-y-4">
-                {cartItems.map(item => <div key={item.id} className="flex items-center p-4 border border-gray-100 rounded-lg">
+                {cartItems.map(item => <div key={item.produtoId} className="flex items-center p-4 border border-gray-100 rounded-lg">
                     <div className="h-16 w-16 flex-shrink-0 rounded-md overflow-hidden">
-                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                      <img src={item.imagemUrl} alt={item.nomeProduto} className="h-full w-full object-cover" />
                     </div>
                     <div className="ml-4 flex-grow">
                       <h3 className="text-sm font-medium text-gray-800">
-                        {item.name}
+                        {item.nomeProduto}
                       </h3>
                       <p className="text-emerald-600 font-medium">
-                        R$ {item.price.toFixed(2)}
+                        R$ {item.precoUnitario.toFixed(2)}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 rounded-md border border-gray-300 hover:bg-gray-50">
+                      <button onClick={() => handleUpdateQuantity(item.produtoId, item.quantidade, -1)} className="p-1 rounded-md border border-gray-300 hover:bg-gray-50">
                         <MinusIcon size={14} />
                       </button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 rounded-md border border-gray-300 hover:bg-gray-50">
+                      <span className="w-8 text-center">{item.quantidade}</span>
+                      <button onClick={() => handleUpdateQuantity(item.produtoId, item.quantidade, 1)} className="p-1 rounded-md border border-gray-300 hover:bg-gray-50">
                         <PlusIcon size={14} />
                       </button>
                     </div>
                     <div className="ml-4 text-right w-20">
                       <p className="font-medium">
-                        R$ {(item.price * item.quantity).toFixed(2)}
+                        R$ {item.subtotal.toFixed(2)}
                       </p>
                     </div>
-                    <button onClick={() => removeItem(item.id)} className="ml-4 p-1 text-red-500 hover:text-red-700">
+                    <button onClick={() => handleRemoveItem(item.produtoId)} className="ml-4 p-1 text-red-500 hover:text-red-700">
                       <TrashIcon size={18} />
                     </button>
                   </div>)}
@@ -101,7 +124,7 @@ const Cart: React.FC = () => {
                     <Button fullWidth>Finalizar Compra</Button>
                   </Link>
                   <Link to="/products">
-                    <Button variant="secondary" fullWidth className="mt-2">
+                    <Button variant="secondary" fullWidth>
                       <ShoppingBagIcon size={16} className="mr-1" />
                       Continuar Comprando
                     </Button>

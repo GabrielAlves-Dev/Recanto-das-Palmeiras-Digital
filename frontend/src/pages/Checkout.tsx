@@ -1,46 +1,108 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, MapPinIcon, CreditCardIcon, CheckIcon } from 'lucide-react';
+import { Input } from '../components/ui/Input';
+import { ArrowLeftIcon, MapPinIcon, CheckIcon, ShoppingBagIcon } from 'lucide-react';
+import cartService from '../services/cart.service';
+import orderService from '../services/order.service';
+import api from '../services/api';
+import type { CartItem } from '../types/cart.types';
+import type { Address } from '../types/address.types';
+
+interface CustomerProfile {
+    nome: string;
+    telefone: string;
+    email: string;
+}
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
-  const [paymentMethod, setPaymentMethod] = useState('credit');
-  const cartItems = [{
-    id: '1',
-    name: 'Arranjo de Rosas',
-    price: 70,
-    quantity: 1,
-    image: 'https://images.unsplash.com/photo-1587556930799-8dca6fad6d71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }, {
-    id: '2',
-    name: 'Buquê Primavera',
-    price: 75,
-    quantity: 2,
-    image: 'https://images.unsplash.com/photo-1561181286-d5c88c3490c9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }, {
-    id: '3',
-    name: 'Orquídea Phalaenopsis',
-    price: 80,
-    quantity: 1,
-    image: 'https://images.unsplash.com/photo-1566616213894-2d4e1baee5d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'
-  }];
-  const address = {
-    street: 'Rua das Flores',
-    number: '123',
-    complement: 'Apto 45',
-    neighborhood: 'Jardim Primavera',
-    city: 'São Paulo',
-    state: 'SP',
-    zipCode: '01234-567'
-  };
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [customer, setCustomer] = useState<CustomerProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate('/orders', { state: { successMessage: 'Pedido realizado com sucesso!' } });
+  const [paymentMethod, setPaymentMethod] = useState('Cartão de Crédito');
+  const [observations, setObservations] = useState('');
+  const [address, setAddress] = useState<Address>({
+    rua: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
+    cep: '',
+  });
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const [items, profile] = await Promise.all([
+        cartService.getCart(),
+        api<CustomerProfile>('/clientes/me')
+      ]);
+      
+      if (items.length === 0) {
+        navigate('/cart');
+        return;
+      }
+
+      setCartItems(items);
+      setCustomer(profile);
+    } catch (err: any) {
+      setError(err.message || "Falha ao carregar os dados para o checkout.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setAddress(prev => ({ ...prev, [name]: value }));
   };
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await orderService.createOrder({
+        endereco: address,
+        itens: cartItems.map(item => ({
+          produtoId: item.produtoId,
+          quantidade: item.quantidade,
+        })),
+        formaPagamento: paymentMethod,
+        observacoes: observations,
+      });
+
+      await cartService.clearCart();
+      navigate('/orders', { state: { successMessage: 'Pedido realizado com sucesso!' } });
+    } catch (err: any) {
+      setError(err.message || "Ocorreu um erro ao finalizar o pedido. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  if (isLoading) {
+    return <div className="text-center p-8">Carregando checkout...</div>;
+  }
+  
+  if (error && !isSubmitting) {
+    return <div className="text-center p-8 text-red-600">{error}</div>;
+  }
 
   return <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -49,72 +111,73 @@ const Checkout: React.FC = () => {
         </Link>
         <h1 className="text-2xl font-bold text-gray-800">Finalizar Pedido</h1>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Card title="Endereço de Entrega">
-            <div className="flex items-start">
-              <MapPinIcon size={18} className="text-emerald-600 mr-2 mt-0.5" />
-              <div>
-                <p className="text-gray-800">
-                  {address.street}, {address.number}
-                  {address.complement && `, ${address.complement}`}
-                </p>
-                <p className="text-gray-600">{address.neighborhood}</p>
-                <p className="text-gray-600">
-                  {address.city} - {address.state}, {address.zipCode}
-                </p>
-              </div>
+            <div className="flex items-center mb-4">
+                <MapPinIcon size={18} className="text-emerald-600 mr-2" />
+                <p className="text-gray-800 font-medium">Preencha as informações para entrega</p>
             </div>
-            <div className="mt-4 text-right">
-              <Link to="/address-edit" className="text-sm text-emerald-600 hover:text-emerald-700">
-                Alterar endereço
-              </Link>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                    <Input label="Rua" id="rua" name="rua" value={address.rua} onChange={handleAddressChange} required />
+                </div>
+                <Input label="Número" id="numero" name="numero" value={address.numero} onChange={handleAddressChange} required />
+                <Input label="Complemento" id="complemento" name="complemento" value={address.complemento} onChange={handleAddressChange} />
+                <Input label="Bairro" id="bairro" name="bairro" value={address.bairro} onChange={handleAddressChange} required />
+                <Input label="Cidade" id="cidade" name="cidade" value={address.cidade} onChange={handleAddressChange} required />
+                <Input label="Estado (UF)" id="uf" name="uf" value={address.uf} onChange={handleAddressChange} required maxLength={2} />
+                <Input label="CEP" id="cep" name="cep" value={address.cep} onChange={handleAddressChange} required mask="00000-000" />
             </div>
           </Card>
           <Card title="Forma de Pagamento">
-            <form>
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <input id="credit" name="paymentMethod" type="radio" checked={paymentMethod === 'credit'} onChange={() => setPaymentMethod('credit')} className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300" />
-                  <label htmlFor="credit" className="ml-3 block text-sm font-medium text-gray-700">
-                    Cartão de Crédito
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input id="pix" name="paymentMethod" type="radio" checked={paymentMethod === 'pix'} onChange={() => setPaymentMethod('pix')} className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300" />
-                  <label htmlFor="pix" className="ml-3 block text-sm font-medium text-gray-700">
-                    PIX
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input id="cash" name="paymentMethod" type="radio" checked={paymentMethod === 'cash'} onChange={() => setPaymentMethod('cash')} className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300" />
-                  <label htmlFor="cash" className="ml-3 block text-sm font-medium text-gray-700">
-                    Dinheiro
-                  </label>
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <input id="credit" name="paymentMethod" type="radio" checked={paymentMethod === 'Cartão de Crédito'} onChange={() => setPaymentMethod('Cartão de Crédito')} className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300" />
+                <label htmlFor="credit" className="ml-3 block text-sm font-medium text-gray-700">
+                  Cartão de Crédito
+                </label>
               </div>
-            </form>
+              <div className="flex items-center">
+                <input id="pix" name="paymentMethod" type="radio" checked={paymentMethod === 'PIX'} onChange={() => setPaymentMethod('PIX')} className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300" />
+                <label htmlFor="pix" className="ml-3 block text-sm font-medium text-gray-700">
+                  PIX
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input id="cash" name="paymentMethod" type="radio" checked={paymentMethod === 'Dinheiro'} onChange={() => setPaymentMethod('Dinheiro')} className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300" />
+                <label htmlFor="cash" className="ml-3 block text-sm font-medium text-gray-700">
+                  Dinheiro
+                </label>
+              </div>
+            </div>
           </Card>
-          <Card title="Observações (opcional)">
-            <textarea rows={3} className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm" placeholder="Informações adicionais sobre o pedido ou entrega..." />
+          <Card title="Observações Adicionais (opcional)">
+            <textarea 
+              rows={3} 
+              className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm" 
+              placeholder="Ex: Ponto de referência, etc."
+              value={observations}
+              onChange={(e) => setObservations(e.target.value)}
+            />
           </Card>
         </div>
         <div className="lg:col-span-1">
           <Card title="Resumo do Pedido">
             <div className="space-y-4">
-              {cartItems.map(item => <div key={item.id} className="flex items-center">
+              {cartItems.map(item => <div key={item.produtoId} className="flex items-center">
                   <div className="h-12 w-12 flex-shrink-0 rounded-md overflow-hidden">
-                    <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                    <img src={item.imagemUrl} alt={item.nomeProduto} className="h-full w-full object-cover" />
                   </div>
                   <div className="ml-3 flex-grow">
                     <p className="text-sm font-medium text-gray-800">
-                      {item.name}{' '}
-                      <span className="text-gray-500">x {item.quantity}</span>
+                      {item.nomeProduto}{' '}
+                      <span className="text-gray-500">x {item.quantidade}</span>
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      R$ {(item.price * item.quantity).toFixed(2)}
+                      R$ {item.subtotal.toFixed(2)}
                     </p>
                   </div>
                 </div>)}
@@ -140,12 +203,13 @@ const Checkout: React.FC = () => {
                 </p>
               </div>
               <div className="pt-4">
-                <Button fullWidth onClick={handleSubmit}>
+                {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+                <Button type="submit" fullWidth disabled={isSubmitting}>
                   <CheckIcon size={16} className="mr-1" />
-                  Confirmar Pedido
+                  {isSubmitting ? 'Finalizando...' : 'Confirmar Pedido'}
                 </Button>
                 <Link to="/cart">
-                  <Button variant="secondary" fullWidth className="mt-2">
+                  <Button variant="secondary" fullWidth disabled={isSubmitting}>
                     Voltar ao Carrinho
                   </Button>
                 </Link>
@@ -153,7 +217,7 @@ const Checkout: React.FC = () => {
             </div>
           </Card>
         </div>
-      </div>
+      </form>
     </div>;
 };
 

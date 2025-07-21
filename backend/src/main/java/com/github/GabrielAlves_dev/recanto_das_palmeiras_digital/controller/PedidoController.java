@@ -41,6 +41,12 @@ public class PedidoController {
         return ResponseEntity.ok(pagina);
     }
 
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<Page<PedidoResponseDTO>> listarPedidosPorCliente(@PathVariable UUID clienteId, @PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
+        Page<PedidoResponseDTO> pagina = pedidoService.listarPorCliente(clienteId, pageable);
+        return ResponseEntity.ok(pagina);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> buscarPedidoPorId(@PathVariable UUID id) {
         PedidoResponseDTO responseDTO = pedidoService.buscarPorId(id);

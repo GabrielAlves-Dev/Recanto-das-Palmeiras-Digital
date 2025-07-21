@@ -102,17 +102,13 @@ const ProductEdit: React.FC = () => {
         await api(`/produtos/${id}`, {
           method: 'PUT',
           body: apiFormData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+
         });
       } else {
         await api('/produtos', {
           method: 'POST',
           body: apiFormData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+
         });
       }
       navigate('/products');

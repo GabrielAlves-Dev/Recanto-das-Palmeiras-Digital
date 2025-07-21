@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, EyeOffIcon, EditIcon } from 'lucide-react';
+import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, EyeOffIcon, EditIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -13,15 +13,6 @@ interface Customer {
     document: string;
     phone: string;
     email: string;
-    // address: {
-    //     street: string;
-    //     number: string;
-    //     complement: string;
-    //     neighborhood: string;
-    //     city: string;
-    //     state: string;
-    //     zipCode: string;
-    // };
     active: boolean;
     orderHistory: any[];
 }
@@ -152,12 +143,12 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
                     </>
                   ) : (
                     <>
-                        <Link to={`/customers/edit/${customer.id}`}>
+                        {isManager && <Link to={`/customers/edit/${customer.id}`}>
                             <Button variant="secondary">
                             <EditIcon size={16} className="mr-1" />
                             Editar Dados
                             </Button>
-                        </Link>
+                        </Link>}
                         {isManager && <Button variant="outline">
                             <EyeOffIcon size={16} className="mr-1" />
                             Desativar

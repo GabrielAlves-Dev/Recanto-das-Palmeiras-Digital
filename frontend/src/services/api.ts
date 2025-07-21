@@ -6,8 +6,7 @@ async function customFetch<T>(endpoint: string, options: RequestInit = {}): Prom
   const user = authService.getCurrentUser();
   const headers: Record<string, string> = {};
 
-  // Não definir Content-Type para FormData
-  if (!(options.body instanceof FormData)) {
+  if (options.body && typeof options.body === 'string') {
     headers['Content-Type'] = 'application/json';
   }
 

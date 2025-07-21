@@ -27,7 +27,7 @@ public class PedidoMapper {
     public PedidoResponseDTO toPedidoResponseDTO(Pedido pedido) {
         return PedidoResponseDTO.builder()
                 .id(pedido.getId())
-                .cliente(pedido.getCliente() != null ? ClienteResponseDTO.builder().nome(pedido.getCliente().getNome()).build() : ClienteResponseDTO.builder().nome("Venda Balcão").build())
+                .cliente(pedido.getCliente() != null ? ClienteResponseDTO.builder().nome(pedido.getCliente().getNome()).email(pedido.getCliente().getEmail()).telefone(pedido.getCliente().getTelefone()).build() : ClienteResponseDTO.builder().nome("Venda Balcão").build())
                 .vendedor(pedido.getUsuario() != null ? UsuarioResponseDTO.builder().nome(pedido.getUsuario().getNome()).build() : UsuarioResponseDTO.builder().nome("Venda Online").build())
                 .endereco(enderecoMapper.toDTO(pedido.getEndereco()))
                 .itens(pedido.getItens().stream().map(this::toPedidoItemResponseDTO).collect(Collectors.toList()))

@@ -84,13 +84,6 @@ const Login: React.FC = () => {
                   Cadastre-se
                 </Link>
               </p>
-              <div className="mt-4 text-sm text-gray-500">
-                <p>Para demonstração:</p>
-                <p>
-                  Use "gerente@email.com", "vendedor@email.com", ou qualquer
-                  outro e-mail
-                </p>
-              </div>
             </div>
           </form>
         </Card>

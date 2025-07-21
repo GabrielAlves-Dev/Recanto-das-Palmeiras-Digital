@@ -124,7 +124,7 @@ const Cart: React.FC = () => {
                     <Button fullWidth>Finalizar Compra</Button>
                   </Link>
                   <Link to="/products">
-                    <Button variant="secondary" fullWidth className="mt-2">
+                    <Button variant="secondary" fullWidth>
                       <ShoppingBagIcon size={16} className="mr-1" />
                       Continuar Comprando
                     </Button>

@@ -22,7 +22,6 @@ interface Customer {
     //     state: string;
     //     zipCode: string;
     // };
-    address: string;
     active: boolean;
     orderHistory: any[];
 }
@@ -66,7 +65,6 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
           document: data.cpfCnpj,
           phone: data.telefone,
           email: data.email,
-          address: data.endereco,
           active: data.ativo,
           orderHistory: orderHistory.content,
         });
@@ -175,7 +173,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
           <Card title="Endereço">
             <div className="flex items-start">
               <MapPinIcon size={18} className="text-emerald-600 mr-2 mt-0.5" />
-              <div>
+              {/* <div>
                 <p className="text-gray-800">
                   {customer.address.street}, {customer.address.number}
                   {customer.address.complement && `, ${customer.address.complement}`}
@@ -185,7 +183,7 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer: customerPro
                   {customer.address.city} - {customer.address.state},{' '}
                   {customer.address.zipCode}
                 </p>
-              </div>
+              </div> */}
             </div>
           </Card>
           <Card title="Histórico de Compras">

@@ -3,6 +3,8 @@ package com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.cliente.ClienteResponseDTO;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.usuario.UsuarioResponseDTO;
 
 @Component
 public class PedidoMapper {
@@ -20,8 +22,8 @@ public class PedidoMapper {
     public PedidoResponseDTO toPedidoResponseDTO(Pedido pedido) {
         return PedidoResponseDTO.builder()
                 .id(pedido.getId())
-                .nomeCliente(pedido.getCliente() != null ? pedido.getCliente().getNome() : "Venda Balcão")
-                .nomeVendedor(pedido.getUsuario() != null ? pedido.getUsuario().getNome() : "Venda Online")
+                .cliente(pedido.getCliente() != null ? ClienteResponseDTO.builder().nome(pedido.getCliente().getNome()).build() : ClienteResponseDTO.builder().nome("Venda Balcão").build())
+                .vendedor(pedido.getUsuario() != null ? UsuarioResponseDTO.builder().nome(pedido.getUsuario().getNome()).build() : UsuarioResponseDTO.builder().nome("Venda Online").build())
                 .itens(pedido.getItens().stream().map(this::toPedidoItemResponseDTO).collect(Collectors.toList()))
                 .dataPedido(pedido.getDataPedido())
                 .status(pedido.getStatus())

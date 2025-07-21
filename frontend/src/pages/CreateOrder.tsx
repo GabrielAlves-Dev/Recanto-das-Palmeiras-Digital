@@ -93,9 +93,9 @@ const CreateOrder: React.FC = () => {
     setOrderItems(prevItems => prevItems.filter(item => item.id !== id));
   };
   const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // For demo purposes, just navigate to orders
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    // Para demo, apenas redireciona para a página de pedidos
     navigate('/orders', { state: { successMessage: 'Pedido criado com sucesso!' } });
   };
   const getSelectedCustomer = () => {
@@ -276,7 +276,7 @@ const CreateOrder: React.FC = () => {
                   Salvar Pedido
                 </Button>
                 <Link to="/orders">
-                  <Button variant="secondary" fullWidth className="mt-2">
+                  <Button variant="secondary" fullWidth>
                     Cancelar
                   </Button>
                 </Link>

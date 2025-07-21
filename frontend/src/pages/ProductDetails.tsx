@@ -176,7 +176,7 @@ const ProductDetails: React.FC = () => {
                         <PlusIcon size={16} />
                       </button>
                     </div>
-                    <Button className="flex-1" disabled={!productData.active || productData.stock === 0 || isAdded} onClick={handleAddToCart}>
+                    <Button disabled={!productData.active || productData.stock === 0 || isAdded} onClick={handleAddToCart}>
                       {isAdded ? (
                         <span className="flex items-center justify-center">
                           <CheckCircleIcon size={18} className="mr-2" />
@@ -203,7 +203,6 @@ const ProductDetails: React.FC = () => {
                         variant={productData.active ? 'outline' : 'primary'}
                         size="md"
                         onClick={handleToggleActive}
-                        title={productData.active ? "Desativar Produto" : "Ativar Produto"}
                       >
                         {productData.active ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
                       </Button>

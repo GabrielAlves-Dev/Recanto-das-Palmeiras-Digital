@@ -174,8 +174,6 @@ const Customers: React.FC = () => {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage - 1)} 
                 disabled={currentPage === 0 || isLoading}
-                className="!p-2"
-                title="Página Anterior"
             >
                 <ArrowLeft size={16} />
             </Button>
@@ -187,8 +185,6 @@ const Customers: React.FC = () => {
                 size="sm"
                 onClick={() => setCurrentPage(currentPage + 1)} 
                 disabled={currentPage >= totalPages - 1 || isLoading}
-                className="!p-2"
-                title="Próxima Página"
             >
                 <ArrowRight size={16} />
             </Button>

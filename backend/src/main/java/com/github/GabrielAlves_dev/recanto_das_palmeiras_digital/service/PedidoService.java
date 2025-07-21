@@ -9,7 +9,6 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.Vali
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ClienteRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.PedidoRepository;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.ProdutoRepository;
-import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,9 +31,6 @@ public class PedidoService {
 
     @Autowired
     private ClienteRepository clienteRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private ProdutoRepository produtoRepository;

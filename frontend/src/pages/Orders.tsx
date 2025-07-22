@@ -61,9 +61,12 @@ const Orders: React.FC = () => {
       const params = new URLSearchParams();
       params.append('page', currentPage.toString());
       params.append('size', '10');
-      // Adicionar filtros de busca e status se o backend suportar
-      // if (searchQuery) params.append('search', searchQuery);
-      // if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (searchQuery) {
+        params.append('searchTerm', searchQuery);
+      }
+      if (statusFilter !== 'all') {
+        params.append('status', statusFilter);
+      }
 
       const response = await api<{ content: BackendOrder[], totalPages: number, number: number }>(`${endpoint}?${params.toString()}`);
       
@@ -86,7 +89,7 @@ const Orders: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, isCustomer]);
+  }, [currentPage, isCustomer, searchQuery, statusFilter]);
 
 
   useEffect(() => {
@@ -102,6 +105,12 @@ const Orders: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(0);
+    fetchOrders();
+  };
 
   const getStatusLabel = (status: string) => {
     const statusOption = statusOptions.find(opt => opt.value === status);
@@ -119,14 +128,6 @@ const Orders: React.FC = () => {
     }
   };
 
-
-  // Filtro local temporário, idealmente seria feito no backend
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) || order.customer.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
   return <div className="space-y-6">
       {successMessage && (
         <div className="mb-4 p-3 bg-green-100 text-green-700 border border-green-300 rounded-md flex items-center">
@@ -143,7 +144,7 @@ const Orders: React.FC = () => {
           </Link>}
       </div>
       <Card>
-        <div className="flex flex-col md:flex-row gap-4">
+        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-grow">
             <SearchIcon size={18} className="absolute left-3 top-2.5 text-gray-400" />
             <input type="text" placeholder="Buscar por ID do pedido ou cliente..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" />
@@ -154,35 +155,18 @@ const Orders: React.FC = () => {
                   {option.label}
                 </option>)}
             </select>
-            <Button variant="secondary" onClick={() => setShowFilters(!showFilters)}>
-              <FilterIcon size={18} className="mr-1" />
-              Mais Filtros
+            <Button type="submit">
+              <SearchIcon size={18} />
             </Button>
           </div>
-        </div>
-        {showFilters && <div className="mt-4 p-4 bg-gray-50 rounded-md">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data Inicial
-                </label>
-                <input type="date" className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data Final
-                </label>
-                <input type="date" className="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 block w-full text-sm" />
-              </div>
-            </div>
-          </div>}
+        </form>
       </Card>
 
       {error && <div className="p-3 bg-red-100 text-red-700 border border-red-300 rounded-md">{error}</div>}
 
       <Card>
         {isLoading && orders.length === 0 ? <p className="text-center py-12">Carregando pedidos...</p> :
-         !isLoading && filteredOrders.length === 0 ? <div className="text-center py-12">
+         !isLoading && orders.length === 0 ? <div className="text-center py-12">
             <ClipboardListIcon size={48} className="mx-auto text-gray-300" />
             <h3 className="mt-4 text-lg font-medium text-gray-800">
               Nenhum pedido encontrado
@@ -214,7 +198,7 @@ const Orders: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredOrders.map(order => <tr key={order.id}>
+                {orders.map(order => <tr key={order.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <ClipboardListIcon size={18} className="text-emerald-600 mr-2" />

@@ -15,4 +15,5 @@ public class CarrinhoItemResponseDTO {
     private Integer quantidade;
     private BigDecimal precoUnitario;
     private BigDecimal subtotal;
+    private Integer estoque;
 }

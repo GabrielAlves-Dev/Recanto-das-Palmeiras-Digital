@@ -75,7 +75,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/pedidos/meus-pedidos").hasRole("CLIENTE")
 
                         // Rotas administrativas
-                        .requestMatchers(HttpMethod.GET, "/pedidos", "/pedidos/{id}").hasAnyRole("GERENTE", "VENDEDOR")
+                        .requestMatchers(HttpMethod.GET, "/pedidos", "/pedidos/{id}").hasAnyRole("GERENTE", "VENDEDOR", "CLIENTE")
 
                         // Rota para o cliente criar um pedido
                         .requestMatchers(HttpMethod.POST, "/pedidos").hasAnyRole("CLIENTE", "GERENTE", "VENDEDOR")

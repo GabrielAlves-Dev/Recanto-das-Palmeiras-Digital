@@ -12,10 +12,11 @@ public class CarrinhoMapper {
         return CarrinhoItemResponseDTO.builder()
                 .produtoId(produto.getId())
                 .nomeProduto(produto.getNome())
-                .imagemUrl(produto.getImagem() != null ? "/uploads/" + produto.getImagem() : null)
+                .imagemUrl(produto.getImagem() != null ? "/uploads/" + produto.getImagem() : "/placeholder-image.jpg")
                 .quantidade(item.getQuantidade())
                 .precoUnitario(produto.getPreco())
                 .subtotal(produto.getPreco().multiply(new BigDecimal(item.getQuantidade())))
+                .estoque(produto.getQuantidade())
                 .build();
     }
 }

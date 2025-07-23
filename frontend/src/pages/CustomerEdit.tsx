@@ -52,7 +52,7 @@ const CustomerEdit: React.FC<CustomerEditProps> = ({ isOwnProfile = false }) => 
     if (id || isOwnProfile) {
       fetchUserData();
     }
-  }, [id]);
+  }, [id, isOwnProfile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

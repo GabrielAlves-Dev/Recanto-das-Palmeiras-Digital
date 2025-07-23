@@ -16,7 +16,7 @@ const MyProfileEdit: React.FC = () => {
 
   const isCustomer = currentUser.cargo === 'CLIENTE';
 
-  return isCustomer ? <CustomerEdit /> : <UserSelfEdit />;
+  return isCustomer ? <CustomerEdit isOwnProfile={true} /> : <UserSelfEdit />;
 };
 
 export default MyProfileEdit;

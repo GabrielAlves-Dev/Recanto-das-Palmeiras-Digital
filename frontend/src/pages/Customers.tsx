@@ -32,6 +32,7 @@ const Customers: React.FC = () => {
   const [actionError, setActionError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchCustomers = useCallback(async () => {
     setIsLoading(true);
@@ -40,6 +41,9 @@ const Customers: React.FC = () => {
       const params = new URLSearchParams();
       params.append('page', currentPage.toString());
       params.append('size', '10');
+      if (searchTerm) {
+        params.append('searchTerm', searchTerm);
+      }
 
       const response = await api<{ content: BackendCustomer[], totalPages: number, number: number }>(
         `/clientes?${params.toString()}`
@@ -65,7 +69,7 @@ const Customers: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage]);
+  }, [currentPage, searchTerm]);
 
   useEffect(() => {
     fetchCustomers();
@@ -81,6 +85,12 @@ const Customers: React.FC = () => {
       console.error(`Erro ao ${action} cliente:`, err);
       setActionError(err.message || `Falha ao ${action} o cliente. Tente novamente.`);
     }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(0);
+    fetchCustomers();
   };
 
   const isManager = userRole === 'gerente';
@@ -110,6 +120,19 @@ const Customers: React.FC = () => {
           {actionError}
         </div>
       )}
+
+      <Card>
+        <form onSubmit={handleSearch} className="flex items-center gap-4">
+          <input
+            type="text"
+            placeholder="Buscar por nome, email ou CPF/CNPJ..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+          />
+          <Button type="submit">Buscar</Button>
+        </form>
+      </Card>
       
       {isLoading && <div className="text-center py-4">Atualizando...</div>}
       
@@ -122,6 +145,14 @@ const Customers: React.FC = () => {
       <Card>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+              </tr>
+            </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {customers.map(customer => (
                 <tr key={customer.id}>

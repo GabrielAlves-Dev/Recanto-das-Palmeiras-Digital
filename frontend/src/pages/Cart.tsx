@@ -37,7 +37,7 @@ const Cart: React.FC = () => {
       await cartService.updateCartItem(productId, { produtoId: productId, quantidade: newQuantity });
       fetchCartItems(); // Re-fetch to ensure consistency
     } catch (err) {
-      setError("Falha ao atualizar a quantidade.");
+      setError(`Falha ao atualizar a quantidade: ${err.message || 'estoque insuficiente'}`);
       console.error(err);
     }
   };
@@ -85,7 +85,7 @@ const Cart: React.FC = () => {
                         <MinusIcon size={14} />
                       </button>
                       <span className="w-8 text-center">{item.quantidade}</span>
-                      <button onClick={() => handleUpdateQuantity(item.produtoId, item.quantidade, 1)} className="p-1 rounded-md border border-gray-300 hover:bg-gray-50">
+                      <button onClick={() => handleUpdateQuantity(item.produtoId, item.quantidade, 1)} className="p-1 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled={item.quantidade >= item.estoque}>
                         <PlusIcon size={14} />
                       </button>
                     </div>

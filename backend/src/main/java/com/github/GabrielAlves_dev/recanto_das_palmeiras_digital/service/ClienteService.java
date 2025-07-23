@@ -6,6 +6,7 @@ import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.NotF
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.exceptions.ValidationException;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.domain.pedido.StatusPedido;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.repository.PedidoRepository;
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.specifications.ClienteSpecification;
 import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.util.CpfCnpjUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,7 +164,8 @@ public class ClienteService {
         repository.save(cliente);
     }
 
-    public Page<ClienteResponseDTO> listar(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponseDTO);
+    public Page<ClienteResponseDTO> listar(Pageable pageable, String searchTerm) {
+        return repository.findAll(ClienteSpecification.search(searchTerm), pageable)
+                .map(mapper::toResponseDTO);
     }
 }

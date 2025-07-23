@@ -19,6 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.github.GabrielAlves_dev.recanto_das_palmeiras_digital.specifications.PedidoSpecification;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,8 +120,9 @@ public class PedidoService {
         return pedidoMapper.toPedidoResponseDTO(pedidoSalvo);
     }
 
-    public Page<PedidoResponseDTO> listarTodos(Pageable pageable) {
-        return pedidoRepository.findAll(pageable).map(pedidoMapper::toPedidoResponseDTO);
+    public Page<PedidoResponseDTO> listarTodos(Pageable pageable, String searchTerm) {
+        Specification<Pedido> spec = Specification.where(PedidoSpecification.searchByClienteName(searchTerm));
+        return pedidoRepository.findAll(spec, pageable).map(pedidoMapper::toPedidoResponseDTO);
     }
 
     public Page<PedidoResponseDTO> listarPorCliente(UUID clienteId, Pageable pageable) {

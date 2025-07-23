@@ -5,6 +5,7 @@ export interface CartItem {
   quantidade: number;
   precoUnitario: number;
   subtotal: number;
+  estoque: number;
 }
 
 export interface CartItemRequest {

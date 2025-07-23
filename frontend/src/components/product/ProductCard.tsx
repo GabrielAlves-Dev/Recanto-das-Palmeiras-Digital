@@ -100,7 +100,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
 
   return (
     <Link to={`/products/${product.id}`} className="block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all hover:shadow-md">
-      <div className="h-40 overflow-hidden relative">
+      <div className="h-56 overflow-hidden relative">
         <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" />
         {(isManager || isSeller) && !product.active && (
           <div className="absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 z-10">

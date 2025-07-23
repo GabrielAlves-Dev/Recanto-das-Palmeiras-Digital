@@ -46,8 +46,11 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ClienteResponseDTO>> listar(@PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(service.listar(pageable));
+    public ResponseEntity<Page<ClienteResponseDTO>> listar(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) String searchTerm
+    ) {
+        return ResponseEntity.ok(service.listar(pageable, searchTerm));
     }
 
     @GetMapping("/{id}")

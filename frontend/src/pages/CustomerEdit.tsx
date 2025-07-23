@@ -13,7 +13,11 @@ interface BackendCustomerData {
     cpfCnpj: string;
 }
 
-const CustomerEdit: React.FC = () => {
+interface CustomerEditProps {
+  isOwnProfile?: boolean;
+}
+
+const CustomerEdit: React.FC<CustomerEditProps> = ({ isOwnProfile = false }) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState({
@@ -29,7 +33,8 @@ const CustomerEdit: React.FC = () => {
     const fetchUserData = async () => {
       setIsLoading(true);
       try {
-        const data = await api<BackendCustomerData>(`/clientes/${id}`);
+        const endpoint = isOwnProfile ? '/clientes/me' : `/clientes/${id}`;
+        const data = await api<BackendCustomerData>(endpoint);
         setFormData({
           nome: data.nome,
           telefone: data.telefone,
@@ -44,10 +49,10 @@ const CustomerEdit: React.FC = () => {
       }
     };
 
-    if (id) {
+    if (id || isOwnProfile) {
       fetchUserData();
     }
-  }, [id]);
+  }, [id, isOwnProfile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,11 +64,13 @@ const CustomerEdit: React.FC = () => {
     setError(null);
     setIsLoading(true);
     try {
-      await api(`/clientes/${id}`, {
+      const endpoint = isOwnProfile ? '/clientes/me' : `/clientes/${id}`;
+      await api(endpoint, {
         method: 'PUT',
         body: JSON.stringify(formData),
       });
-      navigate(`/customers/${id}`, { state: { successMessage: 'Dados atualizados com sucesso!' } });
+      const destination = isOwnProfile ? '/my-profile' : `/customers/${id}`;
+      navigate(destination, { state: { successMessage: 'Dados atualizados com sucesso!' } });
     } catch (err: any) {
       setError(err.message || 'Falha ao atualizar os dados. Verifique as informações e tente novamente.');
     } finally {
@@ -79,7 +86,7 @@ const CustomerEdit: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <Link to={`/customers/${id}`} className="inline-flex items-center text-emerald-600 mb-4">
+          <Link to={isOwnProfile ? '/my-profile' : `/customers/${id}`} className="inline-flex items-center text-emerald-600 mb-4">
             <ArrowLeftIcon size={16} className="mr-1" />
             Voltar para Detalhes do Cliente
           </Link>

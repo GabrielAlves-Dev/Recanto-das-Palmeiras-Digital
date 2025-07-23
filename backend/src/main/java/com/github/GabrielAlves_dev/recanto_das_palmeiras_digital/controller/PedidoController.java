@@ -30,8 +30,11 @@ public class PedidoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<PedidoResponseDTO>> listarTodosOsPedidos(@PageableDefault(size = 10, sort = "dataPedido") Pageable pageable) {
-        Page<PedidoResponseDTO> pagina = pedidoService.listarTodos(pageable);
+    public ResponseEntity<Page<PedidoResponseDTO>> listarTodosOsPedidos(
+            @PageableDefault(size = 10, sort = "dataPedido") Pageable pageable,
+            @RequestParam(required = false) String searchTerm
+    ) {
+        Page<PedidoResponseDTO> pagina = pedidoService.listarTodos(pageable, searchTerm);
         return ResponseEntity.ok(pagina);
     }
 

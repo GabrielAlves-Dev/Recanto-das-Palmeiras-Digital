@@ -31,7 +31,7 @@ const Register: React.FC = () => {
       return;
     }
     try {
-      const response = await api('/clientes/auto-cadastro', {
+      await api('/clientes/auto-cadastro', { // Removed unused 'response' variable
         method: 'POST',
         body: JSON.stringify({
           nome: formData.fullName,

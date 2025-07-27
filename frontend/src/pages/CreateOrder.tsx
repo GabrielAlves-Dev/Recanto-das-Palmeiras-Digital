@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+// import { Input } from '../components/ui/Input'; // Removed unused import
 import { ArrowLeftIcon, SearchIcon, UserPlusIcon, PlusIcon, MinusIcon, TrashIcon, SaveIcon } from 'lucide-react';
 
 const CreateOrder: React.FC = () => {
@@ -95,7 +95,7 @@ const CreateOrder: React.FC = () => {
   const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    // Para demo, apenas redireciona para a página de pedidos
+    // For demo, just redirect to the orders page
     navigate('/orders', { state: { successMessage: 'Pedido criado com sucesso!' } });
   };
   const getSelectedCustomer = () => {

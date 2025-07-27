@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { ArrowLeftIcon, MapPinIcon, CheckIcon, ShoppingBagIcon } from 'lucide-react';
+import { ArrowLeftIcon, MapPinIcon, CheckIcon } from 'lucide-react'; // Removed ShoppingBagIcon
 import cartService from '../services/cart.service';
 import orderService from '../services/order.service';
 import api from '../services/api';
@@ -19,7 +19,7 @@ interface CustomerProfile {
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [customer, setCustomer] = useState<CustomerProfile | null>(null);
+  // const [customer, setCustomer] = useState<CustomerProfile | null>(null); // Removed unused state
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ const Checkout: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [items, profile] = await Promise.all([
+      const [items] = await Promise.all([ // Removed profile from destructuring
         cartService.getCart(),
         api<CustomerProfile>('/clientes/me')
       ]);
@@ -51,7 +51,7 @@ const Checkout: React.FC = () => {
       }
 
       setCartItems(items);
-      setCustomer(profile);
+      // setCustomer(profile); // Removed setting customer state
     } catch (err: any) {
       setError(err.message || "Falha ao carregar os dados para o checkout.");
       console.error(err);

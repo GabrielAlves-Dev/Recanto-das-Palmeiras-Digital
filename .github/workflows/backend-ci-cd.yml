@@ -29,7 +29,7 @@ jobs:
         run: chmod +x backend/mvnw
 
       - name: Build and Package Backend
-        run: |
+        run:
           cd backend
           ./mvnw clean install -DskipTests
           mv target/*.jar target/recanto-das-palmeiras-digital-0.0.1-SNAPSHOT.jar

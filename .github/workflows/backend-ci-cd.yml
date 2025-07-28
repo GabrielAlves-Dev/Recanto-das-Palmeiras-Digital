@@ -29,7 +29,6 @@ jobs:
         run: chmod +x backend/mvnw
 
       - name: Build and Package Backend
-        - name: Build and Package Backend
         run: |
           ./mvnw clean install -DskipTests
           mv target/*.jar target/app.jar

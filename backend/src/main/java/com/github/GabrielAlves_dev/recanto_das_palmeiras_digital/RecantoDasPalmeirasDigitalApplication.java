@@ -10,6 +10,5 @@ public class RecantoDasPalmeirasDigitalApplication {
 		SpringApplication.run(RecantoDasPalmeirasDigitalApplication.class, args);
 		System.out.println("Recanto-das-Palmeiras application started");
 		System.out.println("Ativa ai paizao");
-		System.out.println("Ativa ai paizao 2");
 	}
 }

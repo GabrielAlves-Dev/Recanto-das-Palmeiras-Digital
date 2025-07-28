@@ -1,0 +1,48 @@
+name: Frontend CI/CD to S3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+
+env:
+  AWS_REGION: us-east-1
+  S3_BUCKET_NAME: recanto-das-palmeiras-frontend
+  FRONTEND_DIR: /
+  BUILD_DIR: dist
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.7.0'
+
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: Build Frontend
+        run: npm run build
+        working-directory: ${{ env.FRONTEND_DIR }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy S3 website
+        run: |
+          aws s3 sync ${{ env.BUILD_DIR }} s3://${{ env.S3_BUCKET_NAME }} --delete
+          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/index.html s3://${{ env.S3_BUCKET_NAME }}/index.html --metadata-directive REPLACE --content-type text/html --cache-control max-age=0,no-cache,no-store,must-revalidate --acl public-read
+          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/index.html s3://${{ env.S3_BUCKET_NAME }}/404.html --metadata-directive REPLACE --content-type text/html --cache-control max-age=0,no-cache,no-store,must-revalidate --acl public-read
+        working-directory: ${{ env.FRONTEND_DIR }}

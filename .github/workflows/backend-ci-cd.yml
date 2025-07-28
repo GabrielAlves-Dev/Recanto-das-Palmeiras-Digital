@@ -26,8 +26,8 @@ jobs:
           distribution: 'corretto'
 
       - name: Grant execute permission for mvnw
-        run: chmod +x backend/mvnw
-        working-directory: backend
+        run: chmod +x mvnw
+        working-directory: ./backend
 
       - name: Build and Package Backend
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - name: Create deployment package (ZIP)
         run: |
-          zip -j backend-deploy.zip backend/target/app.jar # O -j "junk paths" coloca o JAR na raiz do zip
+          zip -j backend-deploy.zip Recanto-das-Palmeiras-Digital-infra-aws/backend/target/app.jar
           ls -l backend-deploy.zip # Comando opcional para listar o arquivo zip e verificar se foi criado
 
       - name: Deploy to Elastic Beanstalk
@@ -57,4 +57,4 @@ jobs:
           environment_name: ${{ env.EB_ENVIRONMENT_NAME }}
           version_label: ${{ github.sha }}
           region: ${{ env.AWS_REGION }}
-          deployment_package: backend-deploy.zip # Aponta para o arquivo ZIP que contém o JAR
+          deployment_package: backend-deploy.zip

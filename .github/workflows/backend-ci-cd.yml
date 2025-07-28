@@ -29,9 +29,10 @@ jobs:
         run: chmod +x backend/mvnw
 
       - name: Build and Package Backend
-        run:
+        - name: Build and Package Backend
+        run: |
           ./mvnw clean install -DskipTests
-          mv target/*.jar target/recanto-das-palmeiras-digital-0.0.1-SNAPSHOT.jar
+          mv target/*.jar target/app.jar
         working-directory: ./backend
 
       - name: Configure AWS Credentials

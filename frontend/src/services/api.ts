@@ -1,6 +1,6 @@
 import authService from './auth.service';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://recanto-das-palmeiras-app-env-2.eba-9qiwb4db.us-east-1.elasticbeanstalk.com';
 
 async function customFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const user = authService.getCurrentUser();

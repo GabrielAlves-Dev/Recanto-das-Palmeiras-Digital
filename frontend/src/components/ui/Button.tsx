@@ -5,8 +5,9 @@ interface ButtonProps {
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   type?: 'button' | 'submit' | 'reset';
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
+  title?: string; // Added the title prop here
 }
 const Button: React.FC<ButtonProps> = ({
   children,
@@ -15,7 +16,8 @@ const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   type = 'button',
   onClick,
-  disabled = false
+  disabled = false,
+  title // Destructure title prop
 }) => {
   const baseClasses = 'rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
   const variantClasses = {
@@ -37,7 +39,9 @@ const Button: React.FC<ButtonProps> = ({
         ${sizeClasses[size]}
         ${widthClass}
         ${disabledClass}
-      `}>
+      `}
+      title={title} // Apply title prop to the button element
+      >
       {children}
     </button>;
 };

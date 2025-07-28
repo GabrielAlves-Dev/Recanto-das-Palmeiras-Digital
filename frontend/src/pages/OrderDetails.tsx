@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, MapPinIcon, CreditCardIcon, EditIcon, XIcon } from 'lucide-react';
+import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, CreditCardIcon, EditIcon, XIcon } from 'lucide-react'; // Removed MapPinIcon
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import type { Address } from '../types/address.types';

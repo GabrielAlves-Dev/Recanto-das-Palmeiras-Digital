@@ -1,3 +1,4 @@
+// src/pages/Cart.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/Card';
@@ -17,8 +18,8 @@ const Cart: React.FC = () => {
     try {
       const items = await cartService.getCart();
       setCartItems(items);
-    } catch (err) {
-      setError("Falha ao carregar o carrinho.");
+    } catch (err: unknown) { // Explicitly catch as unknown
+      setError(`Falha ao carregar o carrinho: ${(err as Error).message || 'erro desconhecido'}`); // Type assertion
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -36,8 +37,8 @@ const Cart: React.FC = () => {
     try {
       await cartService.updateCartItem(productId, { produtoId: productId, quantidade: newQuantity });
       fetchCartItems(); // Re-fetch to ensure consistency
-    } catch (err) {
-      setError(`Falha ao atualizar a quantidade: ${err.message || 'estoque insuficiente'}`);
+    } catch (err: unknown) { // Explicitly catch as unknown
+      setError(`Falha ao atualizar a quantidade: ${(err as Error).message || 'estoque insuficiente'}`); // Type assertion
       console.error(err);
     }
   };

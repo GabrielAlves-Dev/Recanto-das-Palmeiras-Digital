@@ -15,6 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const renderNavItems = () => {
+    // Ensure `userRole` is compared with lowercase versions of the roles
     if (userRole === 'gerente') {
       return <>
           <NavItem to="/products" icon={<ShoppingBagIcon size={20} />} label="Produtos" active={isActive('/products')} />

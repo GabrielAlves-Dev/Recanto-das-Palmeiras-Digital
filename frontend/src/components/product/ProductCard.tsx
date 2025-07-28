@@ -19,7 +19,7 @@ export interface ProductCardProps {
   onToggleActive?: (productId: string, currentStatus: boolean) => void;
 }
 
-const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e: React.MouseEvent) => void, isAdded: boolean }> = ({ product, onClickAddToCart, isAdded }) => (
+const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e: React.MouseEvent<HTMLButtonElement>) => void, isAdded: boolean }> = ({ product, onClickAddToCart, isAdded }) => (
   <Button
     fullWidth
     size="md"
@@ -40,14 +40,14 @@ const CustomerProductActions: React.FC<{ product: Product, onClickAddToCart: (e:
   </Button>
 );
 
-const SellerProductActions: React.FC<{ onClickEdit: (e: React.MouseEvent) => void }> = ({ onClickEdit }) => (
+const SellerProductActions: React.FC<{ onClickEdit: (e: React.MouseEvent<HTMLButtonElement>) => void }> = ({ onClickEdit }) => (
     <Button variant="secondary" size="sm" fullWidth onClick={onClickEdit}>
       <EditIcon size={14} className="mr-1" />
       Editar
     </Button>
 );
 
-const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (productId: string, currentStatus: boolean) => void, onClickEdit: (e: React.MouseEvent) => void }> = ({ product, onToggleActive, onClickEdit }) => (
+const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (productId: string, currentStatus: boolean) => void, onClickEdit: (e: React.MouseEvent<HTMLButtonElement>) => void }> = ({ product, onToggleActive, onClickEdit }) => (
   <>
     <Button variant="secondary" size="md" fullWidth onClick={onClickEdit}>
         <span className="flex items-center justify-center">
@@ -59,7 +59,7 @@ const ManagerProductActions: React.FC<{ product: Product, onToggleActive?: (prod
       <Button
         variant={product.active ? 'outline' : 'primary'}
         size="sm"
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => { // Explicitly define type of 'e'
           e.preventDefault();
           e.stopPropagation();
           onToggleActive(product.id, product.active);
@@ -79,7 +79,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
   const isSeller = userRole === 'vendedor';
   const isCustomer = userRole === 'cliente';
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     try {
@@ -92,7 +92,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, userRole, onT
     }
   };
 
-  const handleEditClick = (e: React.MouseEvent) => {
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     navigate(`/products/edit/${product.id}`);

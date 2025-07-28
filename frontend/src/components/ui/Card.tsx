@@ -1,10 +1,12 @@
 import React, { type ReactNode } from 'react';
+
 interface CardProps {
   children: ReactNode;
   title?: string;
   className?: string;
 }
-const Card: React.FC<CardProps> = ({
+
+const Card: React.FC<CardProps> = ({ // Changed from React.FC<{}> to React.FC<CardProps>
   children,
   title,
   className = ''
@@ -16,4 +18,5 @@ const Card: React.FC<CardProps> = ({
       <div className="p-6">{children}</div>
     </div>;
 };
+
 export default Card;

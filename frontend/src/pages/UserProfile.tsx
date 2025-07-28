@@ -1,9 +1,9 @@
+// src/pages/UserProfile.tsx
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Removed useNavigate since 'navigate' is no longer used.
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { ArrowLeftIcon, UserIcon, PhoneIcon, MailIcon, EyeOffIcon, EditIcon } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { UserIcon, MailIcon, EditIcon } from 'lucide-react';
 import api from '../services/api';
 
 interface User {
@@ -23,7 +23,7 @@ interface BackendUserData {
 }
 
 const UserProfile: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Removed the unused navigate declaration
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
 

@@ -27,7 +27,7 @@ jobs:
 
       - name: Grant execute permission for mvnw
         run: chmod +x backend/mvnw
-        working-directory: ./backend
+        working-directory: backend
 
       - name: Build and Package Backend
         run: |

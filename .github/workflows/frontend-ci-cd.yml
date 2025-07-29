@@ -10,7 +10,7 @@ on:
 env:
   AWS_REGION: us-east-1
   S3_BUCKET_NAME: recanto-das-palmeiras-frontend
-  FRONTEND_DIR: /
+  FRONTEND_DIR: ./frontend # Ajuste o diretório para 'frontend'
   BUILD_DIR: dist
 
 jobs:
@@ -25,8 +25,10 @@ jobs:
         with:
           node-version: '22.7.0'
 
-      - name: Install Frontend Dependencies
-        run: npm install
+      - name: Clean npm cache and Install Frontend Dependencies
+        run: |
+          npm cache clean --force # Adicionado para limpar o cache do npm
+          npm install
         working-directory: ${{ env.FRONTEND_DIR }}
 
       - name: Build Frontend

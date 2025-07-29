@@ -30,7 +30,8 @@ export function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           
-
+          {/* Alteracao para ativar o trigger */}
+      
           <Route element={<Layout />}>
             
             <Route element={<RoleBasedRoute allowedRoles={['CLIENTE', 'VENDEDOR', 'GERENTE']} />}>

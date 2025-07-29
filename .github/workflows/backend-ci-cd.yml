@@ -47,6 +47,7 @@ jobs:
         run: |
           zip -j backend-deploy.zip target/app.jar
           ls -l backend-deploy.zip
+        working-directory: ./backend
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21

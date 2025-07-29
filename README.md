@@ -16,8 +16,8 @@ O principal stakeholder e inspiração para o projeto foi a floricultura **Recan
 * Gabriel Alves
 * Tiago Tito
 * Robson José
-
-*Com agradecimentos especiais a Gustavo Fernandes pela colaboração.*
+* Matheus Santos
+* Gustano Fernandes
 
 ### ✨ Destaques e Funcionalidades
 
@@ -184,8 +184,8 @@ The main stakeholder and inspiration for the project was the **Recanto das Palme
 * Gabriel Alves
 * Tiago Tito
 * Robson José
-
-*With special thanks to Gustavo Fernandes for his collaboration.*
+* Matheus Santos
+* Gustano Fernandes
 
 ### ✨ Highlights & Features
 

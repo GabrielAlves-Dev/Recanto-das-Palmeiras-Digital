@@ -10,7 +10,7 @@ on:
 env:
   AWS_REGION: us-east-1
   S3_BUCKET_NAME: recanto-das-palmeiras-frontend
-  FRONTEND_DIR: ./frontend # Ajuste o diretório para 'frontend'
+  FRONTEND_DIR: ./frontend
   BUILD_DIR: dist
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Clean npm cache and Install Frontend Dependencies
         run: |
-          npm cache clean --force # Adicionado para limpar o cache do npm
+          npm cache clean --force
           npm install
         working-directory: ${{ env.FRONTEND_DIR }}
 
@@ -46,6 +46,6 @@ jobs:
       - name: Deploy S3 website
         run: |
           aws s3 sync ${{ env.BUILD_DIR }} s3://${{ env.S3_BUCKET_NAME }} --delete
-          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/index.html s3://${{ env.S3_BUCKET_NAME }}/index.html --metadata-directive REPLACE --content-type text/html --cache-control max-age=0,no-cache,no-store,must-revalidate --acl public-read
-          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/index.html s3://${{ env.S3_BUCKET_NAME }}/404.html --metadata-directive REPLACE --content-type text/html --cache-control max-age=0,no-cache,no-store,must-revalidate --acl public-read
+          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/index.html s3://${{ env.S3_BUCKET_NAME }}/index.html --metadata-directive REPLACE --content-type text/html --cache-control max-age=0,no-cache,no-store,must-revalidate
+          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/index.html s3://${{ env.S3_BUCKET_NAME }}/404.html --metadata-directive REPLACE --content-type text/html --cache-control max-age=0,no-cache,no-store,must-revalidate
         working-directory: ${{ env.FRONTEND_DIR }}

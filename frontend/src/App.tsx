@@ -31,7 +31,6 @@ export function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           
           {/* Alteracao para ativar o trigger */}
-          {/* Alteracao para ativar o trigger */}
           
           <Route element={<Layout />}>
             

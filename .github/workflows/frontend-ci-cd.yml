@@ -33,8 +33,6 @@ jobs:
 
       - name: Build Frontend
         run: npm run build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         working-directory: ${{ env.FRONTEND_DIR }}
 
       - name: Configure AWS Credentials

@@ -461,8 +461,8 @@ COPY public.token_recuperacao_senha (id, token, usuario_id, cliente_id, data_exp
 --
 
 COPY public.usuario (id, nome, email, telefone, cargo, senha, ativo) FROM stdin;
-1d597886-eb5d-4eef-b3ba-e46cb99be88d	Gabriel Alves	gerente@email.com	(85) 99999-0001	GERENTE	$2a$10$mWQ.NXQfWrog0Nria99v3uUWwCc0cjJsdQLs2HRHLuAeVjHjD7x3q	t
-91f643d6-228a-49ee-85de-0b58cce766d3	Tiago Tito	vendedor@email.com	(85) 99999-0002	VENDEDOR	$2a$10$mWQ.NXQfWrog0Nria99v3uUWwCc0cjJsdQLs2HRHLuAeVjHjD7x3q	t
+1d597886-eb5d-4eef-b3ba-e46cb99be88d	Gabriel Alves	gerente@email.com	(85) 99999-0001	GERENTE	$2a$10$rUyN34DLtM2NX/ZNnPZAlOJCMboEIlpUU9dYihs4SwPwaRFOqa.Gu	t
+91f643d6-228a-49ee-85de-0b58cce766d3	Tiago Tito	vendedor@email.com	(85) 99999-0002	VENDEDOR	$2a$10$rUyN34DLtM2NX/ZNnPZAlOJCMboEIlpUU9dYihs4SwPwaRFOqa.Gu	t
 \.
 
 
